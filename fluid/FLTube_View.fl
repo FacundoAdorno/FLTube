@@ -1,0 +1,115 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0311
+header_name {.h}
+code_name {.cxx}
+comment {/*
+ * Copyright (C) 2025 - FLtube
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License, version 3, as published
+ * by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ */} {in_source in_header
+}
+
+widget_class FLTubeMainWindow {
+  label FLTube open selected
+  xywh {568 142 800 618} type Double
+  class Fl_Double_Window visible
+} {
+  Fl_Group {} {
+    label {Search box:} open
+    xywh {10 35 575 85} box UP_FRAME labelfont 1 align 5
+  } {
+    Fl_Input search_term_or_url {
+      label {Term or URL}
+      tooltip {Enter a search term for search or a valid Youtube URL.} xywh {46 59 512 24} align 1
+    }
+    Fl_Button do_search_bttn {
+      label {Go search!}
+      user_data search_term_or_url
+      tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 88 150 22}
+    }
+  }
+  Fl_Group search_result_selectors {
+    xywh {10 125 575 460} box THIN_UP_BOX
+  } {}
+  Fl_Text_Display output_text_display {
+    label {Output log:}
+    xywh {600 35 185 550} align 5 textsize 12
+  }
+  Fl_Group pagination_controls {open
+    xywh {10 585 575 30}
+  } {
+    Fl_Button previous_results_bttn {
+      label {<Previous}
+      tooltip {Get previous results of current search results set.} xywh {135 587 135 25}
+    }
+    Fl_Button next_results_bttn {
+      label {Next>}
+      tooltip {Get following results of current search results set.} xywh {285 587 135 25}
+    }
+  }
+}
+
+widget_class VideoInfo {open
+  xywh {609 283 577 91} type Double hide position_relative
+} {
+  Fl_Box thumbnail {
+    tooltip {Click to stream the video (PREVIEW it)...} xywh {6 5 95 80} box UP_BOX
+  }
+  Fl_Box title {
+    label {Video title}
+    tooltip {video title} xywh {105 8 455 24} labelfont 1 align 213
+  }
+  Fl_Box duration {
+    label {00:10:00}
+    tooltip duration xywh {110 31 70 20} labelfont 2 align 20
+  }
+  Fl_Box uploadDate {
+    label {(10-11-2010)}
+    tooltip {Upload date} xywh {190 31 95 20} labelfont 2 align 20
+  }
+  Fl_Button userUploader {
+    label {Uploaded by: Pepe}
+    tooltip {Click to list all channel's video.} xywh {295 31 260 20} labelfont 2 align 20
+  }
+  Fl_Button d240 {
+    label 240p
+    xywh {110 58 55 25}
+  }
+  Fl_Button d360 {
+    label 360p
+    xywh {176 58 55 25}
+  }
+  Fl_Button d480 {
+    label 480p
+    xywh {242 58 55 25}
+  }
+  Fl_Button d720 {
+    label 720p
+    xywh {308 58 55 25}
+  }
+  Fl_Button d1080 {
+    label 1080p
+    xywh {375 58 55 25}
+  }
+}
+
+widget_class TinyMessageWindow {
+  label Error
+  xywh {632 398 649 100} type Double hide
+  class Fl_Double_Window modal
+} {
+  Fl_Box error_label {
+    xywh {30 15 590 45} align 128
+  }
+  Fl_Button close_bttn {
+    label {&Close and exit}
+    xywh {267 70 115 25} shortcut 0x80063
+  }
+}
