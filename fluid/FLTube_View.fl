@@ -17,7 +17,7 @@ comment {/*
 }
 
 widget_class FLTubeMainWindow {
-  label FLTube open selected
+  label FLTube
   xywh {568 142 800 618} type Double
   class Fl_Double_Window visible
 } {
@@ -30,7 +30,7 @@ widget_class FLTubeMainWindow {
       tooltip {Enter a search term for search or a valid Youtube URL.} xywh {46 59 512 24} align 1
     }
     Fl_Button do_search_bttn {
-      label {Go search!}
+      label {Go &search!}
       user_data search_term_or_url
       tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 88 150 22}
     }
@@ -40,27 +40,39 @@ widget_class FLTubeMainWindow {
   } {}
   Fl_Text_Display output_text_display {
     label {Output log:}
-    xywh {600 35 185 550} align 5 textsize 12
+    xywh {600 35 190 550} align 5 textsize 12
   }
   Fl_Group pagination_controls {open
-    xywh {10 585 575 30}
+    xywh {10 586 310 30}
   } {
     Fl_Button previous_results_bttn {
-      label {<Previous}
-      tooltip {Get previous results of current search results set.} xywh {135 587 135 25}
+      label {<&Previous}
+      tooltip {Get previous results of current search results set.} xywh {25 588 135 23}
     }
     Fl_Button next_results_bttn {
-      label {Next>}
-      tooltip {Get following results of current search results set.} xywh {285 587 135 25}
+      label {&Next>}
+      tooltip {Get following results of current search results set.} xywh {175 588 135 23}
+    }
+  }
+  Fl_Group download_dir_selection {open
+    xywh {320 586 470 34} box GLEAM_DOWN_FRAME
+  } {
+    Fl_Input video_download_directory {
+      label {Download Dir:}
+      xywh {417 590 300 24} labelfont 1 labelsize 12 textsize 12
+    }
+    Fl_Button change_dwl_dir_bttn {
+      label Change
+      tooltip {Click to change download directory.} xywh {722 591 64 22}
     }
   }
 }
 
-widget_class VideoInfo {open
+widget_class VideoInfo {
   xywh {609 283 577 91} type Double hide position_relative
 } {
-  Fl_Box thumbnail {
-    tooltip {Click to stream the video (PREVIEW it)...} xywh {6 5 95 80} box UP_BOX
+  Fl_Button thumbnail {
+    tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
   }
   Fl_Box title {
     label {Video title}
@@ -111,5 +123,27 @@ widget_class TinyMessageWindow {
   Fl_Button close_bttn {
     label {&Close and exit}
     xywh {267 70 115 25} shortcut 0x80063
+  }
+}
+
+widget_class TinyChoiceWindow {
+  label Warn open
+  xywh {642 408 649 118} type Double
+  class Fl_Double_Window modal visible
+} {
+  Fl_Box choice_label {
+    xywh {30 15 590 45} align 128
+  }
+  Fl_Button accept_bttn {
+    label {&Accept}
+    xywh {180 85 115 25} shortcut 0x80061
+  }
+  Fl_Button cancel_bttn {
+    label {&Cancel}
+    xywh {334 85 115 25} shortcut 0x80063
+  }
+  Fl_Check_Button warnme_again_check {
+    label {Don't warn me again and ACCEPT always.} selected
+    tooltip {Check if don't want to be warn again, assuming all risks.} xywh {30 60 590 20} down_box DOWN_BOX labelfont 2 labelsize 12
   }
 }

@@ -12,11 +12,28 @@
  */
 
 #include "../include/fltube_utils.h"
-#include <filesystem>
 
 const std::string HTTP_PREFIX = "http://";
 const std::string HTTPS_PREFIX = "https://";
 const std::string YOUTUBE_URL_PREFIX = HTTPS_PREFIX + "youtu.be/";
+/** Currently, AVC1 is the most supported codec for MP4 in old PC systems... **/
+const std::string VIDEOCODEC_PREFERRED = "avc1";
+const std::string AUDIOCODEC_PREFERRED = "m4a";
+
+/** You can change here for the player of your like (in example: vlc, mpv, etc.). It must be installed in your system. **/
+const std::string DEFAULT_STREAM_PLAYER = "mplayer";
+/** Modify the launch parameters of the DEFAULT_STREAM_PLAYER. */
+const std::string DEFAULT_PLAYER_PARAMS = "-zoom -ao pulse";
+
+/** Mapping FS_PERMISSION_NAMES to corresponding std::filesystem::perms. */
+static const std::map<SIMPLE_FS_PERMISSION, std::map<std::string, std::filesystem::perms>> perms_map = {
+    {CAN_READ,
+        {{"OWNER", std::filesystem::perms::owner_read}, {"GROUP", std::filesystem::perms::group_read}, {"OTHERS", std::filesystem::perms::others_read}}},
+    {CAN_WRITE,
+        {{"OWNER", std::filesystem::perms::owner_write}, {"GROUP", std::filesystem::perms::group_write}, {"OTHERS", std::filesystem::perms::others_write}}},
+    {CAN_EXECUTE,
+        {{"OWNER", std::filesystem::perms::owner_exec}, {"GROUP", std::filesystem::perms::group_exec}, {"OTHERS", std::filesystem::perms::others_exec}}},
+};
 
 /**
  * Execute a system command and returns its output.
@@ -33,7 +50,7 @@ std::string exec(const char* cmd) {
     }
 
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        printf("%s", buffer.data());
+        //printf("%s", buffer.data());
         result += buffer.data();
     }
 
@@ -65,6 +82,86 @@ const std::string currentDateTime() {
     return buf;
 }
 
+/**  Get the $HOME system path, or (if not set) the default specified path, or TEMPORAL System path. */
+const char* getHomePathOr(const char* defaultPath) {
+    const char* target_dir;
+    if ((target_dir = getenv("HOME")) == NULL && !defaultPath) {
+        target_dir = std::filesystem::temp_directory_path().c_str();
+    }
+    return target_dir;
+}
+
+/** For an specified UID, return a list of its corresponding GIDs - group IDs. */
+std::vector<int> getUserGroupsIds(int uid){
+    // Original implementation at https://stackoverflow.com/a/57896725.
+    std::vector<int> user_groups = {};
+
+    struct passwd* pw = getpwuid(uid);
+    if(pw == NULL){
+        perror("getpwuid error: ");
+    } else {
+        int ngroups = 0;
+        //this call is just to get the correct ngroups
+        getgrouplist(pw->pw_name, pw->pw_gid, NULL, &ngroups);
+        __gid_t groups[ngroups];
+        //here we actually get the groups
+        getgrouplist(pw->pw_name, pw->pw_gid, groups, &ngroups);
+        for (int i = 0; i < ngroups; i++){
+            user_groups.push_back(getgrgid(groups[i])->gr_gid);
+        }
+    }
+    return user_groups;
+}
+
+/** Check if a target directory has the requested permissions defined at @FS_PERMISSION_NAMES. */
+bool checkDirectoryPermissions(const char* target_directory, std::array<SIMPLE_FS_PERMISSION,3> target_perms){
+    using namespace std::filesystem;
+    if(target_directory && exists(target_directory)){
+        //Get the user and group id for the user running the process for this program.
+        uid_t process_user_id = geteuid();
+
+        //Get user and group for target directory
+        struct stat fileStat;
+        if( stat(target_directory, &fileStat) < 0 ){
+            //Stat failed for some reason...
+            printf("Cannot make stat() over the directory %s\n", target_directory);
+            return false;
+        }
+
+        // printf("DIR: %s (user: %d, group: %d)\n", target_directory, fileStat.st_uid, fileStat.st_gid);
+
+        bool isOwner = (process_user_id == fileStat.st_uid); //True if process user is owner of directory.
+        bool isInGroup = false; //True if process user belong to the directory's group.'
+        for (int gid: getUserGroupsIds(process_user_id)){
+            if(gid == fileStat.st_gid){
+                isInGroup = true;
+                break;
+            }
+        }
+
+        // Get the file status, which includes permissions
+        std::filesystem::file_status s = std::filesystem::status(target_directory);
+        // Iterate over each requested permission and verify it exists. If any not, then returns false..
+        for (SIMPLE_FS_PERMISSION perm: target_perms) {
+            bool cond1, cond2, cond3;
+            cond1 = (isOwner && ((s.permissions() & perms_map.at(perm).at("OWNER")) != std::filesystem::perms::none));
+            cond2 = (isInGroup && ((s.permissions() & perms_map.at(perm).at("GROUP")) != std::filesystem::perms::none));
+            cond3 = ((s.permissions() & perms_map.at(perm).at("OTHERS")) != std::filesystem::perms::none);
+            if ( ! (cond1 || cond2 || cond3) ) {
+                //This is like write all conditions as nested if's.
+                //If don't have any of requested permissions, return false.
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+/** Check write permissions on specified directory. */
+bool canWriteOnDir(const char* directory){
+    return checkDirectoryPermissions(directory, {CAN_WRITE});
+}
+
 /**
  * Returns true if yt-dlp exists on system path...
  */
@@ -83,38 +180,47 @@ const std::string PRINT_METADATA_TEMPLATE = "title=\\\"%(title)s\\\">>thumbnail=
 "\\\">>creators=\\\"%(uploader)s\\\">>video_id=\\\"%(id)s\\\">>upload_date=\\\"%(upload_date>%Y-%m-%d)s" \
 "\\\">>duration=\\\"%(duration>%H:%M:%S)s\\\">>channel_id=\\\"%(playlist_channel_id,channel_id)s\\\">>";
 
-static std::string do_youtube_search(const char* byTerm){
+static std::string do_youtube_search(const char* byTerm, Pagination_Info page_info){
     char ytdlp_cmd[512];
-    char cmd[512] = "yt-dlp \"ytsearch5:%s\" --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date";
+    char cmd_format[512] = "yt-dlp \"ytsearch%d:%s\" -I %d-%d --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date";
 
-    snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd, byTerm, PRINT_METADATA_TEMPLATE.c_str());
+    snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, page_info.upper_end(), byTerm,
+             page_info.lower_end(), page_info.upper_end(), PRINT_METADATA_TEMPLATE.c_str());
     return exec(ytdlp_cmd);
-
 }
 
 /**
  * Make a search by term in the specified extractor (i.e. "youtube", etc.). See a complete list of extractors at yt-dlp docs.
  * For now, only do searchs at Youtube.
  */
-std::string do_ytdlp_search(const char* search_term, const char* extractor_name){
+std::string do_ytdlp_search(const char* search_term, const char* extractor_name, Pagination_Info page_info){
 
     if (extractor_name == YOUTUBE_EXTRACTOR_NAME) {
-        return do_youtube_search(search_term);
+        return do_youtube_search(search_term, page_info);
     } else {
         return "No extractor matched...";
     }
 }
 
+/**
+ * Retrieve metadata for an specified video URL.
+ */
+std::string get_videoURL_metadata(const char* video_url){
+    char ytdlp_cmd[512];
+    char cmd_format[512] = "yt-dlp --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date %s";
+    snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, PRINT_METADATA_TEMPLATE.c_str(), video_url);
+    return exec(ytdlp_cmd);
+}
 
 /**
- * Stream a video from a its URL using the configured multimedia player.
+ * Stream a video from a its URL using the configured multimedia player at @DEFAULT_STREAM_PLAYER. The stream resolution is 360p.
  */
 void stream_video(const char* video_url) {
     //Open Video in MPlayer
     char stream_videoplayer_cmd[2048];
     const char* stream_format = "bestvideo[height<=360][vcodec=avc1]+bestaudio[ext=m4a]/best";
     snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                "%s \"$(yt-dlp -f \"%s\" -g \"%s\")\"", DEFAULT_STREAM_PLAYER.c_str(), stream_format, video_url);
+                "%s %s \"$(yt-dlp -f \"%s\" -g \"%s\")\"", DEFAULT_STREAM_PLAYER.c_str(), DEFAULT_PLAYER_PARAMS.c_str(), stream_format, video_url);
     printf("%s\n", stream_videoplayer_cmd);
     system(stream_videoplayer_cmd);
 }
@@ -123,10 +229,13 @@ void stream_video(const char* video_url) {
  * Download a video from a its URL using the configured multimedia player.
  */
 void download_video(const char* video_url, const char* download_path, VCODEC_RESOLUTIONS v_resolution){
-    char download_cmd[2048];
-    const char* download_format = "bestvideo[height<=%s][vcodec=avc1]+bestaudio[ext=m4a]/best";
+    char download_cmd[2048], s_dwl_data[200], s_dwl_dir[200];
+    const char* download_data_format= "bestvideo[height<=%d]+bestaudio/best";
+    const char* download_dir_format = "%s/%(id)s.%s";
+    snprintf(s_dwl_data, sizeof(s_dwl_data), download_data_format, v_resolution);
+    snprintf(s_dwl_dir, sizeof(s_dwl_dir), download_dir_format, download_path, DOWNLOAD_VIDEO_PREFERRED_EXT.c_str());
     snprintf(download_cmd, sizeof(download_cmd),
-             "%s \"$(yt-dlp -f \"%s\" -g \"%s\")\"", DEFAULT_STREAM_PLAYER.c_str(), download_format, video_url);
+             "yt-dlp -f \"%s\" \"%s\" -o \"%s\"", s_dwl_data, video_url, s_dwl_dir);
     printf("%s\n", download_cmd);
     system(download_cmd);
 }

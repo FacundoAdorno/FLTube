@@ -34,13 +34,16 @@ public:
   Fl_Group *pagination_controls;
   Fl_Button *previous_results_bttn;
   Fl_Button *next_results_bttn;
+  Fl_Group *download_dir_selection;
+  Fl_Input *video_download_directory;
+  Fl_Button *change_dwl_dir_bttn;
 };
 #include <FL/Fl_Box.H>
 
 class VideoInfo : public Fl_Group {
 public:
   VideoInfo(int X, int Y, int W, int H, const char *L = 0);
-  Fl_Box *thumbnail;
+  Fl_Button *thumbnail;
   Fl_Box *title;
   Fl_Box *duration;
   Fl_Box *uploadDate;
@@ -60,5 +63,18 @@ public:
   TinyMessageWindow();
   Fl_Box *error_label;
   Fl_Button *close_bttn;
+};
+#include <FL/Fl_Check_Button.H>
+
+class TinyChoiceWindow : public Fl_Double_Window {
+  void _TinyChoiceWindow();
+public:
+  TinyChoiceWindow(int X, int Y, int W, int H, const char *L = 0);
+  TinyChoiceWindow(int W, int H, const char *L = 0);
+  TinyChoiceWindow();
+  Fl_Box *choice_label;
+  Fl_Button *accept_bttn;
+  Fl_Button *cancel_bttn;
+  Fl_Check_Button *warnme_again_check;
 };
 #endif

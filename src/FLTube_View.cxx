@@ -25,7 +25,7 @@ FLTubeMainWindow::FLTubeMainWindow(int W, int H, const char *L)
 }
 
 FLTubeMainWindow::FLTubeMainWindow()
-  : Fl_Double_Window(0, 0, 801, 618, "FLTube") {
+  : Fl_Double_Window(0, 0, 800, 618, "FLTube") {
   clear_flag(16);
   _FLTubeMainWindow();
 }
@@ -48,7 +48,7 @@ this->when(FL_WHEN_RELEASE);
     search_term_or_url->tooltip("Enter a search term for search or a valid Youtube URL.");
     search_term_or_url->align(Fl_Align(FL_ALIGN_TOP));
   } // Fl_Input* search_term_or_url
-  { do_search_bttn = new Fl_Button(227, 88, 150, 22, "Go search!");
+  { do_search_bttn = new Fl_Button(227, 88, 150, 22, "Go &search!");
     do_search_bttn->tooltip("If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...");
     do_search_bttn->user_data((void*)(search_term_or_url));
   } // Fl_Button* do_search_bttn
@@ -58,27 +58,38 @@ this->when(FL_WHEN_RELEASE);
   search_result_selectors->box(FL_THIN_UP_BOX);
   search_result_selectors->end();
 } // Fl_Group* search_result_selectors
-{ output_text_display = new Fl_Text_Display(600, 35, 185, 550, "Output log:");
+{ output_text_display = new Fl_Text_Display(600, 35, 190, 550, "Output log:");
   output_text_display->textsize(12);
   output_text_display->align(Fl_Align(FL_ALIGN_TOP_LEFT));
 } // Fl_Text_Display* output_text_display
-{ pagination_controls = new Fl_Group(10, 585, 575, 30);
-  { previous_results_bttn = new Fl_Button(135, 587, 135, 25, "<Previous");
+{ pagination_controls = new Fl_Group(10, 586, 310, 30);
+  { previous_results_bttn = new Fl_Button(25, 588, 135, 23, "<&Previous");
     previous_results_bttn->tooltip("Get previous results of current search results set.");
   } // Fl_Button* previous_results_bttn
-  { next_results_bttn = new Fl_Button(285, 587, 135, 25, "Next>");
+  { next_results_bttn = new Fl_Button(175, 588, 135, 23, "&Next>");
     next_results_bttn->tooltip("Get following results of current search results set.");
   } // Fl_Button* next_results_bttn
   pagination_controls->end();
 } // Fl_Group* pagination_controls
+{ download_dir_selection = new Fl_Group(320, 586, 470, 34);
+  download_dir_selection->box(FL_GLEAM_DOWN_FRAME);
+  { video_download_directory = new Fl_Input(417, 590, 300, 24, "Download Dir:");
+    video_download_directory->labelfont(1);
+    video_download_directory->labelsize(12);
+    video_download_directory->textsize(12);
+  } // Fl_Input* video_download_directory
+  { change_dwl_dir_bttn = new Fl_Button(722, 591, 64, 22, "Change");
+    change_dwl_dir_bttn->tooltip("Click to change download directory.");
+  } // Fl_Button* change_dwl_dir_bttn
+  download_dir_selection->end();
+} // Fl_Group* download_dir_selection
 end();
 }
 VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L)
   : Fl_Group(0, 0, W, H, L) {
-{ thumbnail = new Fl_Box(6, 5, 95, 80);
-  thumbnail->tooltip("Click to stream the video (PREVIEW it)...");
-  thumbnail->box(FL_UP_BOX);
-} // Fl_Box* thumbnail
+{ thumbnail = new Fl_Button(6, 5, 95, 80);
+  thumbnail->tooltip("Click to stream the video (preview it)...");
+} // Fl_Button* thumbnail
 { title = new Fl_Box(105, 8, 455, 24, "Video title");
   title->tooltip("video title");
   title->labelfont(1);
@@ -145,6 +156,51 @@ this->when(FL_WHEN_RELEASE);
 { close_bttn = new Fl_Button(267, 70, 115, 25, "&Close and exit");
   close_bttn->shortcut(0x80063);
 } // Fl_Button* close_bttn
+set_modal();
+end();
+}
+TinyChoiceWindow::TinyChoiceWindow(int X, int Y, int W, int H, const char *L)
+  : Fl_Double_Window(X, Y, W, H, L) {
+  _TinyChoiceWindow();
+}
+
+TinyChoiceWindow::TinyChoiceWindow(int W, int H, const char *L)
+  : Fl_Double_Window(0, 0, W, H, L) {
+  clear_flag(16);
+  _TinyChoiceWindow();
+}
+
+TinyChoiceWindow::TinyChoiceWindow()
+  : Fl_Double_Window(0, 0, 649, 118, "Warn") {
+  clear_flag(16);
+  _TinyChoiceWindow();
+}
+
+void TinyChoiceWindow::_TinyChoiceWindow() {
+this->box(FL_FLAT_BOX);
+this->color(FL_BACKGROUND_COLOR);
+this->selection_color(FL_BACKGROUND_COLOR);
+this->labeltype(FL_NO_LABEL);
+this->labelfont(0);
+this->labelsize(14);
+this->labelcolor(FL_FOREGROUND_COLOR);
+this->align(Fl_Align(FL_ALIGN_TOP));
+this->when(FL_WHEN_RELEASE);
+{ choice_label = new Fl_Box(30, 15, 590, 45);
+  choice_label->align(Fl_Align(FL_ALIGN_WRAP));
+} // Fl_Box* choice_label
+{ accept_bttn = new Fl_Button(180, 85, 115, 25, "&Accept");
+  accept_bttn->shortcut(0x80061);
+} // Fl_Button* accept_bttn
+{ cancel_bttn = new Fl_Button(334, 85, 115, 25, "&Cancel");
+  cancel_bttn->shortcut(0x80063);
+} // Fl_Button* cancel_bttn
+{ warnme_again_check = new Fl_Check_Button(30, 60, 590, 20, "Don\'t warn me again and ACCEPT always.");
+  warnme_again_check->tooltip("Check if don\'t want to be warn again, assuming all risks.");
+  warnme_again_check->down_box(FL_DOWN_BOX);
+  warnme_again_check->labelfont(2);
+  warnme_again_check->labelsize(12);
+} // Fl_Check_Button* warnme_again_check
 set_modal();
 end();
 }

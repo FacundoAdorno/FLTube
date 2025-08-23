@@ -1,9 +1,9 @@
 # Variables
 CXX      = $(shell fltk-config --cxx)
 DEBUG    = -g
-CXXFLAGS = $(shell fltk-config --use-gl --use-images --cxxflags) -Iinclude `pkg-config --cflags libcurl`
+CXXFLAGS = $(shell fltk-config --use-images --cxxflags) -Iinclude `pkg-config --cflags libcurl`
 #LDFLAGS  = $(shell fltk-config --use-gl --use-images --ldflags) `pkg-config --libs libcurl`
-LDSTATIC  = $(shell fltk-config --use-gl --use-images --ldstaticflags) `pkg-config --libs libcurl`
+LDSTATIC  = $(shell fltk-config --use-images --ldstaticflags) `pkg-config --libs libcurl`
 LINK     = $(CXX)
 
 BUILD_DIR = build
@@ -41,3 +41,5 @@ compile_fluid:
 # Regla para limpiar archivos objeto y el ejecutable
 clean:
 	rm -f $(BUILD_DIR)/*.o $(TARGET) 2> /dev/null && rmdir $(BUILD_DIR)
+
+.PHONY: all clean build compile_fluid
