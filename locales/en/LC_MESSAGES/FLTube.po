@@ -1,0 +1,241 @@
+# English translations for PACKAGE package.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: FLTube\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-27 23:50-0300\n"
+"PO-Revision-Date: 2025-08-27 23:52-0300\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.6\n"
+
+#: src/FLTube.cxx:55
+#, fuzzy, c-format
+msgid "Cleaning temporal files at %s.\n"
+msgstr ""
+"Cleaning temporal files at %s.\n"
+"."
+
+#: src/FLTube.cxx:58
+#, c-format
+msgid "Closing FLtube... Bye!\n"
+msgstr "Closing FLtube... Bye!\n"
+
+#: src/FLTube.cxx:126
+msgid "Starting streaming preview of video..."
+msgstr "Starting streaming preview of video..."
+
+#: src/FLTube.cxx:129
+msgid "Cannot get video URL. Review your the video metadata..."
+msgstr "Cannot get video URL. Review your the video metadata..."
+
+#: src/FLTube.cxx:142
+msgid ""
+"WARNING: This option may result in high CPU usage. It is not recommended on "
+"low-spec PCs, as it may freeze the desktop interface. Continue to download "
+"video?"
+msgstr ""
+"WARNING: This option may result in high CPU usage. It is not recommended on "
+"low-spec PCs, as it may freeze the desktop interface. Continue to download "
+"video?"
+
+#: src/FLTube.cxx:145
+msgid "Download CANCELLED by user choice."
+msgstr "Download CANCELLED by user choice."
+
+#: src/FLTube.cxx:150
+msgid "Video downloaded at "
+msgstr "Video downloaded at "
+
+#: src/FLTube.cxx:206
+msgid ""
+"Something went wrong when generating a resize thumbnail for video with ID="
+msgstr ""
+"Something went wrong when generating a resize thumbnail for video with ID="
+
+#: src/FLTube.cxx:225
+msgid ""
+"yt-dlp is not installed on your system or its binary is not at $PATH system "
+"variable. See how to install it at https://github.com/yt-dlp/yt-dlp."
+msgstr ""
+"yt-dlp is not installed on your system or its binary is not at $PATH system "
+"variable. See how to install it at https://github.com/yt-dlp/yt-dlp."
+
+#: src/FLTube.cxx:226
+#, c-format
+msgid "yt-dlp is not installed. Closing app...\n"
+msgstr "yt-dlp is not installed. Closing app...\n"
+
+#: src/FLTube.cxx:285
+#, c-format
+msgid "User input is empty!!!\n"
+msgstr "User input is empty!!!\n"
+
+#: src/FLTube.cxx:292
+msgid ""
+"For now, only Youtube URL's are valid for download. Please, edit your input "
+"text or search using a generic term."
+msgstr ""
+"For now, only Youtube URL's are valid for download. Please, edit your input "
+"text or search using a generic term."
+
+#: src/FLTube.cxx:358
+msgid "Select a download directory"
+msgstr "Select a download directory"
+
+#: src/FLTube.cxx:370
+msgid "No directory was selected."
+msgstr "No directory was selected."
+
+#: src/FLTube.cxx:407
+#, c-format
+msgid "Loading custom config file %s.\n"
+msgstr "Loading custom config file %s.\n"
+
+#: src/FLTube.cxx:409
+#, c-format
+msgid "--config parameter with no path specified.\n"
+msgstr "--config parameter with no path specified.\n"
+
+#: src/FLTube.cxx:422
+#, c-format
+msgid "Starting FLtube v.%s\n"
+msgstr "Starting FLtube v.%s\r\n"
+
+#: src/fltube_utils.cxx:47
+#, c-format
+msgid "There was an error executing the following command: %s \n"
+msgstr "There was an error executing the following command: %s \n"
+
+#: src/fltube_utils.cxx:48
+#, c-format
+msgid "Closing the program due to an error.\n"
+msgstr "Closing the program due to an error.\n"
+
+#: src/FLTube_View.cxx:53
+msgid "Search box:"
+msgstr "Search box:"
+
+#: src/FLTube_View.cxx:57
+msgid "Term or URL"
+msgstr "Term or URL"
+
+#: src/FLTube_View.cxx:58
+msgid "Enter a search term for search or a valid Youtube URL."
+msgstr "Enter a search term for search or a valid Youtube URL."
+
+#: src/FLTube_View.cxx:61
+msgid "Go search!"
+msgstr "Go search!"
+
+#: src/FLTube_View.cxx:62
+msgid ""
+"If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."
+msgstr ""
+"If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."
+
+#: src/FLTube_View.cxx:72
+msgid "Output log:"
+msgstr "Output log:"
+
+#: src/FLTube_View.cxx:77
+msgid "<&Previous"
+msgstr "<&Previous"
+
+#: src/FLTube_View.cxx:78
+msgid "Get previous results of current search results set."
+msgstr "Get previous results of current search results set."
+
+#: src/FLTube_View.cxx:80
+msgid "&Next>"
+msgstr "&Next>"
+
+#: src/FLTube_View.cxx:81
+msgid "Get following results of current search results set."
+msgstr "Get following results of current search results set."
+
+#: src/FLTube_View.cxx:87
+msgid "Download Dir:"
+msgstr "Download Dir:"
+
+#: src/FLTube_View.cxx:88
+msgid "Directory where the video are going to be downloaded."
+msgstr "Directory where the video are going to be downloaded."
+
+#: src/FLTube_View.cxx:93
+msgid "Change"
+msgstr "Change"
+
+#: src/FLTube_View.cxx:94
+msgid "Click to change download directory."
+msgstr "Click to change download directory."
+
+#: src/FLTube_View.cxx:105
+msgid "Click to stream the video (preview it)..."
+msgstr "Click to stream the video (preview it)..."
+
+#: src/FLTube_View.cxx:112
+msgid "Duration expressed as H:MM:SS."
+msgstr "Duration expressed as H:MM:SS."
+
+#: src/FLTube_View.cxx:117
+msgid "Video upload date."
+msgstr "Video upload date."
+
+#: src/FLTube_View.cxx:122
+msgid "Click to list all channel's video."
+msgstr "Click to list all channel's video."
+
+#: src/FLTube_View.cxx:126
+msgid "240p"
+msgstr "240p"
+
+#: src/FLTube_View.cxx:127 src/FLTube_View.cxx:130 src/FLTube_View.cxx:133
+#: src/FLTube_View.cxx:136 src/FLTube_View.cxx:139
+msgid "Download video at this specific resolution."
+msgstr "Download video at this specific resolution."
+
+#: src/FLTube_View.cxx:129
+msgid "360p"
+msgstr "360p"
+
+#: src/FLTube_View.cxx:132
+msgid "480p"
+msgstr "480p"
+
+#: src/FLTube_View.cxx:135
+msgid "720p"
+msgstr "720p"
+
+#: src/FLTube_View.cxx:138
+msgid "1080p"
+msgstr "1080p"
+
+#: src/FLTube_View.cxx:178
+msgid "Close and exit"
+msgstr "Close and exit"
+
+#: src/FLTube_View.cxx:218
+msgid "Accept"
+msgstr "Accept"
+
+#: src/FLTube_View.cxx:221
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/FLTube_View.cxx:224
+msgid "Don't warn me again and ACCEPT always."
+msgstr "Don't warn me again and ACCEPT always."
+
+#: src/FLTube_View.cxx:225
+msgid "Check if don't want to be warn again, assuming all risks."
+msgstr "Check if don't want to be warn again, assuming all risks."

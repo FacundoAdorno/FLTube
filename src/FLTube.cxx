@@ -14,8 +14,8 @@
 #include "../include/FLTube.h"
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
+#include "../include/gnugettext_utils.h"
 #include <FL/Fl_Check_Button.H>
-#include <cstdio>
 
 const std::string* URL_TEST = new std::string("http://example.com/video.mp4");
 
@@ -43,15 +43,19 @@ const std::string FLTUBE_TEMPORAL_DIR(std::filesystem::temp_directory_path().gen
 /** Flag to warn that DOWNLOADING videos in high resolutions (720p, 1080p) may result in a high CPU usage. */
 bool WARN_ABOUT_HIGH_CPU_USAGE_HD_V_DOWNLOAD = true;
 
+std::string CONFIGFILE_PATH = "/etc/fltube/fltube.conf";
+
+std::unique_ptr<std::map<std::string, std::string>> configParameters = {};
+
 /**
  * Callback for main window close action. By default, exit app with success status code (0).
  */
 void exitApp(unsigned short int exitStatusCode = FLT_OK) {
     //Do some cleaning...
-    printf("Cleaning temporal files at %s.\n.", FLTUBE_TEMPORAL_DIR.c_str());
+    printf(_("Cleaning temporal files at %s.\n"), FLTUBE_TEMPORAL_DIR.c_str());
     std::filesystem::remove_all(FLTUBE_TEMPORAL_DIR);
     //Exiting the app...
-    printf("Closing FLtube... Bye!\n");
+    printf(_("Closing FLtube... Bye!\n"));
     exit(exitStatusCode);
 }
 
@@ -119,10 +123,10 @@ bool showChoiceWindow(const char* message, bool& keepShowingFlag) {
 void preview_video_cb(Fl_Button* widget, void* video_url){
     std::string* url = static_cast<std::string*>(video_url);
     if (url){
-        logAtBuffer("Starting streaming preview of video...",LogLevel::INFO);
+        logAtBuffer(_("Starting streaming preview of video..."),LogLevel::INFO);
         stream_video(url->c_str());
     } else {
-        logAtBuffer("Cannot get video URL. Review your the video metadata...", LogLevel::ERROR);
+        logAtBuffer(_("Cannot get video URL. Review your the video metadata..."), LogLevel::ERROR);
     }
 }
 
@@ -132,18 +136,18 @@ void download_video_specified_resolution_cb(Fl_Button* resltn_bttn, void* downlo
     //VCODEC_RESOLUTIONS vc = VCODEC_RESOLUTIONS(resolution);
     DownloadVideoCBData* download_data =  static_cast<DownloadVideoCBData*>(download_video_data);
     bool continueToDownload = true;
-    printf("VIDEO URL: %s - LA RESOLUCION A DESCARGAR ES: %dp\n", download_data->video_url.c_str(), download_data->video_resolution);
+    //printf("VIDEO URL: %s - LA RESOLUCION A DESCARGAR ES: %dp\n", download_data->video_url.c_str(), download_data->video_resolution);
     if(WARN_ABOUT_HIGH_CPU_USAGE_HD_V_DOWNLOAD && download_data->video_resolution >= 720) {
         //Only show waning message if
-        continueToDownload = showChoiceWindow("WARNING: This option may result in high CPU usage. It is not recommended on low-spec PCs, as it may freeze the desktop interface. Continue to download video?", WARN_ABOUT_HIGH_CPU_USAGE_HD_V_DOWNLOAD);
+        continueToDownload = showChoiceWindow(_("WARNING: This option may result in high CPU usage. It is not recommended on low-spec PCs, as it may freeze the desktop interface. Continue to download video?"), WARN_ABOUT_HIGH_CPU_USAGE_HD_V_DOWNLOAD);
     }
     if(!continueToDownload){
-        logAtBuffer("Download CANCELLED by user choice.", LogLevel::WARN);
+        logAtBuffer(_("Download CANCELLED by user choice."), LogLevel::WARN);
         return;
     }
     std::string download_dir = mainWin->video_download_directory->value();
     download_video(download_data->video_url.c_str(), download_dir.c_str(), VCODEC_RESOLUTIONS(download_data->video_resolution));
-    logAtBuffer("Video downloaded at " + download_dir, LogLevel::INFO);
+    logAtBuffer(_("Video downloaded at ") + download_dir, LogLevel::INFO);
 }
 
 /**
@@ -199,7 +203,7 @@ void update_video_info() {
             int targetWidth = video_info_arr[j]->thumbnail->w();
             Fl_Image* resized_thumbnail = create_resized_image_from_jpg(FLTUBE_TEMPORAL_DIR + thumbn_name, targetWidth);
             if (resized_thumbnail == nullptr) {
-                logAtBuffer("Something went wrong when generating a resize thumbnail for video with ID=" + video_metadata[j]->id, LogLevel::ERROR);
+                logAtBuffer(_("Something went wrong when generating a resize thumbnail for video with ID=") + video_metadata[j]->id, LogLevel::ERROR);
             } else {
                 delete video_info_arr[j]->thumbnail->image();
                 video_info_arr[j]->thumbnail->image(resized_thumbnail);
@@ -214,18 +218,25 @@ void update_video_info() {
 }
 
 /**
- * Hook: Actions to execute before main window is drawed...
+ * Hook: Actions to execute before main window is drawn...
  */
 void pre_init() {
     if ( !checkForYTDLP() ) {
-        showMessageWindow("yt-dlp is not installed on your system or its binary is not at $PATH system variable." \
-        "See how to install it at https://github.com/yt-dlp/yt-dlp.");
-        printf("yt-dlp is not installed. Closing app...\n");
+        showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp."));
+        printf(_("yt-dlp is not installed. Closing app...\n"));
         exitApp(FLT_GENERAL_FAILED);
     }
+
+    configParameters = loadConfFile(CONFIGFILE_PATH.c_str());
+
+    //Init Localization. Use locale path specified at config, or custom config /usr/share/locale/.
+    setup_gettext("", ( configParameters->find("LOCALE_PATH") != configParameters->end() )
+                            ? configParameters->find("LOCALE_PATH")->second : "/usr/share/locale");
+
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
     std::filesystem::current_path(FLTUBE_TEMPORAL_DIR);
+
 }
 
 /**
@@ -267,18 +278,18 @@ void logAtBuffer(std::string log_message, LogLevel log_lvl) {
 }
 
 /**
- * Callback for search button: search by YT URL or search term. Input musn't be empty.'
+ * Callback for search button: search by YT URL or search term. Input mustn't be empty.'
  */
 void doSearch_cb(Fl_Widget*, Fl_Input *input) {
     if (input == nullptr) {
-        printf("User input is empty!!!");
+        printf(_("User input is empty!!!\n"));
         return;
     }
     const char* input_text = input->value();
     std::string result;
     if (isUrl(input_text)) {
         if(!isYoutubeURL(input_text)){
-            std::string warn_message = "For now, only Youtube URL's are valid for download. Please, edit your input text or search using a generic term.";
+            std::string warn_message = _("For now, only Youtube URL's are valid for download. Please, edit your input text or search using a generic term.");
             showMessageWindow(warn_message.c_str());
             logAtBuffer(warn_message, LogLevel::WARN);
             return;
@@ -344,7 +355,7 @@ void select_directory_cb(Fl_Widget* widget, void* output) {
     }
 
     // Open dialog to select directory
-    char* dir = fl_dir_chooser("Select a download directory", selected_directory);
+    char* dir = fl_dir_chooser(_("Select a download directory"), selected_directory);
 
     // If a directory is selected, save it at output value.
     if (dir && std::filesystem::exists(dir)) {
@@ -356,7 +367,53 @@ void select_directory_cb(Fl_Widget* widget, void* output) {
         output_widget->value(dir);
         output_widget->tooltip(dir);
     } else {
-        std::cout << "No directory was selected." << std::endl;
+        std::cout << _("No directory was selected.") << std::endl;
+    }
+}
+
+/*
+ * Print program usage and exit if desire (exitApp = true).
+ */
+void showUsage(bool exitApp){
+    const char* usage = R"([FLTube HELP]:
+FLTube is a program developed in FLTK for search and download Youtube videos, as a front-end for the subjacent "yt-dlp" tool.
+
+USAGE:
+    fltube [options]
+
+OPTIONS:
+  --config [PATH_TO_FILE]   Please specify the absolute path to the custom configuration file, which should be
+                              a copy of the original fltube.config. Use this option when you want to apply a
+                              development configuration file for development purposes.
+  -h, --help                Show this text help.
+  -v, --version             Show the program version.
+
+)";
+    printf("%s", usage);
+
+    if (exitApp) { exit(FLT_OK); }
+}
+
+/*
+ *  Parse commandline parameters.
+ */
+void parseOptions(int argc, char **argv){
+    if (existsCmdOption(argc, argv, "-h") || existsCmdOption(argc, argv, "--help")) {
+        showUsage(true);
+    }
+    if (existsCmdOption(argc, argv, "-v") || existsCmdOption(argc, argv, "--version")) {
+        printf("FLtube v.%s\n", VERSION);
+        exit(FLT_OK);
+    }
+    if (existsCmdOption(argc, argv, "--config")){
+        const std::string path = getOptionValue(argc, argv, "--config");
+        if (path != ""){
+            CONFIGFILE_PATH = path;
+            printf(_("Loading custom config file %s.\n"), CONFIGFILE_PATH.c_str());
+        } else {
+            printf(_("--config parameter with no path specified.\n"));
+            exit(FLT_INVALID_CMD_PARAM);
+        }
     }
 }
 
@@ -365,8 +422,9 @@ void select_directory_cb(Fl_Widget* widget, void* output) {
 //////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char **argv) {
-    printf("Starting FLtube v.%s\n", VERSION);
+    parseOptions(argc, argv);
     pre_init();
+    printf(_("Starting FLtube v.%s\n"), VERSION);
 
     char win_title[30] = "FLtube ";
     mainWin = new FLTubeMainWindow(800, 618, strcat(win_title, VERSION));

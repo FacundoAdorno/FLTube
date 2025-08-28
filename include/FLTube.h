@@ -22,6 +22,8 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include "gnugettext_utils.h"
+
 
 enum LogLevel { INFO, WARN, ERROR };
 
@@ -30,7 +32,6 @@ struct DownloadVideoCBData {
     int video_resolution;
     std::string video_url;
 };
-
 
 void exitApp(unsigned short int exitStatusCode);
 static void closeWindow_cb(Fl_Widget*, Fl_Window *targetWindow);
@@ -47,5 +48,7 @@ static void doSearch_cb(Fl_Widget*, Fl_Input *input);
 static void getPreviousSearchResults_cb(Fl_Widget*, Fl_Input *input);
 static void getNextSearchResults_cb(Fl_Widget*, Fl_Input *input);
 static void select_directory_cb(Fl_Widget* widget, void* output);
+void showUsage(bool exitApp);
+static void parseOptions(int argc, char **argv)
 
 #endif

@@ -18,6 +18,7 @@
 #include <array>
 #include <map>
 #include <vector>
+#include <fstream>
 #include <sstream>
 #include <iostream>
 #include <ctime>
@@ -30,9 +31,11 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <algorithm>
 
 #include <FL/Fl_Image.H>
 #include <FL/Fl_JPEG_Image.H>
+#include "gnugettext_utils.h"
 
 const std::string DOWNLOAD_VIDEO_PREFERRED_EXT = "mp4";
 
@@ -45,6 +48,7 @@ enum VCODEC_RESOLUTIONS {
 /** FLtube custom status codes definition... */
 enum FLTUBE_STATUS_CODES {
     FLT_OK=0, FLT_GENERAL_FAILED= 1, FLT_DOWNLOAD_FL_FAILED = 2, FLT_DOWNLOAD_FL_BYPASSED = 3,
+    FLT_INVALID_CMD_PARAM=4,
 };
 
 /** Simplet permissions scheme. */
@@ -120,5 +124,12 @@ int download_file(std::string url, std::string output_dir, std::string outfilena
 
 Fl_Image* create_resized_image_from_jpg(std::string jpg_filepath, int target_width);
 
+std::string getOptionValue(int argc, char* argv[], const std::string& option);
+
+bool existsCmdOption(int argc, char* argv[], const std::string& option);
+
+inline void trim(std::string &s);
+
+std::unique_ptr<std::map<std::string, std::string>> loadConfFile(const char* path_to_conf);
 
 #endif

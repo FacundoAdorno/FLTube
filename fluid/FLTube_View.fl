@@ -1,5 +1,10 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0311
+version 1.0404
+i18n_type 1
+i18n_include {<libintl.h>}
+i18n_conditional {}
+i18n_gnu_function _
+i18n_gnu_static_function gettext_noop
 header_name {.h}
 code_name {.cxx}
 comment {/*
@@ -16,9 +21,19 @@ comment {/*
  */} {in_source in_header
 }
 
+declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
+} {
+  decl {\#define GETTEXT_MACROS_H} {public global
+  }
+  decl {\#define _(String) gettext(String)} {public global
+  }
+  decl {\#define ng_(SINGULAR, PLURAL, COUNT) ngettext(SINGULAR, PLURAL, COUNT)} {public global
+  }
+}
+
 widget_class FLTubeMainWindow {
-  label FLTube
-  xywh {568 142 800 618} type Double
+  label FLTube open
+  xywh {568 142 800 618}
   class Fl_Double_Window visible
 } {
   Fl_Group {} {
@@ -30,9 +45,9 @@ widget_class FLTubeMainWindow {
       tooltip {Enter a search term for search or a valid Youtube URL.} xywh {46 59 512 24} align 1
     }
     Fl_Button do_search_bttn {
-      label {Go &search!}
-      user_data search_term_or_url
-      tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 88 150 22}
+      label {Go search!}
+      user_data search_term_or_url selected
+      tooltip {If search by URL, it must be a complete one (i.e. https : // youtu.be/12345)...} xywh {227 88 150 22}
     }
   }
   Fl_Group search_result_selectors {
@@ -59,7 +74,7 @@ widget_class FLTubeMainWindow {
   } {
     Fl_Input video_download_directory {
       label {Download Dir:}
-      xywh {417 590 300 24} labelfont 1 labelsize 12 textsize 12
+      tooltip {Directory where the video are going to be downloaded.} xywh {417 590 300 24} labelfont 1 labelsize 12 textsize 12
     }
     Fl_Button change_dwl_dir_bttn {
       label Change
@@ -68,82 +83,78 @@ widget_class FLTubeMainWindow {
   }
 }
 
-widget_class VideoInfo {
-  xywh {609 283 577 91} type Double hide position_relative
+widget_class VideoInfo {open
+  xywh {609 283 577 91} hide position_relative
 } {
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
   }
   Fl_Box title {
-    label {Video title}
-    tooltip {video title} xywh {105 8 455 24} labelfont 1 align 213
+    xywh {105 8 455 24} labelfont 1 align 213
   }
   Fl_Box duration {
-    label {00:10:00}
-    tooltip duration xywh {110 31 70 20} labelfont 2 align 20
+    tooltip {Duration expressed as H:MM:SS.} xywh {110 31 70 20} labelfont 2 align 20
   }
   Fl_Box uploadDate {
-    label {(10-11-2010)}
-    tooltip {Upload date} xywh {190 31 95 20} labelfont 2 align 20
+    tooltip {Video upload date.} xywh {190 31 95 20} labelfont 2 align 20
   }
   Fl_Button userUploader {
-    label {Uploaded by: Pepe}
     tooltip {Click to list all channel's video.} xywh {295 31 260 20} labelfont 2 align 20
   }
   Fl_Button d240 {
     label 240p
-    xywh {110 58 55 25}
+    tooltip {Download video at this specific resolution.} xywh {110 58 55 25}
   }
   Fl_Button d360 {
     label 360p
-    xywh {176 58 55 25}
+    tooltip {Download video at this specific resolution.} xywh {176 58 55 25}
   }
   Fl_Button d480 {
     label 480p
-    xywh {242 58 55 25}
+    tooltip {Download video at this specific resolution.} xywh {242 58 55 25}
   }
   Fl_Button d720 {
     label 720p
-    xywh {308 58 55 25}
+    tooltip {Download video at this specific resolution.} xywh {308 58 55 25}
   }
   Fl_Button d1080 {
     label 1080p
-    xywh {375 58 55 25}
+    tooltip {Download video at this specific resolution.} xywh {375 58 55 25}
   }
 }
 
 widget_class TinyMessageWindow {
-  label Error
-  xywh {632 398 649 100} type Double hide
-  class Fl_Double_Window modal
+  label Error open
+  xywh {632 398 649 100}
+  class Fl_Double_Window modal visible
 } {
   Fl_Box error_label {
     xywh {30 15 590 45} align 128
   }
   Fl_Button close_bttn {
-    label {&Close and exit}
+    label {Close and exit}
     xywh {267 70 115 25} shortcut 0x80063
   }
 }
 
 widget_class TinyChoiceWindow {
   label Warn open
-  xywh {642 408 649 118} type Double
+  xywh {620 599 649 118}
   class Fl_Double_Window modal visible
 } {
   Fl_Box choice_label {
     xywh {30 15 590 45} align 128
   }
   Fl_Button accept_bttn {
-    label {&Accept}
+    label Accept
     xywh {180 85 115 25} shortcut 0x80061
   }
   Fl_Button cancel_bttn {
-    label {&Cancel}
+    label Cancel
     xywh {334 85 115 25} shortcut 0x80063
   }
   Fl_Check_Button warnme_again_check {
-    label {Don't warn me again and ACCEPT always.} selected
+    label {Don't warn me again and ACCEPT always.}
     tooltip {Check if don't want to be warn again, assuming all risks.} xywh {30 60 590 20} down_box DOWN_BOX labelfont 2 labelsize 12
   }
 }

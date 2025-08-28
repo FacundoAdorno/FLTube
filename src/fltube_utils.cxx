@@ -44,8 +44,8 @@ std::string exec(const char* cmd) {
     std::unique_ptr<FILE, int(*)(FILE*)> pipe(popen(cmd, "r"), pclose);
 
     if (!pipe) {
-        printf("Hubo un error al ejecutar el siguiente comando: %s \n", cmd);
-        printf("Cerrando el programa por un error.");
+        printf(_("There was an error executing the following command: %s \n"), cmd);
+        printf(_("Closing the program due to an error.\n"));
         exit(2);
     }
 
@@ -328,4 +328,80 @@ Fl_Image* create_resized_image_from_jpg(std::string jpg_filepath, int target_wid
     delete original_image;
 
     return  resized_image;
+}
+
+/*
+ * Parse a parameter with the form "key=value". In example: "--aKey=aValue" will return "aValue".
+ * If parameter doesn't exists, or don't have a value, return an empty string ("").
+ */
+std::string getOptionValue(int argc, char* argv[], const std::string& option) {
+    std::string opt_value("");
+    for( int i = 0; i < argc; ++i) {
+        std::string arg = argv[i];
+        if(0 == arg.find(option)) {
+            std::size_t found = arg.find_first_of("=");
+            if (found != std::string::npos){
+                //Only is a value specified if "=" is present.
+                opt_value =arg.substr(found + 1);
+            }
+            return opt_value;
+        }
+    }
+    return opt_value;
+}
+
+/*
+ * Search for a parameter in the form "key" or "key=value" (In example: "--help", or "-h", or "--ip=W.X.Y.Z").
+ * If exists, return true.
+ */
+bool existsCmdOption(int argc, char* argv[], const std::string& option) {
+    for( int i = 0; i < argc; ++i) {
+        std::string arg = argv[i];
+        if(0 == arg.find(option)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/*
+ * Erase all spaces at the begining or end of the parameter, modifing it.
+ */
+inline void trim(std::string &s){
+    // Left trim
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+
+    // Right trim
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+/**
+ * Load configurations at a .conf file, with the following format: config_key=value.
+ */
+std::unique_ptr<std::map<std::string, std::string>> loadConfFile(const char* path_to_conf){
+    auto configs = std::make_unique<std::map<std::string,std::string>>();
+    std::ifstream infile(path_to_conf);
+
+    std::string line, config_key, config_value;
+    while (std::getline(infile, line)) {
+        config_key = config_value = "";
+        trim(line);
+        if(!line.empty() && line.at(0) != '#') {
+            std::size_t found = line.find_first_of("=");
+            if (found != std::string::npos){
+                //Only is a value specified if "=" is present.
+                config_key = line.substr(0, found);
+                config_value = line.substr(found + 1);
+                trim(config_key);
+                trim(config_value);
+                (*configs)[config_key] = config_value;
+            }
+        }
+    }
+
+    return configs;
 }
