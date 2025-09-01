@@ -14,9 +14,10 @@
 #
 
 yt_dlp_DOWNLOAD_URL="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
-yt_dlp_INSTALL_DIR="$HOME/.local/bin/"
-YES_TO_ALL=0
-QUIET=0
+yt_dlp_INSTALL_DIR="$HOME/.local/bin"
+## Global booleans flags. Keep in mind this bash convention: 0 is true, and 1 is false.
+YES_TO_ALL=1    #Defaults to false
+ALTERNATIVE_PATH=1    #Defaults to false
 
 USAGE=$(cat <<-ENDHELP
 [ == HELP == ] Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system.
@@ -27,53 +28,100 @@ USAGE:
     install_yt-dp [options]
 
 OPTIONS:
+  -p    Alternative PATH for binary installation/update. It must exists in case of installation.
+        Default directory is '$yt_dlp_INSTALL_DIR'.
   -y    Confirm all questions. Avoid interaction with script and accept all.
   -h,   Show this usage help.
 ENDHELP
 )
 
+errorExit() {
+  message=$1; echo -e "\033[31m[ERROR]\033[0m `date +'%F %T'` -- $message"; exit 1;
+}
+
+normalExit() {
+  message=$1; echo -e "\033[32m[INFO]\033[0m `date +'%F %T'` -- $message"; exit 0;
+}
+
+showInfo() {
+  info=$1;  echo -e "\033[34m[INFO]\033[0m `date +'%F %T'` -- $info";
+}
+
+## Returns an exit code of "0" if "true", or "1" if "false".
+questionAndWait() {
+  if [ $YES_TO_ALL -eq 0 ]; then return 0; fi  ## Avoid to question if YES_TO_ALL is true
+
+  question="$@"; echo -e "\033[33m== [QUESTION!] ==\033[0m $question  [Y/N]"; read decision;
+  if [ $decision == 'Y' -o $decision == 'y' ]; then return 0; else return 1; fi
+}
+
+updateYTDLP(){
+  $yt_dlp_INSTALL_DIR/yt-dlp -U
+}
+
 download_ytdlp() {
+  if [ $ALTERNATIVE_PATH -eq 0 -a ! -d $yt_dlp_INSTALL_DIR -a $YES_TO_ALL -ne 0 ]; then
+    questionAndWait "'$yt_dlp_INSTALL_DIR' does not exists. Do you want to create it?"
+    if [ $? -eq 0 ]; then mkdir -p $yt_dlp_INSTALL_DIR && showInfo "Directory '$yt_dlp_INSTALL_DIR' created."
+      else errorExit "You must create '$yt_dlp_INSTALL_DIR' before procced. Aborting installation..."
+    fi
+  else
+    if [ ! -d $yt_dlp_INSTALL_DIR ]; then mkdir -p $yt_dlp_INSTALL_DIR && showInfo "Directory '$yt_dlp_INSTALL_DIR' created."; fi
+  fi
+  showInfo "Starting 'yt-dlp' DOWNLOAD..."
   wget $yt_dlp_DOWNLOAD_URL -O $yt_dlp_INSTALL_DIR/yt-dlp
   chmod a+rx $yt_dlp_INSTALL_DIR/yt-dlp
-  echo "[INFO] 'yt-dlp' installed at $yt_dlp_INSTALL_DIR/yt-dlp directory."
+  showInfo "'yt-dlp' installed at $yt_dlp_INSTALL_DIR/yt-dlp directory."
 }
 
 #Parse parameters
-while getopts yh opts; do
+while getopts p:yh opts; do
    case ${opts} in
-      y) YES_TO_ALL=1;;
-      h) echo "$USAGE" && exit 0;;
+      p) ### Remove any trailing slash on specified path
+         yt_dlp_INSTALL_DIR=`echo $OPTARG | sed 's/\/*$//g'`
+         ALTERNATIVE_PATH=0;;
+      y) YES_TO_ALL=0;;
+      h) normalExit "$USAGE";;
    esac
 done
 
 
-YT_DLP_VERSION=`yt-dlp --version 2> /dev/null`
+##############################
+## ## ## MAIN PROGRAM ## ## ##
+##############################
+YT_DLP_GLOBAL_SYSTEM_VERSION=`yt-dlp --version 2> /dev/null`
+if [ $? -eq 0 ]; then
+  questionAndWait "'yt-dlp' is installed globally at your system ($YT_DLP_GLOBAL_SYSTEM_VERSION).
+    Maybe is installed as a system package. Is recommended to use this script for download the latest 'yt-dlp' version.
+    Do you want to continue and install another 'yt-dlp' binary on your system?"
+  if [ $? -eq 1 ]; then errorExit "Installation aborted by user choice..."; fi
+  #else continue with the installation...
+fi
+
+
+YT_DLP_VERSION=`$yt_dlp_INSTALL_DIR/yt-dlp --version 2> /dev/null`
 #YT_DLP_EXIT_CODE="$?"
 if [ $? -ne 0 ]; then
-  if [ $YES_TO_ALL -eq 1 ]; then
+  if [ $YES_TO_ALL -eq 0 ]; then
     download_ytdlp
   else
-    echo "yt-dlp is not in your system. Do you want to install at $yt_dlp_INSTALL_DIR ? [Y/N]"
-    read decision
-    if [ $decision == 'Y' -o $decision == 'y' ]; then
+    questionAndWait "'yt-dlp' is not in your system. Do you want to install at $yt_dlp_INSTALL_DIR?"
+    if [ $? -eq 0 ]; then
       download_ytdlp
     else
-      echo "[INFO] Installation aborted by user choice..."
+      normalExit "Installation aborted by user choice..."
     fi
   fi
 else
   ## if yt-dlp exists, do you want to update it?
-  if [ $YES_TO_ALL -eq 1 ]; then
-    yt-dlp -U
+  if [ $YES_TO_ALL -eq 0 ]; then
+    updateYTDLP
   else
-    echo "Do you want to update 'yt-dlp@$YT_DLP_VERSION' to any NEW VERSION (if any)? [Y/N]"
-    read decision
-    if [ $decision == 'Y' -o $decision == 'y' ]; then
-      yt-dlp -U
+    questionAndWait "Do you want to update 'yt-dlp@$YT_DLP_VERSION' to any NEW VERSION (if any)?"
+    if [ $? -eq 0 ]; then
+      updateYTDLP
     else
-      echo "[INFO] yt-dlp update process aborted by user choice..."
+      normalExit "yt-dlp update process aborted by user choice..."
     fi
   fi
 fi
-
-echo "Done!"
