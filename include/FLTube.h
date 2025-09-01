@@ -22,8 +22,8 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
-#include "gnugettext_utils.h"
 
+static const char* VERSION = "0.1.alpha";
 
 enum LogLevel { INFO, WARN, ERROR };
 
@@ -49,6 +49,6 @@ static void getPreviousSearchResults_cb(Fl_Widget*, Fl_Input *input);
 static void getNextSearchResults_cb(Fl_Widget*, Fl_Input *input);
 static void select_directory_cb(Fl_Widget* widget, void* output);
 void showUsage(bool exitApp);
-static void parseOptions(int argc, char **argv)
+static void parseOptions(int argc, char **argv);
 
 #endif

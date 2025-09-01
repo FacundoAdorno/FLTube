@@ -12,18 +12,11 @@
  */
 
 #include "../include/fltube_utils.h"
+#include <cstring>
 
 const std::string HTTP_PREFIX = "http://";
 const std::string HTTPS_PREFIX = "https://";
 const std::string YOUTUBE_URL_PREFIX = HTTPS_PREFIX + "youtu.be/";
-/** Currently, AVC1 is the most supported codec for MP4 in old PC systems... **/
-const std::string VIDEOCODEC_PREFERRED = "avc1";
-const std::string AUDIOCODEC_PREFERRED = "m4a";
-
-/** You can change here for the player of your like (in example: vlc, mpv, etc.). It must be installed in your system. **/
-const std::string DEFAULT_STREAM_PLAYER = "mplayer";
-/** Modify the launch parameters of the DEFAULT_STREAM_PLAYER. */
-const std::string DEFAULT_PLAYER_PARAMS = "-zoom -ao pulse";
 
 /** Mapping FS_PERMISSION_NAMES to corresponding std::filesystem::perms. */
 static const std::map<SIMPLE_FS_PERMISSION, std::map<std::string, std::filesystem::perms>> perms_map = {
@@ -215,12 +208,12 @@ std::string get_videoURL_metadata(const char* video_url){
 /**
  * Stream a video from a its URL using the configured multimedia player at @DEFAULT_STREAM_PLAYER. The stream resolution is 360p.
  */
-void stream_video(const char* video_url) {
+void stream_video(const char* video_url, const MediaPlayerInfo* mp) {
     //Open Video in MPlayer
     char stream_videoplayer_cmd[2048];
     const char* stream_format = "bestvideo[height<=360][vcodec=avc1]+bestaudio[ext=m4a]/best";
     snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                "%s %s \"$(yt-dlp -f \"%s\" -g \"%s\")\"", DEFAULT_STREAM_PLAYER.c_str(), DEFAULT_PLAYER_PARAMS.c_str(), stream_format, video_url);
+                "%s %s \"$(yt-dlp -f \"%s\" -g \"%s\")\"", mp->binary_path.c_str(), mp->parameters.c_str(), stream_format, video_url);
     printf("%s\n", stream_videoplayer_cmd);
     system(stream_videoplayer_cmd);
 }
@@ -228,11 +221,12 @@ void stream_video(const char* video_url) {
 /**
  * Download a video from a its URL using the configured multimedia player.
  */
-void download_video(const char* video_url, const char* download_path, VCODEC_RESOLUTIONS v_resolution){
+void download_video(const char* video_url, const char* download_path, VCODEC_RESOLUTIONS v_resolution,
+                        const char* vcodec = VIDEOCODEC_PREFERRED.c_str()){
     char download_cmd[2048], s_dwl_data[200], s_dwl_dir[200];
-    const char* download_data_format= "bestvideo[height<=%d]+bestaudio/best";
+    const char* download_data_format= "bestvideo[height<=%d][vcodec^=%s]+bestaudio/best";
     const char* download_dir_format = "%s/%(id)s.%s";
-    snprintf(s_dwl_data, sizeof(s_dwl_data), download_data_format, v_resolution);
+    snprintf(s_dwl_data, sizeof(s_dwl_data), download_data_format, v_resolution, vcodec);
     snprintf(s_dwl_dir, sizeof(s_dwl_dir), download_dir_format, download_path, DOWNLOAD_VIDEO_PREFERRED_EXT.c_str());
     snprintf(download_cmd, sizeof(download_cmd),
              "yt-dlp -f \"%s\" \"%s\" -o \"%s\"", s_dwl_data, video_url, s_dwl_dir);
@@ -367,7 +361,7 @@ bool existsCmdOption(int argc, char* argv[], const std::string& option) {
 /*
  * Erase all spaces at the begining or end of the parameter, modifing it.
  */
-inline void trim(std::string &s){
+void trim(std::string &s){
     // Left trim
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
         return !std::isspace(ch);
@@ -379,6 +373,9 @@ inline void trim(std::string &s){
     }).base(), s.end());
 }
 
+
+
+// TODO: all of this, the configuration map and the logic to check the configs, should be abstracted in a Configuration Class...
 /**
  * Load configurations at a .conf file, with the following format: config_key=value.
  */
@@ -404,4 +401,22 @@ std::unique_ptr<std::map<std::string, std::string>> loadConfFile(const char* pat
     }
 
     return configs;
+}
+
+/*
+ * Return the value of a property configuration loaded with @loadConfFile() method.
+ * If no property is found, returns @default_value or empty string ("") if no default value is specified..
+ */
+std::string getProperty(const char* config_name, const char* default_value, const std::unique_ptr<std::map<std::string, std::string>> &config_map){
+    if (!config_name || std::strlen(config_name) == 0) {
+        return "";
+    }
+    else if (config_map && config_map->find(config_name) != config_map->end()) {
+        return config_map->find(config_name)->second;
+    }
+    return std::string((default_value) ? default_value : "");
+}
+
+bool existProperty(const char* config_name, const std::unique_ptr<std::map<std::string, std::string>> &config_map) {
+    return (config_name && config_map && config_map->find(config_name) != config_map->end());
 }

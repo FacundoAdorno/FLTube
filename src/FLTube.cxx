@@ -11,15 +11,11 @@
  * more details.
  */
 
+#include "../include/gnugettext_utils.h"
 #include "../include/FLTube.h"
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
-#include "../include/gnugettext_utils.h"
-#include <FL/Fl_Check_Button.H>
 
-const std::string* URL_TEST = new std::string("http://example.com/video.mp4");
-
-static const char* VERSION = "0.2.2.alpha";
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -44,6 +40,11 @@ const std::string FLTUBE_TEMPORAL_DIR(std::filesystem::temp_directory_path().gen
 bool WARN_ABOUT_HIGH_CPU_USAGE_HD_V_DOWNLOAD = true;
 
 std::string CONFIGFILE_PATH = "/etc/fltube/fltube.conf";
+
+// This variable holds the configured video codec used when download a video.
+std::string DOWNLOAD_VIDEO_CODEC;
+
+MediaPlayerInfo* media_player;
 
 std::unique_ptr<std::map<std::string, std::string>> configParameters = {};
 
@@ -124,7 +125,7 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
     std::string* url = static_cast<std::string*>(video_url);
     if (url){
         logAtBuffer(_("Starting streaming preview of video..."),LogLevel::INFO);
-        stream_video(url->c_str());
+        stream_video(url->c_str(), media_player);
     } else {
         logAtBuffer(_("Cannot get video URL. Review your the video metadata..."), LogLevel::ERROR);
     }
@@ -146,7 +147,9 @@ void download_video_specified_resolution_cb(Fl_Button* resltn_bttn, void* downlo
         return;
     }
     std::string download_dir = mainWin->video_download_directory->value();
-    download_video(download_data->video_url.c_str(), download_dir.c_str(), VCODEC_RESOLUTIONS(download_data->video_resolution));
+
+    download_video(download_data->video_url.c_str(), download_dir.c_str(), VCODEC_RESOLUTIONS(download_data->video_resolution),
+                   DOWNLOAD_VIDEO_CODEC.c_str());
     logAtBuffer(_("Video downloaded at ") + download_dir, LogLevel::INFO);
 }
 
@@ -222,16 +225,47 @@ void update_video_info() {
  */
 void pre_init() {
     if ( !checkForYTDLP() ) {
-        showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp."));
+        showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run in a terminal the 'install_yt-dlp' script."));
         printf(_("yt-dlp is not installed. Closing app...\n"));
         exitApp(FLT_GENERAL_FAILED);
     }
 
+    ///// LOAD CONFIGURATIONS  //////
     configParameters = loadConfFile(CONFIGFILE_PATH.c_str());
 
-    //Init Localization. Use locale path specified at config, or custom config /usr/share/locale/.
-    setup_gettext("", ( configParameters->find("LOCALE_PATH") != configParameters->end() )
-                            ? configParameters->find("LOCALE_PATH")->second : "/usr/share/locale");
+    //Init Localization. Use locale path specified at config, or custom config default_locale_path().
+    setup_gettext("", getProperty("LOCALE_PATH", default_locale_path().c_str(), configParameters));
+
+    // Checking video codec configuration for download, if set in configuration file...
+    std::string video_codec = getProperty("VCODEC_FOR_DOWNLOAD", VIDEOCODEC_PREFERRED.c_str(), configParameters);
+    if (video_codec != ""){
+        bool vcodec_accepted = false;
+        for (const char* vcodec : VCODEC_IMPL_NAMES) {
+            if(video_codec == vcodec){
+                vcodec_accepted = true;
+                break;
+            }
+        }
+        if(!vcodec_accepted) {
+            char error_message[512];
+            std::string error_message_f = _("The video codec %s set in configuration file is not accepted by FLTube. Please, change for a valid one. Fallback to default codec: %s.");
+            snprintf(error_message, 512, error_message_f.c_str(), video_codec.c_str(), VIDEOCODEC_PREFERRED.c_str());
+            printf("[ERROR] --- %s\n",error_message);
+
+            video_codec = VIDEOCODEC_PREFERRED;
+        }
+    }
+    DOWNLOAD_VIDEO_CODEC = video_codec;
+
+
+    media_player = new MediaPlayerInfo();
+    if(existProperty("STREAM_PLAYER_PATH", configParameters)) {
+        media_player->binary_path = getProperty("STREAM_PLAYER_PATH", "", configParameters);
+        media_player->parameters = getProperty("STREAM_PLAYER_PARAMS", "", configParameters);
+    } else {
+        media_player->binary_path = DEFAULT_STREAM_PLAYER;
+        media_player->parameters = DEFAULT_PLAYER_PARAMS;
+    }
 
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
@@ -260,6 +294,7 @@ void post_init() {
 
 /** Write a log message at main application text buffer.*/
 void logAtBuffer(std::string log_message, LogLevel log_lvl) {
+    //TODO check if buffer exists before write on it...
     std::string logleveltext;
     switch (log_lvl) {
         case LogLevel::INFO:
@@ -382,7 +417,7 @@ USAGE:
     fltube [options]
 
 OPTIONS:
-  --config [PATH_TO_FILE]   Please specify the absolute path to the custom configuration file, which should be
+  --config=[PATH_TO_FILE]   Please specify the ABSOLUTE path to the custom configuration file, which should be
                               a copy of the original fltube.config. Use this option when you want to apply a
                               development configuration file for development purposes.
   -h, --help                Show this text help.

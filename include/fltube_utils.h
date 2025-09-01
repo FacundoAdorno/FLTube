@@ -37,12 +37,25 @@
 #include <FL/Fl_JPEG_Image.H>
 #include "gnugettext_utils.h"
 
+
+//TODO some bellow configurations can be put at fltube.conf config file.
+/** Currently, AVC1 is the most supported codec for MP4 in old PC systems... **/
+const std::string VIDEOCODEC_PREFERRED = "avc1";
+const std::string AUDIOCODEC_PREFERRED = "m4a";
+
+/** You can change here for the player of your like (in example: vlc, mpv, etc.). It must be installed in your system. **/
+const std::string DEFAULT_STREAM_PLAYER = "mplayer";
+/** Modify the launch parameters of the DEFAULT_STREAM_PLAYER. */
+const std::string DEFAULT_PLAYER_PARAMS = "-zoom -ao alsa";
+
 const std::string DOWNLOAD_VIDEO_PREFERRED_EXT = "mp4";
 
 const std::string YOUTUBE_EXTRACTOR_NAME = "youtube";
 /*Enum for the target video resolutions. */
 enum VCODEC_RESOLUTIONS {
     R240p = 240, R360p = 360, R480p = 480, R720p = 720, R1080p = 1080 };
+
+static std::array<const char*,2> VCODEC_IMPL_NAMES = {"avc1", "av01"};
 
 
 /** FLtube custom status codes definition... */
@@ -90,6 +103,13 @@ struct YTDLP_Video_Metadata{
     std::string thumbnail_url;
 };
 
+struct MediaPlayerInfo {
+    // The name of the binary (or system path) of the media player.
+    std::string binary_path;
+    // Parameters to media playar (optional).
+    std::string parameters;
+};
+
 std::string exec(const char* cmd);
 
 bool isUrl(const char* user_input);
@@ -114,9 +134,9 @@ static std::string do_youtube_search(const char* byTerm);
 
 std::string get_videoURL_metadata(const char* video_url);
 
-void stream_video(const char* video_url);
+void stream_video(const char* video_url, const MediaPlayerInfo* mp);
 
-void download_video(const char* video_url, const char* download_path, VCODEC_RESOLUTIONS v_resolution);
+void download_video(const char* video_url, const char* download_path, VCODEC_RESOLUTIONS v_resolution, const char* vcodec);
 
 YTDLP_Video_Metadata* parse_YT_Video_Metadata(const char ytdlp_video_metadata[512]);
 
@@ -128,8 +148,12 @@ std::string getOptionValue(int argc, char* argv[], const std::string& option);
 
 bool existsCmdOption(int argc, char* argv[], const std::string& option);
 
-inline void trim(std::string &s);
+void trim(std::string &s);
 
 std::unique_ptr<std::map<std::string, std::string>> loadConfFile(const char* path_to_conf);
+
+std::string getProperty(const char* config_name, const char* default_value, const std::unique_ptr<std::map<std::string, std::string>> &config_map);
+
+bool existProperty(const char* config_name, const std::unique_ptr<std::map<std::string, std::string>> &config_map);
 
 #endif
