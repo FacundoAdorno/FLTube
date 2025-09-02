@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-31 19:06-0300\n"
+"POT-Creation-Date: 2025-08-31 23:53-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,93 +17,93 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/FLTube.cxx:57
+#: src/FLTube.cxx:56
 #, c-format
 msgid "Cleaning temporal files at %s.\n"
 msgstr ""
 
-#: src/FLTube.cxx:60
+#: src/FLTube.cxx:59
 #, c-format
 msgid "Closing FLtube... Bye!\n"
 msgstr ""
 
-#: src/FLTube.cxx:128
+#: src/FLTube.cxx:127
 msgid "Starting streaming preview of video..."
 msgstr ""
 
-#: src/FLTube.cxx:131
+#: src/FLTube.cxx:130
 msgid "Cannot get video URL. Review your the video metadata..."
 msgstr ""
 
-#: src/FLTube.cxx:144
+#: src/FLTube.cxx:143
 msgid ""
 "WARNING: This option may result in high CPU usage. It is not recommended on "
 "low-spec PCs, as it may freeze the desktop interface. Continue to download "
 "video?"
 msgstr ""
 
-#: src/FLTube.cxx:147
+#: src/FLTube.cxx:146
 msgid "Download CANCELLED by user choice."
 msgstr ""
 
-#: src/FLTube.cxx:154
+#: src/FLTube.cxx:153
 msgid "Video downloaded at "
 msgstr ""
 
-#: src/FLTube.cxx:210
+#: src/FLTube.cxx:209
 msgid ""
 "Something went wrong when generating a resize thumbnail for video with ID="
 msgstr ""
 
-#: src/FLTube.cxx:229
+#: src/FLTube.cxx:228
 msgid ""
 "yt-dlp is not installed on your system or its binary is not at $PATH system "
 "variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run "
 "in a terminal the 'install_yt-dlp' script."
 msgstr ""
 
-#: src/FLTube.cxx:230
+#: src/FLTube.cxx:229
 #, c-format
 msgid "yt-dlp is not installed. Closing app...\n"
 msgstr ""
 
-#: src/FLTube.cxx:252
+#: src/FLTube.cxx:251
 #, c-format
 msgid ""
 "The video codec %s set in configuration file is not accepted by FLTube. "
 "Please, change for a valid one. Fallback to default codec: %s."
 msgstr ""
 
-#: src/FLTube.cxx:321
+#: src/FLTube.cxx:320
 #, c-format
 msgid "User input is empty!!!\n"
 msgstr ""
 
-#: src/FLTube.cxx:328
+#: src/FLTube.cxx:327
 msgid ""
 "For now, only Youtube URL's are valid for download. Please, edit your input "
 "text or search using a generic term."
 msgstr ""
 
-#: src/FLTube.cxx:394
+#: src/FLTube.cxx:393
 msgid "Select a download directory"
 msgstr ""
 
-#: src/FLTube.cxx:406
+#: src/FLTube.cxx:405
 msgid "No directory was selected."
 msgstr ""
 
-#: src/FLTube.cxx:448
+#: src/FLTube.cxx:447
 #, c-format
 msgid "Loading custom config file %s.\n"
 msgstr ""
 
-#: src/FLTube.cxx:450
+#: src/FLTube.cxx:449
 #, c-format
 msgid "--config parameter with no path specified.\n"
 msgstr ""
 
-#: src/FLTube.cxx:463
+#: src/FLTube.cxx:462
 #, c-format
 msgid "Starting FLtube v.%s\n"
 msgstr ""

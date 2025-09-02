@@ -11,6 +11,7 @@ SRC_DIR = src
 INCLUDE_DIR = include
 FLUID_PATHFILE = fluid/FLTube_View.fl
 SCRIPTS_DIR = scripts
+INSTALL_YTDLP_SCRIPTNAME = install_yt-dlp
 # Files
 TARGET = $(BUILD_DIR)/fltube
 SOURCES_LIST = fltube_utils.cxx gnugettext_utils.cxx FLTube_View.cxx FLTube.cxx
@@ -45,6 +46,9 @@ install: all
 	msgfmt -o locales/es/LC_MESSAGES/FLTube.mo  locales/es/LC_MESSAGES/FLTube.po
 	cp locales/es/LC_MESSAGES/FLTube.mo $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/
 
+	msgfmt -o locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).mo  locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po
+	cp locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).mo $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/
+
 	mkdir -p $(PREFIX)/etc/fltube
 	cp fltube.conf $(PREFIX)/etc/fltube/fltube.conf
 
@@ -58,6 +62,8 @@ po_update:
 	xgettext --keyword=_ --keyword=ng_ --language=C++ --from-code=utf-8 --output locales/FLTube.pot src/*.cxx include/*.h
 	msgmerge --update locales/en/LC_MESSAGES/FLTube.po  locales/FLTube.pot
 	msgmerge --update locales/es/LC_MESSAGES/FLTube.po  locales/FLTube.pot
+	xgettext --keyword=_ --keyword=ng_ --language=Shell --from-code=utf-8 --output locales/$(INSTALL_YTDLP_SCRIPTNAME).pot $(SCRIPTS_DIR)/$(INSTALL_YTDLP_SCRIPTNAME).sh
+	msgmerge --update locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po  locales/$(INSTALL_YTDLP_SCRIPTNAME).pot
 
 # Rule to compile FLUID files
 compile_fluid:

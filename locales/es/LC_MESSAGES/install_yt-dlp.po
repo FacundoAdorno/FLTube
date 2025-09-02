@@ -1,0 +1,115 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: install_yt-dlp by FLTube\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-01 23:24-0300\n"
+"PO-Revision-Date: 2025-09-01 21:39-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
+
+#: scripts/install_yt-dlp.sh:33
+#, sh-printf-format
+msgid ""
+"[ == HELP == ]\n"
+"    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system.\n"
+"    Advice that this software require that Python 3.X been installed on "
+"your\n"
+"    system (more info at: %s).\n"
+"\n"
+"USAGE:\n"
+"    install_yt-dp [options]\n"
+"\n"
+"OPTIONS:\n"
+"  -p    Alternative PATH for binary installation/update. It must exists in "
+"case of installation.\n"
+"        Default directory is '%s'.\n"
+"  -y    Confirm all questions. Avoid interaction with script and accept "
+"all.\n"
+"  -h,   Show this usage help."
+msgstr ""
+"[ == AYUDA == ] \n"
+"     Usa este script para INSTALAR o ACTUALIZAR la herramienta 'yt-dlp' en "
+"tu sistema.\n"
+"     Advierte que este software requiere que Python 3.X esté instalado en "
+"su\n"
+"     sistema (más información en: %s).\n"
+"\n"
+"USO:\n"
+"    install_yt-dp [opciones]\n"
+"\n"
+"OPCIONES:\n"
+"  -p    Ruta alternativa para la instalación/actualización del binario. Debe "
+"existir en caso de instalación.\n"
+"        El directorio predeterminado es '%s'.\n"
+"  -y    Confirma todas las preguntas. Evita la interacción con el script y "
+"acepta todo.\n"
+"  -h,   Muestra este texto de ayuda."
+
+#: scripts/install_yt-dlp.sh:78
+#, sh-printf-format
+msgid "'%s' does not exists. Do you want to create it?"
+msgstr "'%s' No existe. ¿Deseas crearlo?"
+
+#: scripts/install_yt-dlp.sh:80 scripts/install_yt-dlp.sh:86
+#, sh-printf-format
+msgid "Directory '%s' created."
+msgstr "Directorio '%s' creado."
+
+#: scripts/install_yt-dlp.sh:82
+#, sh-printf-format
+msgid "You must create '%s' before procced. Aborting installation..."
+msgstr "Debes crear '%s' antes de proceder. Abortando instalación..."
+
+#: scripts/install_yt-dlp.sh:88
+msgid "Starting 'yt-dlp' DOWNLOAD..."
+msgstr "Comenzando la DESCARGA de 'yt-dlp'..."
+
+#: scripts/install_yt-dlp.sh:92
+#, sh-printf-format
+msgid "'yt-dlp' installed at %s/yt-dlp directory."
+msgstr "'yt-dlp' instalado en el directorio %s/yt-dlp."
+
+#: scripts/install_yt-dlp.sh:114
+#, sh-printf-format
+msgid ""
+"'yt-dlp' is installed globally at your system %s.\n"
+"    Maybe is installed as a system package. Is recommended to use this "
+"script for download the latest 'yt-dlp' version.\n"
+"    Do you want to continue and install another 'yt-dlp' binary on your "
+"system?"
+msgstr ""
+"'yt-dlp' está instalado globalmente en el sistema %s.\n"
+"   Quizás como un paquete del sistema. Es recomendable utilizar este script "
+"para descargar la última versión de 'yt-dlp'.\n"
+"    ¿Deseas continuar e instalar otro binario de 'yt-dlp' en el sistema?"
+
+#: scripts/install_yt-dlp.sh:129
+#, sh-printf-format
+msgid "'yt-dlp' is not in your system. Do you want to install at '%s'?"
+msgstr "'yt-dlp' no está instalado en tu sistema. ¿Deseas instalarlo en '%s'?"
+
+#: scripts/install_yt-dlp.sh:134
+msgid "Installation aborted by user choice..."
+msgstr "Instalación abortada por elección del usuario..."
+
+#: scripts/install_yt-dlp.sh:143
+#, sh-printf-format
+msgid "Do you want to update 'yt-dlp@%s' to any NEW VERSION (if any)?"
+msgstr ""
+"¿Deseas actualizar 'yt-dlp@%s' a una NUEVA VERSIÓN (si es que hay otra más "
+"reciente)?"
+
+#: scripts/install_yt-dlp.sh:148
+msgid "yt-dlp update process aborted by user choice..."
+msgstr "actualización abortada por elección del usuario..."
