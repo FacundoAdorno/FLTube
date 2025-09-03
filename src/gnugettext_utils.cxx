@@ -14,7 +14,7 @@
 
 
 std::string default_locale_path(){
-    return std::string("/usr/share/locale");
+    return std::string("/usr/local/share/locale");
 }
 
 /*
