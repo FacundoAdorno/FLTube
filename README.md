@@ -58,6 +58,15 @@ $ ./build/usr/local/bin/fltube   ##To execute app.
 $ make clean                    ## For clean ./build directory
 ```
 
+## *yt-dlp* installation
+
+Is recommended to use the latest version of **yt-dlp**, so we encouraged to use the installation script provided by this app.
+
+Once FLTube is installed, run this command on a terminal to install *yt-dlp*:
+```bash
+$ install_yt-dlp.sh
+```
+
 ## TODO
     
     Complete this README!
