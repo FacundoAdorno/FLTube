@@ -46,7 +46,7 @@ install: all
 	msgfmt -o locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).mo  locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po
 	cp locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).mo $(PREFIX)$(LOCALE_INSTALL_DIR)/es/LC_MESSAGES/
 
-	mkdir -p $(PREFIX)/etc/fltube
+	mkdir -p $(PREFIX)/usr/local/etc/fltube
 	cp fltube.conf $(PREFIX)/usr/local/etc/fltube/fltube.conf
 
 	mkdir -p $(PREFIX)/usr/local/bin/
@@ -71,6 +71,6 @@ clean:
 		echo "Error: BUILD_DIR must be set before make a clean."; \
 		exit 1; \
 	fi
-	rm -f $(BUILD_DIR)/*.o $(TARGET) 2> /dev/null && rm -rf $(BUILD_DIR)/usr/local $(BUILD_DIR)/usr/ $(BUILD_DIR)/usr/local/etc/fltube && rmdir $(BUILD_DIR)/etc $(BUILD_DIR)
+	rm -f $(BUILD_DIR)/*.o $(TARGET) 2> /dev/null && rm -rf $(BUILD_DIR)/usr/local $(BUILD_DIR)/usr/ $(BUILD_DIR)/usr/local/etc/fltube $(BUILD_DIR)/usr/local/etc && rmdir $(BUILD_DIR)
 
 .PHONY: all clean build compile_fluid po_update

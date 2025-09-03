@@ -74,6 +74,7 @@ void showMessageWindow(const char* message){
     if (message_window == nullptr) {
         message_window = new TinyMessageWindow();
         message_window->close_bttn->callback((Fl_Callback*)closeWindow_cb, (void*)(message_window));
+        message_window->set_modal();
     }
     message_window->show();
     message_window->error_label->label(message);
@@ -107,6 +108,7 @@ bool showChoiceWindow(const char* message, bool& keepShowingFlag) {
         Fl_Check_Button* ch_bttn = static_cast<Fl_Check_Button*>(widget);
         *keep_showing_message_flag = ! (ch_bttn->value());
     }, &keepShowingFlag);
+    choiceWindow->set_modal();
     choiceWindow->show();
     choiceWindow->choice_label->label(message);
 
@@ -321,6 +323,10 @@ void doSearch_cb(Fl_Widget*, Fl_Input *input) {
         return;
     }
     const char* input_text = input->value();
+    if (input_text == nullptr || input_text[0] == '\0') {
+        showMessageWindow(_("Search input is empty. Please, retry and enter a valid text."));
+        return;
+    }
     std::string result;
     if (isUrl(input_text)) {
         if(!isYoutubeURL(input_text)){
