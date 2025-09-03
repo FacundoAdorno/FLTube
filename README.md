@@ -11,11 +11,15 @@ Although initially developed for [Spirit-OS](https://spirit-os.sourceforge.io/) 
 - Localized in English and Spanish, with the potential for future translation into other languages. Localization is done using [GNU gettext](https://www.gnu.org/software/gettext/).
 - Still at **alpha stage**, but usable. For now, only tested on GNU/Linux.
 
-![FLtube on Spirit OS!](https://i.postimg.cc/zXyrVV4S/fltube-screenshot-1.png "Fltube")
+![FLtube on Spirit OS!](https://i.postimg.cc/zXyrVV4S/fltube-screenshot-1.png "Fltube on Spirit OS")
+
+![FLtube on Debian 13 Trixie!](https://i.postimg.cc/pdVFvCgX/fltube-demo-3.png "Fltube on Debian 13 Trixie")
+
 
 ## Installation
 
-Once the source code is downloaded, you can compile it using [Make](https://www.gnu.org/software/make/).
+Once downloaded the source code, you can compile it using [Make](https://www.gnu.org/software/make/). 
+> NOTE: By default, the installation directories are under `/usr/local`, so to find the binaries correctly after installation, you must ensure that `/usr/local/bin` is on your `$PATH` environment variable.
 
 ### On SpiritOS (or any TinyCore-based distro)
 
@@ -37,9 +41,9 @@ $ tce-load -wi ffmpeg4.tcz libEGL.tcz bash.tcz
 
 Install app dependencies and compile using *make*.
 ```bash
-$ sudo apt install libfltk1.3-dev pkg-config libcurl4-openssl-dev g++ python3 \
-    libpng-dev zlib1g-dev libjpeg-dev libxrender-dev libxcursor-dev libxfixes-dev \
-    libxext-dev libxft-dev libfontconfig1-dev libxinerama-dev
+$ sudo apt install libfltk1.3-dev pkg-config libcurl4-openssl-dev g++ python3 gettext wget mplayer\
+    ffmpeg libpng-dev zlib1g-dev libjpeg-dev libxrender-dev libxcursor-dev libxfixes-dev libxext-dev \
+    libxft-dev libfontconfig1-dev libxinerama-dev
     
 $ sudo make install
 
@@ -48,7 +52,7 @@ $ fltube        ## To execute app.
 
 #### WARNING
 
-The app doesn't have an **uninstall** task yet, so you can install it in a sort of *"development mode"*, instead of running `make install`:
+The app doesn't have an **uninstall** task yet, so if not sure what you are doing, you can install it in a sort of *"development mode"*, instead of running `make install`:
 
 ```bash
 $ make PREFIX=./build install
@@ -66,8 +70,9 @@ Once FLTube is installed, run this command on a terminal to install *yt-dlp*:
 ```bash
 $ install_yt-dlp.sh
 ```
+By default, **yt-dlp** will be installed at `$HOME/.local/bin`, but you can change the target installation directory using the `-p` parameter. Run `install_yt-dlp.sh -h` for more help.
 
-## TODO
+## [!!] TODO [!!]
     
     Complete this README!
 
