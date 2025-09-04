@@ -76,6 +76,11 @@ By default, **yt-dlp** will be installed at `$HOME/.local/bin`, but you can chan
     
     Complete this README!
 
+## Clarifications
+
+This application is based on an initial concept created by Nicolas Longardi for a package called FLTube, developed for the Spirit-OS distribution. https://gitlab.com/tinydesktoplinux/xpkg/-/tree/f5e29a272fbd27d91c9b17b775ee79f3e3ea420e/fltube
+
+    
 ## License
 
 This project is licensed under the GNU General Public License v3. For more details, see the LICENSE file.
