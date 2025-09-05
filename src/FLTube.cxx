@@ -39,7 +39,7 @@ const std::string FLTUBE_TEMPORAL_DIR(std::filesystem::temp_directory_path().gen
 /** Flag to warn that DOWNLOADING videos in high resolutions (720p, 1080p) may result in a high CPU usage. */
 bool WARN_ABOUT_HIGH_CPU_USAGE_HD_V_DOWNLOAD = true;
 
-std::string CONFIGFILE_PATH = "/etc/fltube/fltube.conf";
+std::string CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
 
 // This variable holds the configured video codec used when download a video.
 std::string DOWNLOAD_VIDEO_CODEC;
