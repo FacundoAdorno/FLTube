@@ -37,8 +37,7 @@ void exitApp(unsigned short int exitStatusCode);
 static void closeWindow_cb(Fl_Widget*, Fl_Window *targetWindow);
 static void showMessageWindow(const char* message);
 static void preview_video_cb(Fl_Button* widget, void* video_url);
-static void download_video_specified_resolution_cb(Fl_Button* resltn_bttn, void* download_video_data);
-static void logAtBuffer(std::string log_message, LogLevel log_lvl);
+static void logAtTerminal(std::string log_message, LogLevel log_lvl);
 static void add_video_group(int posx, int posy);
 static VideoInfo* create_video_group(int posx, int posy);
 static void update_video_info();
@@ -47,7 +46,6 @@ static void post_init();
 static void doSearch_cb(Fl_Widget*, Fl_Input *input);
 static void getPreviousSearchResults_cb(Fl_Widget*, Fl_Input *input);
 static void getNextSearchResults_cb(Fl_Widget*, Fl_Input *input);
-static void select_directory_cb(Fl_Widget* widget, void* output);
 void showUsage(bool exitApp);
 static void parseOptions(int argc, char **argv);
 

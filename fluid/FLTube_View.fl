@@ -33,7 +33,7 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 
 widget_class FLTubeMainWindow {
   label FLTube open
-  xywh {568 142 800 618}
+  xywh {568 142 593 618}
   class Fl_Double_Window visible
 } {
   Fl_Group {} {
@@ -47,38 +47,22 @@ widget_class FLTubeMainWindow {
     Fl_Button do_search_bttn {
       label {Go search!}
       user_data search_term_or_url selected
-      tooltip {If search by URL, it must be a complete one (i.e. https : // youtu.be/12345)...} xywh {227 88 150 22}
+      tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 88 150 22}
     }
   }
   Fl_Group search_result_selectors {
     xywh {10 125 575 460} box THIN_UP_BOX
   } {}
-  Fl_Text_Display output_text_display {
-    label {Output log:}
-    xywh {600 35 190 550} align 5 textsize 12
-  }
   Fl_Group pagination_controls {open
-    xywh {10 586 310 30}
+    xywh {10 586 448 30}
   } {
     Fl_Button previous_results_bttn {
       label {<&Previous}
-      tooltip {Get previous results of current search results set.} xywh {25 588 135 23}
+      tooltip {Get previous results of current search results set.} xywh {169 588 135 23}
     }
     Fl_Button next_results_bttn {
       label {&Next>}
-      tooltip {Get following results of current search results set.} xywh {175 588 135 23}
-    }
-  }
-  Fl_Group download_dir_selection {open
-    xywh {320 586 470 34} box GLEAM_DOWN_FRAME
-  } {
-    Fl_Input video_download_directory {
-      label {Download Dir:}
-      tooltip {Directory where the video are going to be downloaded.} xywh {417 590 300 24} labelfont 1 labelsize 12 textsize 12
-    }
-    Fl_Button change_dwl_dir_bttn {
-      label Change
-      tooltip {Click to change download directory.} xywh {722 591 64 22}
+      tooltip {Get following results of current search results set.} xywh {319 588 135 23}
     }
   }
 }
@@ -90,36 +74,16 @@ widget_class VideoInfo {open
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
   }
   Fl_Box title {
-    xywh {105 8 455 24} labelfont 1 align 213
+    xywh {105 8 455 40} labelfont 1 align 213
   }
   Fl_Box duration {
-    tooltip {Duration expressed as H:MM:SS.} xywh {110 31 70 20} labelfont 2 align 20
+    tooltip {Duration expressed as H:MM:SS.} xywh {110 57 70 20} labelfont 2 align 20
   }
   Fl_Box uploadDate {
-    tooltip {Video upload date.} xywh {190 31 95 20} labelfont 2 align 20
+    tooltip {Video upload date.} xywh {190 57 95 20} labelfont 2 align 20
   }
   Fl_Button userUploader {
-    tooltip {Click to list all channel's video.} xywh {295 31 260 20} labelfont 2 align 20
-  }
-  Fl_Button d240 {
-    label 240p
-    tooltip {Download video at this specific resolution.} xywh {110 58 55 25}
-  }
-  Fl_Button d360 {
-    label 360p
-    tooltip {Download video at this specific resolution.} xywh {176 58 55 25}
-  }
-  Fl_Button d480 {
-    label 480p
-    tooltip {Download video at this specific resolution.} xywh {242 58 55 25}
-  }
-  Fl_Button d720 {
-    label 720p
-    tooltip {Download video at this specific resolution.} xywh {308 58 55 25}
-  }
-  Fl_Button d1080 {
-    label 1080p
-    tooltip {Download video at this specific resolution.} xywh {375 58 55 25}
+    tooltip {Click to list all channel's video.} xywh {295 57 260 20} labelfont 2 align 20
   }
 }
 

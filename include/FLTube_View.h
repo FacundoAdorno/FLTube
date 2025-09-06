@@ -24,7 +24,6 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Text_Display.H>
 
 class FLTubeMainWindow : public Fl_Double_Window {
   void _FLTubeMainWindow();
@@ -35,13 +34,9 @@ public:
   Fl_Input *search_term_or_url;
   Fl_Button *do_search_bttn;
   Fl_Group *search_result_selectors;
-  Fl_Text_Display *output_text_display;
   Fl_Group *pagination_controls;
   Fl_Button *previous_results_bttn;
   Fl_Button *next_results_bttn;
-  Fl_Group *download_dir_selection;
-  Fl_Input *video_download_directory;
-  Fl_Button *change_dwl_dir_bttn;
 };
 #include <FL/Fl_Box.H>
 
@@ -53,11 +48,6 @@ public:
   Fl_Box *duration;
   Fl_Box *uploadDate;
   Fl_Button *userUploader;
-  Fl_Button *d240;
-  Fl_Button *d360;
-  Fl_Button *d480;
-  Fl_Button *d720;
-  Fl_Button *d1080;
 };
 
 class TinyMessageWindow : public Fl_Double_Window {

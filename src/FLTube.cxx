@@ -36,9 +36,6 @@ std::array <YTDLP_Video_Metadata*,SEARCH_PAGE_SIZE> video_metadata{ nullptr, nul
 
 const std::string FLTUBE_TEMPORAL_DIR(std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/");
 
-/** Flag to warn that DOWNLOADING videos in high resolutions (720p, 1080p) may result in a high CPU usage. */
-bool WARN_ABOUT_HIGH_CPU_USAGE_HD_V_DOWNLOAD = true;
-
 std::string CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
 
 // This variable holds the configured video codec used when download a video.
@@ -131,57 +128,11 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
     }
     std::string* url = static_cast<std::string*>(video_url);
     if (url){
-        logAtBuffer(_("Starting streaming preview of video..."),LogLevel::INFO);
+        logAtTerminal(_("Starting streaming preview of video..."),LogLevel::INFO);
         stream_video(url->c_str(), media_player);
     } else {
-        logAtBuffer(_("Cannot get video URL. Review your the video metadata..."), LogLevel::ERROR);
+        logAtTerminal(_("Cannot get video URL. Review your the video metadata..."), LogLevel::ERROR);
     }
-}
-
-/** Callback for download a video at resolution relative to button clicked...
- */
-void download_video_specified_resolution_cb(Fl_Button* resltn_bttn, void* download_video_data){
-    if (! verify_network_connection()) {
-        showMessageWindow( _("There seems that you don't have access to the Internet. "
-        "Please, verify you network connection before proceed..."));
-        return;
-    }
-    //VCODEC_RESOLUTIONS vc = VCODEC_RESOLUTIONS(resolution);
-    DownloadVideoCBData* download_data =  static_cast<DownloadVideoCBData*>(download_video_data);
-    bool continueToDownload = true;
-    //printf("VIDEO URL: %s - LA RESOLUCION A DESCARGAR ES: %dp\n", download_data->video_url.c_str(), download_data->video_resolution);
-    if(WARN_ABOUT_HIGH_CPU_USAGE_HD_V_DOWNLOAD && download_data->video_resolution >= 720) {
-        //Only show waning message if
-        continueToDownload = showChoiceWindow(_("WARNING: This option may result in high CPU usage. It is not recommended on low-spec PCs, as it may freeze the desktop interface. Continue to download video?"), WARN_ABOUT_HIGH_CPU_USAGE_HD_V_DOWNLOAD);
-    }
-    if(!continueToDownload){
-        logAtBuffer(_("Download CANCELLED by user choice."), LogLevel::WARN);
-        return;
-    }
-    std::string download_dir = mainWin->video_download_directory->value();
-
-    download_video(download_data->video_url.c_str(), download_dir.c_str(), VCODEC_RESOLUTIONS(download_data->video_resolution),
-                   DOWNLOAD_VIDEO_CODEC.c_str());
-    logAtBuffer(_("Video downloaded at ") + download_dir, LogLevel::INFO);
-}
-
-/**
- * Create a new group to view video info.
- */
-VideoInfo* create_video_group(int posx, int posy) {
-    VideoInfo *video_info = new VideoInfo (posx, posy, 600, 90, "");
-    DownloadVideoCBData* dv_data = new DownloadVideoCBData{VCODEC_RESOLUTIONS::R240p, ""};
-    video_info->d240->callback((Fl_Callback*) download_video_specified_resolution_cb, dv_data);
-    dv_data = new DownloadVideoCBData{VCODEC_RESOLUTIONS::R360p, ""};
-    video_info->d360->callback((Fl_Callback*) download_video_specified_resolution_cb, dv_data);
-    dv_data = new DownloadVideoCBData{VCODEC_RESOLUTIONS::R480p, ""};
-    video_info->d480->callback((Fl_Callback*) download_video_specified_resolution_cb, dv_data);
-    dv_data = new DownloadVideoCBData{VCODEC_RESOLUTIONS::R720p, ""};
-    video_info->d720->callback((Fl_Callback*) download_video_specified_resolution_cb, dv_data);
-    dv_data = new DownloadVideoCBData{VCODEC_RESOLUTIONS::R1080p, ""};
-    video_info->d1080->callback((Fl_Callback*) download_video_specified_resolution_cb, dv_data);
-    video_info->thumbnail->callback((Fl_Callback*)preview_video_cb);
-    return video_info;
 }
 
 /**
@@ -197,20 +148,10 @@ void update_video_info() {
             video_info_arr[j]->duration->label(video_metadata[j]->duration.c_str());
             video_info_arr[j]->uploadDate->label(video_metadata[j]->upload_date.c_str());
             video_info_arr[j]->userUploader->label(video_metadata[j]->creators.c_str());
-            // Update the URL in every Download Button in VideoInfo
-            const std::vector<DownloadVideoCBData*> download_buttons = {
-                static_cast<DownloadVideoCBData*>(video_info_arr[j]->d240->user_data()),
-                static_cast<DownloadVideoCBData*>(video_info_arr[j]->d360->user_data()),
-                static_cast<DownloadVideoCBData*>(video_info_arr[j]->d480->user_data()),
-                static_cast<DownloadVideoCBData*>(video_info_arr[j]->d720->user_data()),
-                static_cast<DownloadVideoCBData*>(video_info_arr[j]->d1080->user_data())
-            };
+
             //Setting URL for streaming a video preview...
             video_info_arr[j]->thumbnail->user_data(static_cast<void*>(&video_metadata[j]->url));
-            //Setting URL for download buttons...
-            for(DownloadVideoCBData* dvcbd:download_buttons){
-                dvcbd->video_url = video_metadata[j]->url;
-            }
+
             //Download, resize and update the video thumbnail image...
             std::string thumbn_url = video_metadata[j]->thumbnail_url.substr(0, video_metadata[j]->thumbnail_url.find("?"));
             std::string thumbn_name = "th_" + video_metadata[j]->id + ".jpg";
@@ -218,7 +159,7 @@ void update_video_info() {
             int targetWidth = video_info_arr[j]->thumbnail->w();
             Fl_Image* resized_thumbnail = create_resized_image_from_jpg(FLTUBE_TEMPORAL_DIR + thumbn_name, targetWidth);
             if (resized_thumbnail == nullptr) {
-                logAtBuffer(_("Something went wrong when generating a resize thumbnail for video with ID=") + video_metadata[j]->id, LogLevel::ERROR);
+                logAtTerminal(_("Something went wrong when generating a resize thumbnail for video with ID=") + video_metadata[j]->id, LogLevel::ERROR);
             } else {
                 delete video_info_arr[j]->thumbnail->image();
                 video_info_arr[j]->thumbnail->image(resized_thumbnail);
@@ -247,28 +188,6 @@ void pre_init() {
 
     //Init Localization. Use locale path specified at config, or custom config default_locale_path().
     setup_gettext("", getProperty("LOCALE_PATH", default_locale_path().c_str(), configParameters));
-
-    // Checking video codec configuration for download, if set in configuration file...
-    std::string video_codec = getProperty("VCODEC_FOR_DOWNLOAD", VIDEOCODEC_PREFERRED.c_str(), configParameters);
-    if (video_codec != ""){
-        bool vcodec_accepted = false;
-        for (const char* vcodec : VCODEC_IMPL_NAMES) {
-            if(video_codec == vcodec){
-                vcodec_accepted = true;
-                break;
-            }
-        }
-        if(!vcodec_accepted) {
-            char error_message[512];
-            std::string error_message_f = _("The video codec %s set in configuration file is not accepted by FLTube. Please, change for a valid one. Fallback to default codec: %s.");
-            snprintf(error_message, 512, error_message_f.c_str(), video_codec.c_str(), VIDEOCODEC_PREFERRED.c_str());
-            printf("[ERROR] --- %s\n",error_message);
-
-            video_codec = VIDEOCODEC_PREFERRED;
-        }
-    }
-    DOWNLOAD_VIDEO_CODEC = video_codec;
-
 
     media_player = new MediaPlayerInfo();
     if(existProperty("STREAM_PLAYER_PATH", configParameters)) {
@@ -305,7 +224,7 @@ void post_init() {
 }
 
 /** Write a log message at main application text buffer.*/
-void logAtBuffer(std::string log_message, LogLevel log_lvl) {
+void logAtTerminal(std::string log_message, LogLevel log_lvl) {
     //TODO check if buffer exists before write on it...
     std::string logleveltext;
     switch (log_lvl) {
@@ -321,7 +240,16 @@ void logAtBuffer(std::string log_message, LogLevel log_lvl) {
         default:
             logleveltext = "[UNKNOWN] ";
     }
-    mainWin->output_text_display->buffer()->append((logleveltext +  currentDateTime() + " --- "+ log_message + "\n").c_str());
+    printf("%s %s --- %s\n", logleveltext.c_str(), currentDateTime().c_str(), log_message.c_str());
+}
+
+/**
+ * Create a new group to view video info.
+ */
+VideoInfo* create_video_group(int posx, int posy) {
+    VideoInfo *video_info = new VideoInfo (posx, posy, 600, 90, "");
+    video_info->thumbnail->callback((Fl_Callback*)preview_video_cb);
+    return video_info;
 }
 
 /**
@@ -349,7 +277,7 @@ void doSearch_cb(Fl_Widget*, Fl_Input *input) {
         if(!isYoutubeURL(input_text)){
             std::string warn_message = _("For now, only Youtube URL's are valid for download. Please, edit your input text or search using a generic term.");
             showMessageWindow(warn_message.c_str());
-            logAtBuffer(warn_message, LogLevel::WARN);
+            logAtTerminal(warn_message, LogLevel::WARN);
             return;
         }
         result = get_videoURL_metadata(input_text);
@@ -361,7 +289,7 @@ void doSearch_cb(Fl_Widget*, Fl_Input *input) {
             mainWin->next_results_bttn->activate();
         }
         result = do_ytdlp_search(input_text, YOUTUBE_EXTRACTOR_NAME.c_str(), page_i);
-        logAtBuffer(result, LogLevel::INFO);
+        logAtTerminal(result, LogLevel::INFO);
     }
     // Read input lines until an empty line is encountered
     std::istringstream result_sstream(result);
@@ -419,7 +347,7 @@ void select_directory_cb(Fl_Widget* widget, void* output) {
     if (dir && std::filesystem::exists(dir)) {
         if(!canWriteOnDir(dir)){
             std::string directory(dir);
-            logAtBuffer("Don't have write permissions on " + directory + ". Select another one.", LogLevel::WARN);
+            logAtTerminal("Don't have write permissions on " + directory + ". Select another one.", LogLevel::WARN);
             return;
         }
         output_widget->value(dir);
@@ -485,18 +413,13 @@ int main(int argc, char **argv) {
     printf(_("Starting FLtube v.%s\n"), VERSION);
 
     char win_title[30] = "FLtube ";
-    mainWin = new FLTubeMainWindow(800, 618, strcat(win_title, VERSION));
+    mainWin = new FLTubeMainWindow(593, 618, strcat(win_title, VERSION));
     mainWin->callback((Fl_Callback*)exitApp);
     mainWin->do_search_bttn->callback((Fl_Callback*)doSearch_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->callback((Fl_Callback*)getPreviousSearchResults_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->deactivate();
     mainWin->next_results_bttn->callback((Fl_Callback*)getNextSearchResults_cb, (void*)(mainWin->search_term_or_url));
     mainWin->next_results_bttn->deactivate();
-    Fl_Text_Buffer* buffer = new Fl_Text_Buffer();
-    mainWin->output_text_display->buffer(buffer);
-    mainWin->video_download_directory->value(getHomePathOr(FLTUBE_TEMPORAL_DIR.c_str()));
-    mainWin->video_download_directory->readonly(1);
-    mainWin->change_dwl_dir_bttn->callback((Fl_Callback*)select_directory_cb, mainWin->video_download_directory);
 
     post_init();
     mainWin->show(argc, argv);

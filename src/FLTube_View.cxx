@@ -34,7 +34,7 @@ FLTubeMainWindow::FLTubeMainWindow(int W, int H, const char *L) :
 }
 
 FLTubeMainWindow::FLTubeMainWindow() :
-  Fl_Double_Window(0, 0, 800, 618, "FLTube")
+  Fl_Double_Window(0, 0, 593, 618, "FLTube")
 {
   clear_flag(16);
   _FLTubeMainWindow();
@@ -69,32 +69,15 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     search_result_selectors->box(FL_THIN_UP_BOX);
     search_result_selectors->end();
   } // Fl_Group* search_result_selectors
-  { output_text_display = new Fl_Text_Display(600, 35, 190, 550, _("Output log:"));
-    output_text_display->textsize(12);
-    output_text_display->align(Fl_Align(FL_ALIGN_TOP_LEFT));
-  } // Fl_Text_Display* output_text_display
-  { pagination_controls = new Fl_Group(10, 586, 310, 30);
-    { previous_results_bttn = new Fl_Button(25, 588, 135, 23, _("<&Previous"));
+  { pagination_controls = new Fl_Group(10, 586, 448, 30);
+    { previous_results_bttn = new Fl_Button(169, 588, 135, 23, _("<&Previous"));
       previous_results_bttn->tooltip(_("Get previous results of current search results set."));
     } // Fl_Button* previous_results_bttn
-    { next_results_bttn = new Fl_Button(175, 588, 135, 23, _("&Next>"));
+    { next_results_bttn = new Fl_Button(319, 588, 135, 23, _("&Next>"));
       next_results_bttn->tooltip(_("Get following results of current search results set."));
     } // Fl_Button* next_results_bttn
     pagination_controls->end();
   } // Fl_Group* pagination_controls
-  { download_dir_selection = new Fl_Group(320, 586, 470, 34);
-    download_dir_selection->box(FL_GLEAM_DOWN_FRAME);
-    { video_download_directory = new Fl_Input(417, 590, 300, 24, _("Download Dir:"));
-      video_download_directory->tooltip(_("Directory where the video are going to be downloaded."));
-      video_download_directory->labelfont(1);
-      video_download_directory->labelsize(12);
-      video_download_directory->textsize(12);
-    } // Fl_Input* video_download_directory
-    { change_dwl_dir_bttn = new Fl_Button(722, 591, 64, 22, _("Change"));
-      change_dwl_dir_bttn->tooltip(_("Click to change download directory."));
-    } // Fl_Button* change_dwl_dir_bttn
-    download_dir_selection->end();
-  } // Fl_Group* download_dir_selection
   end();
 }
 
@@ -104,40 +87,25 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
   { thumbnail = new Fl_Button(6, 5, 95, 80);
     thumbnail->tooltip(_("Click to stream the video (preview it)..."));
   } // Fl_Button* thumbnail
-  { title = new Fl_Box(105, 8, 455, 24);
+  { title = new Fl_Box(105, 8, 455, 40);
     title->labelfont(1);
     title->align(Fl_Align(197|FL_ALIGN_INSIDE));
   } // Fl_Box* title
-  { duration = new Fl_Box(110, 31, 70, 20);
+  { duration = new Fl_Box(110, 57, 70, 20);
     duration->tooltip(_("Duration expressed as H:MM:SS."));
     duration->labelfont(2);
     duration->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
   } // Fl_Box* duration
-  { uploadDate = new Fl_Box(190, 31, 95, 20);
+  { uploadDate = new Fl_Box(190, 57, 95, 20);
     uploadDate->tooltip(_("Video upload date."));
     uploadDate->labelfont(2);
     uploadDate->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
   } // Fl_Box* uploadDate
-  { userUploader = new Fl_Button(295, 31, 260, 20);
+  { userUploader = new Fl_Button(295, 57, 260, 20);
     userUploader->tooltip(_("Click to list all channel\'s video."));
     userUploader->labelfont(2);
     userUploader->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
   } // Fl_Button* userUploader
-  { d240 = new Fl_Button(110, 58, 55, 25, _("240p"));
-    d240->tooltip(_("Download video at this specific resolution."));
-  } // Fl_Button* d240
-  { d360 = new Fl_Button(176, 58, 55, 25, _("360p"));
-    d360->tooltip(_("Download video at this specific resolution."));
-  } // Fl_Button* d360
-  { d480 = new Fl_Button(242, 58, 55, 25, _("480p"));
-    d480->tooltip(_("Download video at this specific resolution."));
-  } // Fl_Button* d480
-  { d720 = new Fl_Button(308, 58, 55, 25, _("720p"));
-    d720->tooltip(_("Download video at this specific resolution."));
-  } // Fl_Button* d720
-  { d1080 = new Fl_Button(375, 58, 55, 25, _("1080p"));
-    d1080->tooltip(_("Download video at this specific resolution."));
-  } // Fl_Button* d1080
   end();
   position(X, Y);
 }
