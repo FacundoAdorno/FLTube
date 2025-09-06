@@ -12,9 +12,6 @@
  */
 
 #include "../include/fltube_utils.h"
-#include <cstdio>
-#include <cstring>
-#include <curl/curl.h>
 
 const std::string HTTP_PREFIX = "http://";
 const std::string HTTPS_PREFIX = "https://";

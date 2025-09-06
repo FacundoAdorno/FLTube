@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <algorithm>
+#include <cstring>
 
 #include <FL/Fl_Image.H>
 #include <FL/Fl_JPEG_Image.H>
