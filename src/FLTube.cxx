@@ -326,37 +326,6 @@ void getNextSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     doSearch_cb(widget, input);
 }
 
-/** Change video download directory callback.  */
-void select_directory_cb(Fl_Widget* widget, void* output) {
-    const char *selected_directory;
-
-    Fl_Input* output_widget = static_cast<Fl_Input*>(output);
-
-    //printf("DIR: %s\n", output_widget->value());
-    const char* output_value = output_widget->value();
-    if (output_value != nullptr && output_value[0] != '\0') {
-        selected_directory = output_value;
-    } else if ((selected_directory = getenv("HOME")) == NULL) {
-        selected_directory = nullptr;
-    }
-
-    // Open dialog to select directory
-    char* dir = fl_dir_chooser(_("Select a download directory"), selected_directory);
-
-    // If a directory is selected, save it at output value.
-    if (dir && std::filesystem::exists(dir)) {
-        if(!canWriteOnDir(dir)){
-            std::string directory(dir);
-            logAtTerminal("Don't have write permissions on " + directory + ". Select another one.", LogLevel::WARN);
-            return;
-        }
-        output_widget->value(dir);
-        output_widget->tooltip(dir);
-    } else {
-        std::cout << _("No directory was selected.") << std::endl;
-    }
-}
-
 /*
  * Print program usage and exit if desire (exitApp = true).
  */
