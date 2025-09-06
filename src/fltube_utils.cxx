@@ -12,7 +12,9 @@
  */
 
 #include "../include/fltube_utils.h"
+#include <cstdio>
 #include <cstring>
+#include <curl/curl.h>
 
 const std::string HTTP_PREFIX = "http://";
 const std::string HTTPS_PREFIX = "https://";
@@ -272,37 +274,83 @@ YTDLP_Video_Metadata* parse_YT_Video_Metadata(const char ytdlp_video_metadata[51
     return metadata;
 }
 
+/**
+ *  Create a CURL handle, for an specific URL (not null) and an optional output_file;
+ */
+static CURL* get_curl_handle(const char* forURL, FILE* output_file) {
+    if(forURL == nullptr || forURL[0] == '\0'){
+        return nullptr;
+    }
+    CURL *curl;
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, forURL);
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);  //This allow redirections (i.e. HTTP 301 code)
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+        if (output_file != nullptr)     curl_easy_setopt(curl, CURLOPT_WRITEDATA, output_file);
+    }
+    return curl;
+}
+
 //Function for download a file to a local output directory, and set a custom name. Returns 0 if all is ok.
-int download_file(std::string url, std::string output_dir, std::string outfilename, bool overwrite) {
+FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::string outfilename, bool overwrite) {
     CURL *curl;
     FILE *fp;
     CURLcode response;
+    FLTUBE_STATUS_CODES returnCode = FLT_OK;
     std::string fullpath = output_dir + outfilename;
     //If must not overwrite the file, check if exists before do any download...
     if (!overwrite && std::filesystem::exists(fullpath)) {
         return FLT_DOWNLOAD_FL_BYPASSED;
     }
-    curl_global_init(CURL_GLOBAL_ALL);
-    curl = curl_easy_init();
+
+    fp = fopen(fullpath.c_str(),"wb");
+    if (fp == nullptr) {
+       perror("Error creating download file");
+        //TODO: what else we can do if fp is nullptr?
+    }
+    curl = get_curl_handle(url.c_str(), fp);
     if (curl) {
-        fp = fopen(fullpath.c_str(),"wb");
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
         response = curl_easy_perform(curl);
 
         if (response != CURLE_OK) {
             fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(response));
-            return FLT_DOWNLOAD_FL_FAILED;
+            returnCode = FLT_DOWNLOAD_FL_FAILED;
         }
-
-        /* always cleanup */
         curl_easy_cleanup(curl);
         fclose(fp);
     }
-    return FLT_OK;
+    return returnCode;
+}
+
+/**
+ *  Check if there is network connectivity. Returns true if Internet is reachable.
+ */
+bool verify_network_connection() {
+    CURL *curl;
+    CURLcode response;
+    const char* url_test = "https://youtube.com";
+    // Use null device to redirect CURL output...
+    FILE* null_file = fopen("/dev/null", "w");
+    if (null_file == nullptr)  {
+        //TODO what else we can do if null_file is nullptr?
+        perror("Error opening file");
+    }
+    curl = get_curl_handle(url_test, null_file);
+    if (curl) {
+        response = curl_easy_perform(curl);
+        if ( response != CURLE_OK) {
+            printf(_("Connection testing failure: %s. Check your connectivity.\n"), url_test);
+            curl_easy_cleanup(curl);
+            return false;
+        }
+        curl_easy_cleanup(curl);
+        if (null_file != nullptr) fclose(null_file);
+        return true;
+    }
+    return false;
 }
 
 /** Returns a resized Fl_Image widget from an existing JPG image. If original image doesn't exists, a @nullptr is returned.*/

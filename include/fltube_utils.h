@@ -140,7 +140,11 @@ void download_video(const char* video_url, const char* download_path, VCODEC_RES
 
 YTDLP_Video_Metadata* parse_YT_Video_Metadata(const char ytdlp_video_metadata[512]);
 
-int download_file(std::string url, std::string output_dir, std::string outfilename, bool overwrite = false);
+static CURL* get_curl_handle(const char* forURL, FILE* output_file = nullptr);
+
+FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::string outfilename, bool overwrite = false);
+
+bool verify_network_connection();
 
 Fl_Image* create_resized_image_from_jpg(std::string jpg_filepath, int target_width);
 

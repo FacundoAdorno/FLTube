@@ -124,6 +124,11 @@ bool showChoiceWindow(const char* message, bool& keepShowingFlag) {
 
 /** Callback to preview a video... */
 void preview_video_cb(Fl_Button* widget, void* video_url){
+    if (! verify_network_connection()) {
+        showMessageWindow( _("There seems that you don't have access to the Internet. "
+        "Please, verify you network connection before proceed..."));
+        return;
+    }
     std::string* url = static_cast<std::string*>(video_url);
     if (url){
         logAtBuffer(_("Starting streaming preview of video..."),LogLevel::INFO);
@@ -136,6 +141,11 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
 /** Callback for download a video at resolution relative to button clicked...
  */
 void download_video_specified_resolution_cb(Fl_Button* resltn_bttn, void* download_video_data){
+    if (! verify_network_connection()) {
+        showMessageWindow( _("There seems that you don't have access to the Internet. "
+        "Please, verify you network connection before proceed..."));
+        return;
+    }
     //VCODEC_RESOLUTIONS vc = VCODEC_RESOLUTIONS(resolution);
     DownloadVideoCBData* download_data =  static_cast<DownloadVideoCBData*>(download_video_data);
     bool continueToDownload = true;
@@ -318,10 +328,17 @@ void logAtBuffer(std::string log_message, LogLevel log_lvl) {
  * Callback for search button: search by YT URL or search term. Input mustn't be empty.'
  */
 void doSearch_cb(Fl_Widget*, Fl_Input *input) {
+    // Check if there is Internet connectivity before do a search...
+    if (! verify_network_connection()) {
+        showMessageWindow( _("There seems that you don't have access to the Internet. "
+                            "Please, verify you network connection before proceed..."));
+        return;
+    }
     if (input == nullptr) {
         printf(_("User input is empty!!!\n"));
         return;
     }
+
     const char* input_text = input->value();
     if (input_text == nullptr || input_text[0] == '\0') {
         showMessageWindow(_("Search input is empty. Please, retry and enter a valid text."));

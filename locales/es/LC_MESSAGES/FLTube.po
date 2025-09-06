@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-31 23:53-0300\n"
-"PO-Revision-Date: 2025-08-31 22:56-0300\n"
+"POT-Creation-Date: 2025-09-06 01:15-0300\n"
+"PO-Revision-Date: 2025-09-06 01:24-0300\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: es\n"
@@ -28,15 +28,23 @@ msgstr "Eliminando archivos temporales en %s.\n"
 msgid "Closing FLtube... Bye!\n"
 msgstr "Cerrando FLTube... ¡Adiós!\n"
 
-#: src/FLTube.cxx:127
+#: src/FLTube.cxx:128 src/FLTube.cxx:145 src/FLTube.cxx:333
+msgid ""
+"There seems that you don't have access to the Internet. Please, verify you "
+"network connection before proceed..."
+msgstr ""
+"Parece que no tienes conexión a Internet. Por favor, verifica tu conexión "
+"de red antes de proceder..."
+
+#: src/FLTube.cxx:134
 msgid "Starting streaming preview of video..."
 msgstr "Iniciando previsualización del video..."
 
-#: src/FLTube.cxx:130
+#: src/FLTube.cxx:137
 msgid "Cannot get video URL. Review your the video metadata..."
 msgstr "No se puede descargar URL de video. Revisala..."
 
-#: src/FLTube.cxx:143
+#: src/FLTube.cxx:155
 msgid ""
 "WARNING: This option may result in high CPU usage. It is not recommended on "
 "low-spec PCs, as it may freeze the desktop interface. Continue to download "
@@ -46,20 +54,20 @@ msgstr ""
 "recomienda en PCs de especificaciones bajas, ya que puede congelar la "
 "interfaz del escritorio. ¿Continuar con la descarga del video?"
 
-#: src/FLTube.cxx:146
+#: src/FLTube.cxx:158
 msgid "Download CANCELLED by user choice."
 msgstr "Descarga CANCELADA por opción del usuario."
 
-#: src/FLTube.cxx:153
+#: src/FLTube.cxx:165
 msgid "Video downloaded at "
 msgstr "Video descargado en "
 
-#: src/FLTube.cxx:209
+#: src/FLTube.cxx:221
 msgid ""
 "Something went wrong when generating a resize thumbnail for video with ID="
 msgstr "Algo falló al generar una miniatura re-escalada para el video con ID="
 
-#: src/FLTube.cxx:228
+#: src/FLTube.cxx:240
 msgid ""
 "yt-dlp is not installed on your system or its binary is not at $PATH system "
 "variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run "
@@ -69,12 +77,12 @@ msgstr ""
 "variable $PATH del sistema. Instalalo desde https://github.com/yt-dlp/yt-"
 "dlp. Ó ejecuta en una terminal el comando 'install_yt-dlp'."
 
-#: src/FLTube.cxx:229
+#: src/FLTube.cxx:241
 #, c-format
 msgid "yt-dlp is not installed. Closing app...\n"
 msgstr "yt-dlp no está instalado. Cerrando app...\n"
 
-#: src/FLTube.cxx:251
+#: src/FLTube.cxx:263
 #, c-format
 msgid ""
 "The video codec %s set in configuration file is not accepted by FLTube. "
@@ -83,12 +91,17 @@ msgstr ""
 "El códec de video %s indicado en el archivo de configuración no es aceptado "
 "por FLTube. Cambialo por uno válido. Usando códec por defecto: %s."
 
-#: src/FLTube.cxx:320
+#: src/FLTube.cxx:338
 #, c-format
 msgid "User input is empty!!!\n"
 msgstr "¡La entrada del usuario está vacía!\n"
 
-#: src/FLTube.cxx:327
+#: src/FLTube.cxx:344
+msgid "Search input is empty. Please, retry and enter a valid text."
+msgstr ""
+"La entrada está vacía. Por favor, re-inténtalo e ingresa un texto válido."
+
+#: src/FLTube.cxx:350
 msgid ""
 "For now, only Youtube URL's are valid for download. Please, edit your input "
 "text or search using a generic term."
@@ -96,38 +109,43 @@ msgstr ""
 "Por ahora, sólo URL's de Youtube son válidas para descargar. Por favor, "
 "edita tu entrada ó realiza una búsqueda por término de búsqueda."
 
-#: src/FLTube.cxx:393
+#: src/FLTube.cxx:416
 msgid "Select a download directory"
 msgstr "Haga clic para cambiar el directorio de descarga"
 
-#: src/FLTube.cxx:405
+#: src/FLTube.cxx:428
 msgid "No directory was selected."
 msgstr "Ningún directorio fue seleccionado."
 
-#: src/FLTube.cxx:447
+#: src/FLTube.cxx:470
 #, c-format
 msgid "Loading custom config file %s.\n"
 msgstr "Cargando archivo de configuración personalizado: %s.\r\n"
 
-#: src/FLTube.cxx:449
+#: src/FLTube.cxx:472
 #, c-format
 msgid "--config parameter with no path specified.\n"
 msgstr "El parámetro --config no especifica una ruta de archivo.\n"
 
-#: src/FLTube.cxx:462
+#: src/FLTube.cxx:485
 #, c-format
 msgid "Starting FLtube v.%s\n"
 msgstr "Iniciando FLTube v.%s\n"
 
-#: src/fltube_utils.cxx:40
+#: src/fltube_utils.cxx:42
 #, c-format
 msgid "There was an error executing the following command: %s \n"
 msgstr "Se produjo un error al ejecutar el siguiente comando: %s \n"
 
-#: src/fltube_utils.cxx:41
+#: src/fltube_utils.cxx:43
 #, c-format
 msgid "Closing the program due to an error.\n"
 msgstr "Cerrando el programa debido a un error.\n"
+
+#: src/fltube_utils.cxx:341
+#, c-format
+msgid "Connection testing failure: %s. Check your connectivity.\n"
+msgstr "Prueba de conexión fallida: %s. Verifica tu conectividad.\n"
 
 #: src/FLTube_View.cxx:53
 msgid "Search box:"
