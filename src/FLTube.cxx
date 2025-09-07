@@ -265,9 +265,9 @@ VideoInfo* create_video_group(int posx, int posy) {
 }
 
 /**
- * Callback for search button: search by YT URL or search term. Input mustn't be empty.'
+ * Search by YT URL or search term. Input mustn't be empty.'
  */
-void doSearch_cb(Fl_Widget*, Fl_Input *input) {
+void doSearch(Fl_Widget*, Fl_Input *input) {
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
         logAtTerminal(_("Your device is offline. Check your internet connection."), LogLevel::WARN);
@@ -324,6 +324,16 @@ void doSearch_cb(Fl_Widget*, Fl_Input *input) {
     update_video_info();
 }
 
+/*
+ * Callback for search button.
+ */
+void searchButtonAction_cb(Fl_Widget *wdgt, Fl_Input *input){
+    //Reset global pagination index and "deactivate" previos button...
+    mainWin->previous_results_bttn->deactivate();
+    SEARCH_PAGE_INDEX = 0;
+    doSearch(wdgt, input);
+}
+
 /** Callback for Previous results button... */
 void getPreviousSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     if (SEARCH_PAGE_INDEX>0) {
@@ -332,14 +342,14 @@ void getPreviousSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     if (SEARCH_PAGE_INDEX == 0) {
         mainWin->previous_results_bttn->deactivate();
     }
-    doSearch_cb(widget, input);
+    doSearch(widget, input);
 }
 /** Callback for Next results button.. */
 void getNextSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     //TODO: what to do if there is no more results? It must be controlled in some way...
     SEARCH_PAGE_INDEX++;
     mainWin->previous_results_bttn->activate();
-    doSearch_cb(widget, input);
+    doSearch(widget, input);
 }
 
 /*
@@ -407,7 +417,7 @@ int main(int argc, char **argv) {
     char win_title[30] = "FLTube ";
     mainWin = new FLTubeMainWindow(593, 618, strcat(win_title, VERSION));
     mainWin->callback((Fl_Callback*)exitApp);
-    mainWin->do_search_bttn->callback((Fl_Callback*)doSearch_cb, (void*)(mainWin->search_term_or_url));
+    mainWin->do_search_bttn->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->callback((Fl_Callback*)getPreviousSearchResults_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->deactivate();
     mainWin->next_results_bttn->callback((Fl_Callback*)getNextSearchResults_cb, (void*)(mainWin->search_term_or_url));
