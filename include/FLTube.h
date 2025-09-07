@@ -22,10 +22,11 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <format>
 
 static const char* VERSION = "0.1.alpha";
 
-enum LogLevel { INFO, WARN, ERROR };
+enum LogLevel { INFO, WARN, ERROR, DEBUG };
 
 /**  Save this object as user_data in buttons callbacks for Video Info. */
 struct DownloadVideoCBData {

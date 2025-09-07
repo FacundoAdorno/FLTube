@@ -38,6 +38,9 @@ const std::string FLTUBE_TEMPORAL_DIR(std::filesystem::temp_directory_path().gen
 
 std::string CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
 
+//If value is 0, enable the debug mode. Defaults to false (or 1).
+int DEBUG_ENABLED = 1;
+
 // This variable holds the configured video codec used when download a video.
 std::string DOWNLOAD_VIDEO_CODEC;
 
@@ -50,10 +53,12 @@ std::unique_ptr<std::map<std::string, std::string>> configParameters = {};
  */
 void exitApp(unsigned short int exitStatusCode = FLT_OK) {
     //Do some cleaning...
-    printf(_("Cleaning temporal files at %s.\n"), FLTUBE_TEMPORAL_DIR.c_str());
+    char message[1024];
+    snprintf(message, sizeof(message), _("Cleaning temporal files at %s."), FLTUBE_TEMPORAL_DIR.c_str());
+    logAtTerminal(std::string(message), LogLevel::INFO);
     std::filesystem::remove_all(FLTUBE_TEMPORAL_DIR);
     //Exiting the app...
-    printf(_("Closing FLtube... Bye!\n"));
+    logAtTerminal(_("Closing FLtube... Bye!\n"), LogLevel::INFO);
     exit(exitStatusCode);
 }
 
@@ -122,16 +127,19 @@ bool showChoiceWindow(const char* message, bool& keepShowingFlag) {
 /** Callback to preview a video... */
 void preview_video_cb(Fl_Button* widget, void* video_url){
     if (! verify_network_connection()) {
+        logAtTerminal(_("Your device is offline. Check your internet connection."), LogLevel::WARN);
         showMessageWindow( _("There seems that you don't have access to the Internet. "
         "Please, verify you network connection before proceed..."));
         return;
     }
     std::string* url = static_cast<std::string*>(video_url);
     if (url){
-        logAtTerminal(_("Starting streaming preview of video..."),LogLevel::INFO);
+        char message[256];
+        snprintf(message, sizeof(message), _("Starting streaming preview of video '%s'..."), url->c_str());
+        logAtTerminal(message,LogLevel::INFO);
         stream_video(url->c_str(), media_player);
     } else {
-        logAtTerminal(_("Cannot get video URL. Review your the video metadata..."), LogLevel::ERROR);
+        logAtTerminal(_("Cannot get video URL. Review the video metadata enabling app debugging..."), LogLevel::ERROR);
     }
 }
 
@@ -179,7 +187,7 @@ void update_video_info() {
 void pre_init() {
     if ( !checkForYTDLP() ) {
         showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run in a terminal the 'install_yt-dlp' script."));
-        printf(_("yt-dlp is not installed. Closing app...\n"));
+        logAtTerminal(_("yt-dlp is not installed. Closing app...\n"), LogLevel::ERROR);
         exitApp(FLT_GENERAL_FAILED);
     }
 
@@ -223,24 +231,28 @@ void post_init() {
     mainWin->redraw();
 }
 
-/** Write a log message at main application text buffer.*/
+/** Write a log message at the terminal where the application was launched. */
 void logAtTerminal(std::string log_message, LogLevel log_lvl) {
-    //TODO check if buffer exists before write on it...
+    if (log_lvl == LogLevel::DEBUG && DEBUG_ENABLED == 1) { return; }//if debug mode disabled, cancel debug message...
+
     std::string logleveltext;
     switch (log_lvl) {
         case LogLevel::INFO:
-            logleveltext = "[INFO] ";
+            logleveltext = "\033[32m\033[1m[INFO]\033[0m ";
             break;
         case LogLevel::WARN:
-            logleveltext = "[WARN] ";
+            logleveltext = "\033[34m\033[1m[WARN]\033[0m ";
             break;
         case LogLevel::ERROR:
-            logleveltext = "[ERROR] ";
+            logleveltext = "\033[31m\033[1m[ERROR]\033[0m ";
+            break;
+        case LogLevel::DEBUG:
+            logleveltext = "\033[33m\033[1m[DEBUG]\033[0m ";
             break;
         default:
-            logleveltext = "[UNKNOWN] ";
+            logleveltext = "\033[1m[UNKNOWN]\033[0m ";
     }
-    printf("%s %s --- %s\n", logleveltext.c_str(), currentDateTime().c_str(), log_message.c_str());
+    printf("\n%s [%s] - - -  %s\n", logleveltext.c_str(), currentDateTime().c_str(), log_message.c_str());
 }
 
 /**
@@ -258,12 +270,13 @@ VideoInfo* create_video_group(int posx, int posy) {
 void doSearch_cb(Fl_Widget*, Fl_Input *input) {
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
+        logAtTerminal(_("Your device is offline. Check your internet connection."), LogLevel::WARN);
         showMessageWindow( _("There seems that you don't have access to the Internet. "
                             "Please, verify you network connection before proceed..."));
         return;
     }
     if (input == nullptr) {
-        printf(_("User input is empty!!!\n"));
+        logAtTerminal(_("The Fl_Input search widget inexistent!!!\n"), LogLevel::ERROR);
         return;
     }
 
@@ -272,6 +285,10 @@ void doSearch_cb(Fl_Widget*, Fl_Input *input) {
         showMessageWindow(_("Search input is empty. Please, retry and enter a valid text."));
         return;
     }
+
+    char message[1024];
+    snprintf(message, sizeof(message), _("Searching for results for '%s' user input..."), input_text);
+    logAtTerminal(std::string(message), LogLevel::DEBUG);
     std::string result;
     if (isUrl(input_text)) {
         if(!isYoutubeURL(input_text)){
@@ -283,13 +300,12 @@ void doSearch_cb(Fl_Widget*, Fl_Input *input) {
         result = get_videoURL_metadata(input_text);
 
     } else {
-        //printf("User input is a search term.\n");
         Pagination_Info page_i(SEARCH_PAGE_SIZE, SEARCH_PAGE_INDEX);
         if (SEARCH_PAGE_INDEX == 0) {
             mainWin->next_results_bttn->activate();
         }
         result = do_ytdlp_search(input_text, YOUTUBE_EXTRACTOR_NAME.c_str(), page_i);
-        logAtTerminal(result, LogLevel::INFO);
+        logAtTerminal(result, LogLevel::DEBUG);
     }
     // Read input lines until an empty line is encountered
     std::istringstream result_sstream(result);
@@ -340,6 +356,7 @@ OPTIONS:
   --config=[PATH_TO_FILE]   Please specify the ABSOLUTE path to the custom configuration file, which should be
                               a copy of the original fltube.config. Use this option when you want to apply a
                               development configuration file for development purposes.
+  -d, --debug               Enable the debug mode through more verbose log messages.
   -h, --help                Show this text help.
   -v, --version             Show the program version.
 
@@ -360,6 +377,10 @@ void parseOptions(int argc, char **argv){
         printf("FLtube v.%s\n", VERSION);
         exit(FLT_OK);
     }
+    if (existsCmdOption(argc, argv, "-d") || existsCmdOption(argc, argv, "--debug")) {
+        printf(_("DEBUG MODE enabled.\n"));
+        DEBUG_ENABLED = 0;
+    }
     if (existsCmdOption(argc, argv, "--config")){
         const std::string path = getOptionValue(argc, argv, "--config");
         if (path != ""){
@@ -379,9 +400,11 @@ void parseOptions(int argc, char **argv){
 int main(int argc, char **argv) {
     parseOptions(argc, argv);
     pre_init();
-    printf(_("Starting FLtube v.%s\n"), VERSION);
+    char message[64];
+    snprintf(message, sizeof(message), _("Starting FLTube v.%s\n"), VERSION);
+    logAtTerminal(message, LogLevel::INFO);
 
-    char win_title[30] = "FLtube ";
+    char win_title[30] = "FLTube ";
     mainWin = new FLTubeMainWindow(593, 618, strcat(win_title, VERSION));
     mainWin->callback((Fl_Callback*)exitApp);
     mainWin->do_search_bttn->callback((Fl_Callback*)doSearch_cb, (void*)(mainWin->search_term_or_url));
@@ -391,7 +414,9 @@ int main(int argc, char **argv) {
     mainWin->next_results_bttn->deactivate();
 
     post_init();
-    mainWin->show(argc, argv);
+    //mainWin->show(argc, argv);    //TODO Avoid passing parameters to the mainWin function to prevent undesirable logs.
+    mainWin->show();
+    logAtTerminal(_("The FLTube main window has loaded."), LogLevel::DEBUG);
     return Fl::run();
 
 }
