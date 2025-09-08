@@ -1,24 +1,25 @@
 # FLTube
 
-Fltube es una aplicación para buscar y reproducir videos desde Youtube, con opciones de descarga de videos hasta una resolución de 1080p. Escrito para [FLTK](https://www.fltk.org/) y potenciado por [yt-dlp](https://github.com/yt-dlp/yt-dlp).
+Fltube es una aplicación para buscar y reproducir videos desde Youtube. Escrito para [FLTK](https://www.fltk.org/) y potenciado por [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
 Aunque inicialmente fue desarrollado para la distribución [Spirit-OS](https://spirit-os.sourceforge.io/), puede ser compilado en otras distribuciones modernas que tengan un compilador C++.
 
 ### Características
 - Aplicación ligera gracias a **C++** y la librería **FLTK** *(soporta FLTK 1.3.x o superior)*.
 - Potenciado por **yt-dlp**, una herramienta para descargar videos/audios por línea de comandos, muy rica en características, y desarrollada en Python.
-- Con capacidad de búsqueda de video en YouTube usando términos de búsqueda o una URL de YouTube específica. Además, se puede descargar los videos en cualquier resolución disponible desde los 240p hasta los 1080p.
+- Con capacidad de búsqueda de video en YouTube usando términos de búsqueda o una URL de YouTube específica.
 - Localizado al Inglés y Español, pero con potencial futuro a traducirse en otros idiomas. La localización se realiza mediante el uso de [GNU gettext](https://www.gnu.org/software/gettext/).
-- Todavía está en **fase alpha**, pero es utilizable. Por ahora, sólo fue probado en GNU/Linux.
+- Diseñado para bajas resoluciones de pantalla en pantallas pequeñas.
+- Por ahora, la aplicación sólo fue probado en GNU/Linux.
 
-![FLtube on Spirit OS!](https://i.postimg.cc/zXyrVV4S/fltube-screenshot-1.png "Fltube on Spirit OS")
+![FLtube en Spirit OS!](https://i.postimg.cc/5yKTKdCG/fltube-screenshot-3.png "Fltube en Spirit OS")
 
-![FLtube on Debian 13 Trixie!](https://i.postimg.cc/pdVFvCgX/fltube-demo-3.png "Fltube on Debian 13 Trixie")
+![FLtube en Debian 13 Trixie!](https://i.postimg.cc/pdM76Bm2/fltube-screenshot-4.png "Fltube en Debian 13 Trixie")
 
 
 =====================================================
 
-## Installation
+## Instalación
 
 Una vez descargado el código fuente (y siempre recomendable mantenerlo versionado con Git), puedes compilarlo utilizando [Make](https://www.gnu.org/software/make/).
 > NOTA: Por defecto, los directorios de instalación están bajo `/usr/local`, así que para encontrar los binarios del programa correctamente luego de la instalación, debes asegurarte que `/usr/local/bin` esté en la variable `$PATH` del sistema.

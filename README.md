@@ -1,19 +1,20 @@
 # FLTube
 
-FLTube is an application for search & stream Youtube videos, with options for download videos up to 1080p resolution. Written for [FLTK](https://www.fltk.org/) and powered by [yt-dlp](https://github.com/yt-dlp/yt-dlp).
+FLTube is an application for search & stream Youtube videos. Written for [FLTK](https://www.fltk.org/) and powered by [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
 Although initially developed for [Spirit-OS](https://spirit-os.sourceforge.io/) distribution, but can be compiled for other modern distributions with a C++ compiler.
 
 ### Features
 - A very lighweight app thanks to **C++** and **FLTK** toolkit *(support for FLTK 1.3.x or above)*.
 - Powered by **yt-dlp**, a feature-rich command-line audio/video downloader developed in Python.
-- With capabilities to search for videos on YouTube using search terms or a specific YouTube URL, and to download videos ranging from 240p to 1080p.
+- With capabilities to search for videos on YouTube using search terms or a specific YouTube URL.
 - Localized in English and Spanish, with the potential for future translation into other languages. Localization is done using [GNU gettext](https://www.gnu.org/software/gettext/).
-- Still at **alpha stage**, but usable. For now, only tested on GNU/Linux.
+- Designed for low screen resolutions on small screens.
+- For now, the app only was tested on GNU/Linux.
 
-![FLtube on Spirit OS!](https://i.postimg.cc/zXyrVV4S/fltube-screenshot-1.png "Fltube on Spirit OS")
+![FLtube on Spirit OS!](https://i.postimg.cc/5yKTKdCG/fltube-screenshot-3.png "Fltube on Spirit OS")
 
-![FLtube on Debian 13 Trixie!](https://i.postimg.cc/pdVFvCgX/fltube-demo-3.png "Fltube on Debian 13 Trixie")
+![FLtube on Debian 13 Trixie!](https://i.postimg.cc/pdM76Bm2/fltube-screenshot-4.png "Fltube on Debian 13 Trixie")
 
 
 ## Installation
