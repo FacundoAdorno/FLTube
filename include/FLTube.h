@@ -24,7 +24,7 @@
 #include <string>
 #include <format>
 
-static const char* VERSION = "0.1.alpha";
+static const char* VERSION = "2.0";
 
 enum LogLevel { INFO, WARN, ERROR, DEBUG };
 
