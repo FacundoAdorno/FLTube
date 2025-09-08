@@ -27,12 +27,12 @@ TinyMessageWindow* message_window = (TinyMessageWindow *)0;
 int SEARCH_PAGE_INDEX = 0;
 
 // Count of search results per page. BEWARE: don't modify this value unless you change the view at Fltube_View.cxx file.'
-const int SEARCH_PAGE_SIZE = 5;
+const int SEARCH_PAGE_SIZE = 4;
 
 // Array that holds the search results WIDGETS, in groups of size @SEARCH_PAGE_SIZE...
-std::array <VideoInfo*,SEARCH_PAGE_SIZE> video_info_arr{ nullptr, nullptr, nullptr, nullptr, nullptr };
+std::array <VideoInfo*,SEARCH_PAGE_SIZE> video_info_arr{ nullptr, nullptr, nullptr, nullptr };
 // Array that holds the search results METADATA, in groups of size @SEARCH_PAGE_SIZE...
-std::array <YTDLP_Video_Metadata*,SEARCH_PAGE_SIZE> video_metadata{ nullptr, nullptr, nullptr, nullptr, nullptr };
+std::array <YTDLP_Video_Metadata*,SEARCH_PAGE_SIZE> video_metadata{ nullptr, nullptr, nullptr, nullptr };
 
 const std::string FLTUBE_TEMPORAL_DIR(std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/");
 
@@ -415,7 +415,7 @@ int main(int argc, char **argv) {
     logAtTerminal(message, LogLevel::INFO);
 
     char win_title[30] = "FLTube ";
-    mainWin = new FLTubeMainWindow(593, 618, strcat(win_title, VERSION));
+    mainWin = new FLTubeMainWindow(593, 540, strcat(win_title, VERSION));
     mainWin->callback((Fl_Callback*)exitApp);
     mainWin->do_search_bttn->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->callback((Fl_Callback*)getPreviousSearchResults_cb, (void*)(mainWin->search_term_or_url));

@@ -33,7 +33,7 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 
 widget_class FLTubeMainWindow {
   label FLTube open
-  xywh {568 142 593 618}
+  xywh {568 142 593 540}
   class Fl_Double_Window visible
 } {
   Fl_Group {} {
@@ -46,23 +46,23 @@ widget_class FLTubeMainWindow {
     }
     Fl_Button do_search_bttn {
       label {Go search!}
-      user_data search_term_or_url selected
+      user_data search_term_or_url
       tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 88 150 22}
     }
   }
-  Fl_Group search_result_selectors {
-    xywh {10 125 575 460} box THIN_UP_BOX
+  Fl_Group search_result_selectors {selected
+    xywh {10 126 575 380} box THIN_UP_BOX
   } {}
   Fl_Group pagination_controls {open
-    xywh {10 586 448 30}
+    xywh {10 508 575 30}
   } {
     Fl_Button previous_results_bttn {
       label {<&Previous}
-      tooltip {Get previous results of current search results set.} xywh {169 588 135 23}
+      tooltip {Get previous results of current search results set.} xywh {169 510 135 23}
     }
     Fl_Button next_results_bttn {
       label {&Next>}
-      tooltip {Get following results of current search results set.} xywh {319 588 135 23}
+      tooltip {Get following results of current search results set.} xywh {319 510 135 23}
     }
   }
 }
