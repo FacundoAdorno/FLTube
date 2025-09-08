@@ -15,6 +15,7 @@
 #include "../include/FLTube.h"
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
+#include <FL/Fl_Button.H>
 
 
 /** Main Fltube window. */
@@ -35,6 +36,9 @@ std::array <VideoInfo*,SEARCH_PAGE_SIZE> video_info_arr{ nullptr, nullptr, nullp
 std::array <YTDLP_Video_Metadata*,SEARCH_PAGE_SIZE> video_metadata{ nullptr, nullptr, nullptr, nullptr };
 
 const std::string FLTUBE_TEMPORAL_DIR(std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/");
+
+//This FLAG changes over the application usage. If user wants to see all videos of a channel, is set to true (0). Defaults to false.
+bool SEARCH_BY_CHANNEL_F = false;
 
 std::string CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
 
@@ -156,6 +160,7 @@ void update_video_info() {
             video_info_arr[j]->duration->label(video_metadata[j]->duration.c_str());
             video_info_arr[j]->uploadDate->label(video_metadata[j]->upload_date.c_str());
             video_info_arr[j]->userUploader->label(video_metadata[j]->creators.c_str());
+            video_info_arr[j]->userUploader->user_data(static_cast<void*>(&video_metadata[j]->channel_id));
 
             //Setting URL for streaming a video preview...
             video_info_arr[j]->thumbnail->user_data(static_cast<void*>(&video_metadata[j]->url));
@@ -261,13 +266,14 @@ void logAtTerminal(std::string log_message, LogLevel log_lvl) {
 VideoInfo* create_video_group(int posx, int posy) {
     VideoInfo *video_info = new VideoInfo (posx, posy, 600, 90, "");
     video_info->thumbnail->callback((Fl_Callback*)preview_video_cb);
+    video_info->userUploader->callback((Fl_Callback*)getYTChannelVideo_cb);
     return video_info;
 }
 
 /**
- * Search by YT URL or search term. Input mustn't be empty.'
+ * Search by YT URL or search term. Or if "is_a_channel" is set, then return videos from channel URL specified at "input_text".
  */
-void doSearch(Fl_Widget*, Fl_Input *input) {
+void doSearch(const char* input_text, bool is_a_channel) {
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
         logAtTerminal(_("Your device is offline. Check your internet connection."), LogLevel::WARN);
@@ -275,22 +281,12 @@ void doSearch(Fl_Widget*, Fl_Input *input) {
                             "Please, verify you network connection before proceed..."));
         return;
     }
-    if (input == nullptr) {
-        logAtTerminal(_("The Fl_Input search widget inexistent!!!\n"), LogLevel::ERROR);
-        return;
-    }
-
-    const char* input_text = input->value();
-    if (input_text == nullptr || input_text[0] == '\0') {
-        showMessageWindow(_("Search input is empty. Please, retry and enter a valid text."));
-        return;
-    }
 
     char message[1024];
     snprintf(message, sizeof(message), _("Searching for results for '%s' user input..."), input_text);
     logAtTerminal(std::string(message), LogLevel::DEBUG);
     std::string result;
-    if (isUrl(input_text)) {
+    if (isUrl(input_text) && !SEARCH_BY_CHANNEL_F) {
         if(!isYoutubeURL(input_text)){
             std::string warn_message = _("For now, only Youtube URL's are valid for download. Please, edit your input text or search using a generic term.");
             showMessageWindow(warn_message.c_str());
@@ -304,9 +300,9 @@ void doSearch(Fl_Widget*, Fl_Input *input) {
         if (SEARCH_PAGE_INDEX == 0) {
             mainWin->next_results_bttn->activate();
         }
-        result = do_ytdlp_search(input_text, YOUTUBE_EXTRACTOR_NAME.c_str(), page_i);
-        logAtTerminal(result, LogLevel::DEBUG);
+        result = do_ytdlp_search(input_text, YOUTUBE_EXTRACTOR_NAME.c_str(), page_i, SEARCH_BY_CHANNEL_F);
     }
+    logAtTerminal(result, LogLevel::DEBUG);
     // Read input lines until an empty line is encountered
     std::istringstream result_sstream(result);
     std::string line;
@@ -325,13 +321,56 @@ void doSearch(Fl_Widget*, Fl_Input *input) {
 }
 
 /*
+ *
+ */
+void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
+    if (bttn == nullptr) {
+        logAtTerminal(_("The Fl_Button is inexistent when search videos for a channel!!!\n"), LogLevel::ERROR);
+        return;
+    }
+    std::string* channel_id =  static_cast<std::string*>(channel_id_str);
+    printf("CHANNEL ID: %s", channel_id->c_str());
+    if (channel_id == nullptr || channel_id->empty()) {
+        logAtTerminal(_("Channel ID is empty. Please verify the video metadata initilization!!!\n"), LogLevel::ERROR);
+        return;
+    }
+    mainWin->previous_results_bttn->deactivate();
+    SEARCH_PAGE_INDEX = 0;
+    SEARCH_BY_CHANNEL_F = true;
+    char channel_videos_URL[256];
+    snprintf(channel_videos_URL, sizeof(channel_videos_URL), "https://www.youtube.com/channel/%s/videos", channel_id->c_str());
+    mainWin->search_term_or_url->value(channel_videos_URL);
+    doSearch(channel_videos_URL, true);
+}
+
+
+/*
+ * Extract and return the search term value from the search input. Returns nullptr only if text if empty or some error happens...
+ */
+const char* getSearchValue(Fl_Input *input){
+    if (input == nullptr) {
+        logAtTerminal(_("The Fl_Input search widget inexistent!!!\n"), LogLevel::ERROR);
+        return nullptr;
+    }
+
+    const char* input_text = input->value();
+    if (input_text == nullptr || input_text[0] == '\0') {
+        showMessageWindow(_("Search input is empty. Please, retry and enter a valid text."));
+        return nullptr;
+    }
+    return input_text;
+}
+
+/*
  * Callback for search button.
  */
 void searchButtonAction_cb(Fl_Widget *wdgt, Fl_Input *input){
     //Reset global pagination index and "deactivate" previos button...
     mainWin->previous_results_bttn->deactivate();
     SEARCH_PAGE_INDEX = 0;
-    doSearch(wdgt, input);
+    SEARCH_BY_CHANNEL_F = false;
+    const char* input_text = getSearchValue(input);
+    if (input_text != nullptr)  doSearch(input_text);
 }
 
 /** Callback for Previous results button... */
@@ -342,14 +381,16 @@ void getPreviousSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     if (SEARCH_PAGE_INDEX == 0) {
         mainWin->previous_results_bttn->deactivate();
     }
-    doSearch(widget, input);
+    const char* input_text = getSearchValue(input);
+    if (input_text != nullptr)  doSearch(input_text);
 }
 /** Callback for Next results button.. */
 void getNextSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     //TODO: what to do if there is no more results? It must be controlled in some way...
     SEARCH_PAGE_INDEX++;
     mainWin->previous_results_bttn->activate();
-    doSearch(widget, input);
+    const char* input_text = getSearchValue(input);
+    if (input_text != nullptr)  doSearch(input_text);
 }
 
 /*

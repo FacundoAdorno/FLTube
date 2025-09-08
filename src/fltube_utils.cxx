@@ -58,7 +58,7 @@ bool isUrl(const char* user_input) {
 /** Check if an URL starts with any valid Youtube URL format.**/
 bool isYoutubeURL(const char* url){
     std::string url_s(url);
-    return ((url_s.rfind("https://youtube.com/", 0) == 0) || (url_s.rfind("https://youtu.be/", 0) == 0));
+    return ((url_s.rfind("https://www.youtube.com/", 0) == 0) || (url_s.rfind("https://youtube.com/", 0) == 0) || (url_s.rfind("https://youtu.be/", 0) == 0));
 }
 
 /** Get the current date/time. The format is YYYY-MM-DD.HH:mm:ss. */
@@ -169,14 +169,19 @@ bool checkForYTDLP() {
 
 /** Metadata print template for youtube search videos.  **/
 const std::string PRINT_METADATA_TEMPLATE = "title=\\\"%(title)s\\\">>thumbnail=\\\"%(thumbnails.0.url)s" \
-"\\\">>creators=\\\"%(uploader)s\\\">>video_id=\\\"%(id)s\\\">>upload_date=\\\"%(upload_date>%Y-%m-%d)s" \
+"\\\">>creators=\\\"%(uploader,playlist_channel)s\\\">>video_id=\\\"%(id)s\\\">>upload_date=\\\"%(upload_date>%Y-%m-%d)s" \
 "\\\">>duration=\\\"%(duration>%H:%M:%S)s\\\">>channel_id=\\\"%(playlist_channel_id,channel_id)s\\\">>";
-
-static std::string do_youtube_search(const char* byTerm, Pagination_Info page_info){
+static std::string do_youtube_search(const char* search_text, bool is_a_channel ,Pagination_Info page_info){
+    char search_component[128];
+    if(is_a_channel){
+        snprintf(search_component, sizeof(search_component), "%s", search_text);  //The term is a Channel URL...
+    } else {
+        snprintf(search_component, sizeof(search_component), "ytsearch%d:%s", page_info.upper_end(), search_text);  // Else, do a normal search by term.
+    }
     char ytdlp_cmd[512];
-    char cmd_format[512] = "yt-dlp \"ytsearch%d:%s\" -I %d-%d --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date";
+    char cmd_format[512] = "yt-dlp \"%s\" -I %d-%d --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date";
 
-    snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, page_info.upper_end(), byTerm,
+    snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, search_component,
              page_info.lower_end(), page_info.upper_end(), PRINT_METADATA_TEMPLATE.c_str());
     return exec(ytdlp_cmd);
 }
@@ -185,10 +190,10 @@ static std::string do_youtube_search(const char* byTerm, Pagination_Info page_in
  * Make a search by term in the specified extractor (i.e. "youtube", etc.). See a complete list of extractors at yt-dlp docs.
  * For now, only do searchs at Youtube.
  */
-std::string do_ytdlp_search(const char* search_term, const char* extractor_name, Pagination_Info page_info){
+std::string do_ytdlp_search(const char* search_term, const char* extractor_name, Pagination_Info page_info, bool get_channel_videos){
 
     if (extractor_name == YOUTUBE_EXTRACTOR_NAME) {
-        return do_youtube_search(search_term, page_info);
+        return do_youtube_search(search_term, get_channel_videos, page_info);
     } else {
         return "No extractor matched...";
     }
@@ -199,8 +204,10 @@ std::string do_ytdlp_search(const char* search_term, const char* extractor_name,
  */
 std::string get_videoURL_metadata(const char* video_url){
     char ytdlp_cmd[512];
-    char cmd_format[512] = "yt-dlp --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date %s";
-    snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, PRINT_METADATA_TEMPLATE.c_str(), video_url);
+    //Restrict results to only one element, since that for one URL video is only one result.
+    const char* results_restriction = "1-1";
+    char cmd_format[512] = "yt-dlp --flat-playlist -I %s --print \"%s\" --extractor-args youtubetab:approximate_date %s";
+    snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, results_restriction, PRINT_METADATA_TEMPLATE.c_str(), video_url);
     return exec(ytdlp_cmd);
 }
 
@@ -261,7 +268,7 @@ YTDLP_Video_Metadata* parse_YT_Video_Metadata(const char ytdlp_video_metadata[51
                     metadata->duration = value;
                 } else if (key == "thumbnail"){
                     metadata->thumbnail_url = value;
-                } else if (key == "playlist_channel_id"){
+                } else if (key == "channel_id"){
                     metadata->channel_id = value;
                 }
             }

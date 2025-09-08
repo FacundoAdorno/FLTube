@@ -33,6 +33,7 @@
 #include <sys/stat.h>
 #include <algorithm>
 #include <cstring>
+#include <format>
 
 #include <FL/Fl_Image.H>
 #include <FL/Fl_JPEG_Image.H>
@@ -129,7 +130,7 @@ bool canWriteOnDir(const char* directory);
 
 bool checkForYTDLP();
 
-std::string do_ytdlp_search(const char* search_term, const char* extractor_name, Pagination_Info page_info);
+std::string do_ytdlp_search(const char* search_term, const char* extractor_name, Pagination_Info page_info, bool get_channel_videos = false);
 
 static std::string do_youtube_search(const char* byTerm);
 
