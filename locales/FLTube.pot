@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-07 01:47-0300\n"
+"POT-Creation-Date: 2025-09-08 16:11-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,91 +17,100 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/FLTube.cxx:57
+#: src/FLTube.cxx:61
 #, c-format
 msgid "Cleaning temporal files at %s."
 msgstr ""
 
-#: src/FLTube.cxx:61
+#: src/FLTube.cxx:65
 msgid "Closing FLtube... Bye!\n"
 msgstr ""
 
-#: src/FLTube.cxx:130 src/FLTube.cxx:273
+#: src/FLTube.cxx:134 src/FLTube.cxx:279
 msgid "Your device is offline. Check your internet connection."
 msgstr ""
 
-#: src/FLTube.cxx:131 src/FLTube.cxx:274
+#: src/FLTube.cxx:135 src/FLTube.cxx:280
 msgid ""
 "There seems that you don't have access to the Internet. Please, verify you "
 "network connection before proceed..."
 msgstr ""
 
-#: src/FLTube.cxx:138
+#: src/FLTube.cxx:142
 #, c-format
 msgid "Starting streaming preview of video '%s'..."
 msgstr ""
 
-#: src/FLTube.cxx:142
+#: src/FLTube.cxx:146
 msgid ""
 "Cannot get video URL. Review the video metadata enabling app debugging..."
 msgstr ""
 
-#: src/FLTube.cxx:170
+#: src/FLTube.cxx:175
 msgid ""
 "Something went wrong when generating a resize thumbnail for video with ID="
 msgstr ""
 
-#: src/FLTube.cxx:189
+#: src/FLTube.cxx:194
 msgid ""
 "yt-dlp is not installed on your system or its binary is not at $PATH system "
 "variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run "
 "in a terminal the 'install_yt-dlp' script."
 msgstr ""
 
-#: src/FLTube.cxx:190
+#: src/FLTube.cxx:195
 msgid "yt-dlp is not installed. Closing app...\n"
 msgstr ""
 
-#: src/FLTube.cxx:279
-msgid "The Fl_Input search widget inexistent!!!\n"
-msgstr ""
-
-#: src/FLTube.cxx:285
-msgid "Search input is empty. Please, retry and enter a valid text."
-msgstr ""
-
-#: src/FLTube.cxx:290
+#: src/FLTube.cxx:286
 #, c-format
 msgid "Searching for results for '%s' user input..."
 msgstr ""
 
-#: src/FLTube.cxx:295
+#: src/FLTube.cxx:291
 msgid ""
 "For now, only Youtube URL's are valid for download. Please, edit your input "
 "text or search using a generic term."
 msgstr ""
 
-#: src/FLTube.cxx:381
+#: src/FLTube.cxx:328
+msgid "The Fl_Button is inexistent when search videos for a channel!!!\n"
+msgstr ""
+
+#: src/FLTube.cxx:334
+msgid ""
+"Channel ID is empty. Please verify the video metadata initilization!!!\n"
+msgstr ""
+
+#: src/FLTube.cxx:352
+msgid "The Fl_Input search widget inexistent!!!\n"
+msgstr ""
+
+#: src/FLTube.cxx:358
+msgid "Search input is empty. Please, retry and enter a valid text."
+msgstr ""
+
+#: src/FLTube.cxx:432
 #, c-format
 msgid "DEBUG MODE enabled.\n"
 msgstr ""
 
-#: src/FLTube.cxx:388
+#: src/FLTube.cxx:439
 #, c-format
 msgid "Loading custom config file %s.\n"
 msgstr ""
 
-#: src/FLTube.cxx:390
+#: src/FLTube.cxx:441
 #, c-format
 msgid "--config parameter with no path specified.\n"
 msgstr ""
 
-#: src/FLTube.cxx:404
+#: src/FLTube.cxx:455
 #, c-format
 msgid "Starting FLTube v.%s\n"
 msgstr ""
 
-#: src/FLTube.cxx:419
+#: src/FLTube.cxx:470
 msgid "The FLTube main window has loaded."
 msgstr ""
 
@@ -115,7 +124,7 @@ msgstr ""
 msgid "Closing the program due to an error.\n"
 msgstr ""
 
-#: src/fltube_utils.cxx:342
+#: src/fltube_utils.cxx:349
 #, c-format
 msgid "Connection testing failure: %s. Check your connectivity.\n"
 msgstr ""
@@ -141,54 +150,54 @@ msgid ""
 "If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."
 msgstr ""
 
-#: src/FLTube_View.cxx:73
+#: src/FLTube_View.cxx:72
 msgid "<&Previous"
 msgstr ""
 
-#: src/FLTube_View.cxx:74
+#: src/FLTube_View.cxx:73
 msgid "Get previous results of current search results set."
 msgstr ""
 
-#: src/FLTube_View.cxx:76
+#: src/FLTube_View.cxx:75
 msgid "&Next>"
 msgstr ""
 
-#: src/FLTube_View.cxx:77
+#: src/FLTube_View.cxx:76
 msgid "Get following results of current search results set."
 msgstr ""
 
-#: src/FLTube_View.cxx:88
+#: src/FLTube_View.cxx:87
 msgid "Click to stream the video (preview it)..."
 msgstr ""
 
-#: src/FLTube_View.cxx:95
+#: src/FLTube_View.cxx:94
 msgid "Duration expressed as H:MM:SS."
 msgstr ""
 
-#: src/FLTube_View.cxx:100
+#: src/FLTube_View.cxx:99
 msgid "Video upload date."
 msgstr ""
 
-#: src/FLTube_View.cxx:105
+#: src/FLTube_View.cxx:104
 msgid "Click to list all channel's video."
 msgstr ""
 
-#: src/FLTube_View.cxx:146
+#: src/FLTube_View.cxx:145
 msgid "Close and exit"
 msgstr ""
 
-#: src/FLTube_View.cxx:186
+#: src/FLTube_View.cxx:185
 msgid "Accept"
 msgstr ""
 
-#: src/FLTube_View.cxx:189
+#: src/FLTube_View.cxx:188
 msgid "Cancel"
 msgstr ""
 
-#: src/FLTube_View.cxx:192
+#: src/FLTube_View.cxx:191
 msgid "Don't warn me again and ACCEPT always."
 msgstr ""
 
-#: src/FLTube_View.cxx:193
+#: src/FLTube_View.cxx:192
 msgid "Check if don't want to be warn again, assuming all risks."
 msgstr ""
