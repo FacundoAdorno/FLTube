@@ -15,6 +15,7 @@
 #include "../include/FLTube.h"
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
+#include <FL/Enumerations.H>
 #include <FL/Fl_Button.H>
 
 
@@ -130,6 +131,8 @@ bool showChoiceWindow(const char* message, bool& keepShowingFlag) {
 
 /** Callback to preview a video... */
 void preview_video_cb(Fl_Button* widget, void* video_url){
+    mainWin->cursor(FL_CURSOR_WAIT);
+    Fl::check();
     if (! verify_network_connection()) {
         logAtTerminal(_("Your device is offline. Check your internet connection."), LogLevel::WARN);
         showMessageWindow( _("There seems that you don't have access to the Internet. "
@@ -145,6 +148,8 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
     } else {
         logAtTerminal(_("Cannot get video URL. Review the video metadata enabling app debugging..."), LogLevel::ERROR);
     }
+    mainWin->cursor(FL_CURSOR_DEFAULT);
+    Fl::check();
 }
 
 /**
@@ -274,6 +279,9 @@ VideoInfo* create_video_group(int posx, int posy) {
  * Search by YT URL or search term. Or if "is_a_channel" is set, then return videos from channel URL specified at "input_text".
  */
 void doSearch(const char* input_text, bool is_a_channel) {
+    //Change cursor to wait symbol, to indicate that the search is in process...
+    mainWin->cursor(FL_CURSOR_WAIT);
+    Fl::check();
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
         logAtTerminal(_("Your device is offline. Check your internet connection."), LogLevel::WARN);
@@ -318,6 +326,9 @@ void doSearch(const char* input_text, bool is_a_channel) {
         }
     }
     update_video_info();
+    //Restore cursor to default when search is done.
+    mainWin->cursor(FL_CURSOR_DEFAULT);
+    Fl::check();
 }
 
 /*
