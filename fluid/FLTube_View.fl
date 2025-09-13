@@ -45,24 +45,24 @@ widget_class FLTubeMainWindow {
       tooltip {Enter a search term for search or a valid Youtube URL.} xywh {46 59 512 24} align 1
     }
     Fl_Button do_search_bttn {
-      label {Go search!}
+      label {Go &search!}
       user_data search_term_or_url
       tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 88 150 22}
     }
   }
-  Fl_Group search_result_selectors {selected
+  Fl_Group search_result_selectors {
     xywh {10 126 575 380} box THIN_UP_BOX
   } {}
   Fl_Group pagination_controls {open
-    xywh {10 508 575 30}
+    xywh {9 508 577 30}
   } {
     Fl_Button previous_results_bttn {
       label {<&Previous}
-      tooltip {Get previous results of current search results set.} xywh {169 510 135 23}
+      tooltip {Get previous results of current search results set.} xywh {10 510 135 23}
     }
     Fl_Button next_results_bttn {
       label {&Next>}
-      tooltip {Get following results of current search results set.} xywh {319 510 135 23}
+      tooltip {Get following results of current search results set.} xywh {450 510 135 23}
     }
   }
 }
@@ -82,15 +82,15 @@ widget_class VideoInfo {open
   Fl_Box uploadDate {
     tooltip {Video upload date.} xywh {190 57 95 20} labelfont 2 align 20
   }
-  Fl_Button userUploader {
+  Fl_Button userUploader {selected
     tooltip {Click to list all channel's video.} xywh {295 57 260 20} labelfont 2 align 20
   }
 }
 
 widget_class TinyMessageWindow {
   label Error open
-  xywh {632 398 649 100}
-  class Fl_Double_Window modal visible
+  xywh {632 398 649 100} hide
+  class Fl_Double_Window modal
 } {
   Fl_Box error_label {
     xywh {30 15 590 45} align 128
@@ -103,8 +103,8 @@ widget_class TinyMessageWindow {
 
 widget_class TinyChoiceWindow {
   label Warn open
-  xywh {620 599 649 118}
-  class Fl_Double_Window modal visible
+  xywh {620 599 649 118} hide
+  class Fl_Double_Window modal
 } {
   Fl_Box choice_label {
     xywh {30 15 590 45} align 128

@@ -58,7 +58,7 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
       search_term_or_url->tooltip(_("Enter a search term for search or a valid Youtube URL."));
       search_term_or_url->align(Fl_Align(FL_ALIGN_TOP));
     } // Fl_Input* search_term_or_url
-    { do_search_bttn = new Fl_Button(227, 88, 150, 22, _("Go search!"));
+    { do_search_bttn = new Fl_Button(227, 88, 150, 22, _("Go &search!"));
       do_search_bttn->tooltip(_("If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."));
       do_search_bttn->user_data((void*)(search_term_or_url));
     } // Fl_Button* do_search_bttn
@@ -68,11 +68,11 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     search_result_selectors->box(FL_THIN_UP_BOX);
     search_result_selectors->end();
   } // Fl_Group* search_result_selectors
-  { pagination_controls = new Fl_Group(10, 508, 575, 30);
-    { previous_results_bttn = new Fl_Button(169, 510, 135, 23, _("<&Previous"));
+  { pagination_controls = new Fl_Group(9, 508, 577, 30);
+    { previous_results_bttn = new Fl_Button(10, 510, 135, 23, _("<&Previous"));
       previous_results_bttn->tooltip(_("Get previous results of current search results set."));
     } // Fl_Button* previous_results_bttn
-    { next_results_bttn = new Fl_Button(319, 510, 135, 23, _("&Next>"));
+    { next_results_bttn = new Fl_Button(450, 510, 135, 23, _("&Next>"));
       next_results_bttn->tooltip(_("Get following results of current search results set."));
     } // Fl_Button* next_results_bttn
     pagination_controls->end();
