@@ -15,8 +15,6 @@
 #include "../include/FLTube.h"
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
-#include <FL/Enumerations.H>
-#include <FL/Fl_Button.H>
 
 
 /** Main Fltube window. */

@@ -15,6 +15,8 @@
 
 #include "FLTube_View.h"
 #include <FL/Fl_File_Chooser.H>
+#include <FL/Enumerations.H>
+#include <FL/Fl_Button.H>
 #include <array>
 #include <sstream>
 #include <map>
@@ -22,7 +24,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
-#include <format>
+#include <thread>
 
 static const char* VERSION = "2.0";
 
