@@ -24,7 +24,6 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
-#include <thread>
 
 static const char* VERSION = "2.0";
 
