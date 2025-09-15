@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.5
+Type=Application
+Name=FLTube
+GenericName=Youtube player
+Name[es]=FLTube
+GenericName[es]=Reproductor de Youtube
+Comment=Search and stream Youtube videos. Written for FLTK and powered by yt-dlp.
+Comment[es]=Busca y reproduce videos desde Youtube. Escrito para FLTK y potenciado por yt-dlp.
+TryExec=/usr/local/bin/fltube
+Exec=fltube
+Icon=/usr/local/share/icons/fltube/256x256.png
+Terminal=false
+Categories=AudioVideo;Video;
+SingleMainWindow=true
+Keywords=Youtube;stream;

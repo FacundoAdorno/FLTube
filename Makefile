@@ -53,6 +53,9 @@ install: all
 	mv $(TARGET) $(PREFIX)/usr/local/bin/
 	cp $(SCRIPTS_DIR)/install_yt-dlp.sh $(PREFIX)/usr/local/bin/
 
+	mkdir -p $(PREFIX)/usr/local/share/icons/fltube/ $(PREFIX)/usr/local/share/applications/
+	cp resources/desktop/FLTube.desktop $(PREFIX)/usr/local/share/applications/
+	cp resources/icons/*.png $(PREFIX)/usr/local/share/icons/fltube/
 
 # Extract strings from source and update .po locale files.
 po_update:
