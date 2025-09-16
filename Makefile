@@ -6,7 +6,7 @@ CXXFLAGS = $(shell fltk-config --use-images --cxxflags) -Iinclude `pkg-config --
 LDSTATIC  = $(shell fltk-config --use-images --ldstaticflags) `pkg-config --libs libcurl`
 LINK     = $(CXX)
 
-ARCH_CPU  != uname -m | grep -q "x86_64" && echo "x86_64" || echo "i386"
+ARCH_CPU  != uname -m | grep -q "x86_64" && echo "amd64" || echo "i386"
 # If cannot calculate architecture for some reason, defaults to i386 architecture...
 ARCH_CPU  ?= i386
 
