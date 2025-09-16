@@ -5,6 +5,8 @@ Maintainer: Facundo G. Adorno <adorno.facundo@gmail.com>
 Architecture: -REPLACE_ARCH-
 Vcs-Git: https://gitlab.com/facuA/fltube.git
 Version: -REPLACE_VERSION-
-Depends: libfltk1.3-dev, pkg-config, libcurl4-openssl-dev, g++, python3, gettext, wget, mplayer, ffmpeg, libpng-dev, zlib1g-dev, libjpeg-dev, libxrender-dev, libxcursor-dev, libxfixes-dev, libxext-dev, libxft-dev, libfontconfig1-dev, libxinerama-dev
-Description: FLTK App for search & stream Youtube videos.
- FLTube is an application for search & stream Youtube videos. Written for FLTK and powered by yt-dlp.
+Depends: curl, python3, gettext, wget, mplayer, ffmpeg
+Description: Lightweight FLTK App for search & stream Youtube videos.
+ FLTube is an application for search & stream Youtube videos. For low-resources PC's. Written for FLTK and powered by yt-dlp.
+Description-es: Aplicación ligera para buscar y reproducir videos desde Youtube.
+ FLTube es una aplicación para buscar y reproducir videos desde Youtube. Para PC's de bajos recursos. Escrito para FLTK y potenciado por yt-dlp.

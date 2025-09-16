@@ -4,4 +4,11 @@ set -e
 ## Update the system menu entry
 [ ! -x /usr/bin/update-menus ] || /usr/bin/update-menus
 
+printf "\033[32mTrying to install yt-dlp...\033[0m\n"
+if [ -x /usr/local/bin/install_yt-dlp.sh ]; then
+    /usr/local/bin/install_yt-dlp.sh -p "/usr/local/bin/" -y
+else
+    printf "\033[31mCANNOT INSTALL yt-dlp FROM PACKAGE\033[0m. Please, install manually later using 'install_yt-dlp.sh' command.\n"
+if
+
 exit 0
