@@ -6,6 +6,14 @@ CXXFLAGS = $(shell fltk-config --use-images --cxxflags) -Iinclude `pkg-config --
 LDSTATIC  = $(shell fltk-config --use-images --ldstaticflags) `pkg-config --libs libcurl`
 LINK     = $(CXX)
 
+ARCH_CPU  != uname -m | grep -q "x86_64" && echo "x86_64" || echo "i386"
+# If cannot calculate architecture for some reason, defaults to i386 architecture...
+ARCH_CPU  ?= i386
+
+ARCH_BITS != uname -m | grep -q "x86_64" && echo "64" || echo "32"
+# If cannot calculate architecture, defaults to 32 bits...
+ARCH_BITS ?= 32
+
 BUILD_DIR = build
 SRC_DIR = src
 INCLUDE_DIR = include
@@ -18,6 +26,8 @@ TARGET = $(BUILD_DIR)/fltube
 SOURCES_LIST = fltube_utils.cxx gnugettext_utils.cxx FLTube_View.cxx FLTube.cxx
 SOURCES = $(addprefix $(SRC_DIR)/, $(SOURCES_LIST))
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cxx=$(BUILD_DIR)/%.o)
+FLTUBE_VERSION=2.0.0
+PACKAGE_NAME=FLTube_$(VERSION)-$(ARCH_CPU).deb
 
 # Rules
 .SUFFIXES: .o .cxx
@@ -27,11 +37,11 @@ all: build $(TARGET)
 
 # Rule to link to executable
 $(TARGET): $(OBJECTS)
-	$(LINK) -o $@ $^ $(LDSTATIC)
+	$(LINK) -m$(ARCH_BITS) -o $@ $^ $(LDSTATIC)
 
 # Rule for compile .o (object) files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cxx
-	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
+	$(CXX) -m$(ARCH_BITS) $(CXXFLAGS) $(DEBUG) -c $< -o $@
 
 # Create build directory
 build:
@@ -57,12 +67,29 @@ install: all
 	cp resources/desktop/FLTube.desktop $(PREFIX)/usr/local/share/applications/
 	cp resources/icons/*.png $(PREFIX)/usr/local/share/icons/fltube/
 
+uninstall:
+	rm $(PREFIX)/usr/local/etc/fltube/fltube.conf $(PREFIX)/usr/local/bin/fltube $(PREFIX)/usr/local/bin/install_yt-dlp.sh $(PREFIX)/usr/local/share/applications/FLTube.desktop $(PREFIX)/usr/local/share/icons/fltube/*.png $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/FLTube.mo $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/install_yt-dlp.mo
+	rmdir $(PREFIX)/usr/local/share/icons/fltube/
+
 # Extract strings from source and update .po locale files.
 po_update:
 	xgettext --keyword=_ --keyword=ng_ --language=C++ --from-code=utf-8 --output locales/FLTube.pot src/*.cxx include/*.h
 	msgmerge --update locales/es/LC_MESSAGES/FLTube.po  locales/FLTube.pot
 	xgettext --keyword=_ --keyword=ng_ --language=Shell --from-code=utf-8 --output locales/$(INSTALL_YTDLP_SCRIPTNAME).pot $(SCRIPTS_DIR)/$(INSTALL_YTDLP_SCRIPTNAME).sh
 	msgmerge --update locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po  locales/$(INSTALL_YTDLP_SCRIPTNAME).pot
+
+
+DEB_BLD_DIR=/tmp/fltube_deb_build
+deb_package: install
+	rm -rf $(DEB_BLD_DIR)
+	mkdir -p $(DEB_BLD_DIR)/DEBIAN
+	cp -R $(PREFIX)/usr $(DEB_BLD_DIR)
+	sed  's/-REPLACE_ARCH-/$(ARCH_CPU)/g' packaging/debian/control.template | sed 's/-REPLACE_VERSION-/$(FLTUBE_VERSION)/g' > $(DEB_BLD_DIR)/DEBIAN/control
+	cp packaging/debian/postinst $(DEB_BLD_DIR)/DEBIAN/
+	chmod +x $(DEB_BLD_DIR)/DEBIAN/postinst
+	chmod +x $(DEB_BLD_DIR)/usr/local/bin/*
+	dpkg-deb --root-owner-group --build $(DEB_BLD_DIR) $(DEB_BLD_DIR)/$(PACKAGE_NAME)
+	@printf "\033[32mPackage built at: $(DEB_BLD_DIR)/$(PACKAGE_NAME)\033[0m. Install using 'apt install [path_to_pkg]'...\n"
 
 # Rule to compile FLUID files
 compile_fluid:
@@ -76,4 +103,4 @@ clean:
 	fi
 	rm -f $(BUILD_DIR)/*.o $(TARGET) 2> /dev/null && rm -rf $(BUILD_DIR)/usr/local $(BUILD_DIR)/usr/ $(BUILD_DIR)/usr/local/etc/fltube $(BUILD_DIR)/usr/local/etc && rmdir $(BUILD_DIR)
 
-.PHONY: all clean build compile_fluid po_update
+.PHONY: all clean build compile_fluid po_update install uninstall deb_package
