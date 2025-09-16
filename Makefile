@@ -6,13 +6,15 @@ CXXFLAGS = $(shell fltk-config --use-images --cxxflags) -Iinclude `pkg-config --
 LDSTATIC  = $(shell fltk-config --use-images --ldstaticflags) `pkg-config --libs libcurl`
 LINK     = $(CXX)
 
-ARCH_CPU  != uname -m | grep -q "x86_64" && echo "amd64" || echo "i386"
+ARCH_CPU_T  != uname -m | grep -q "x86_64" && echo "amd64" || echo "i386"
 # If cannot calculate architecture for some reason, defaults to i386 architecture...
-ARCH_CPU  ?= i386
+ARCH_CPU_T  ?= i386
+ARCH_CPU    ?= $(ARCH_CPU_T)
 
-ARCH_BITS != uname -m | grep -q "x86_64" && echo "64" || echo "32"
+ARCH_BITS_T != uname -m | grep -q "x86_64" && echo "64" || echo "32"
 # If cannot calculate architecture, defaults to 32 bits...
-ARCH_BITS ?= 32
+ARCH_BITS_T ?= 32
+ARCH_BITS ?= $(ARCH_BITS_T)
 
 BUILD_DIR = build
 SRC_DIR = src
@@ -27,7 +29,7 @@ SOURCES_LIST = fltube_utils.cxx gnugettext_utils.cxx FLTube_View.cxx FLTube.cxx
 SOURCES = $(addprefix $(SRC_DIR)/, $(SOURCES_LIST))
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cxx=$(BUILD_DIR)/%.o)
 FLTUBE_VERSION=2.0.0
-PACKAGE_NAME=FLTube_$(VERSION)-$(ARCH_CPU).deb
+PACKAGE_NAME=FLTube_$(FLTUBE_VERSION)-$(ARCH_CPU).deb
 
 # Rules
 .SUFFIXES: .o .cxx

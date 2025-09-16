@@ -9,6 +9,6 @@ if [ -x /usr/local/bin/install_yt-dlp.sh ]; then
     /usr/local/bin/install_yt-dlp.sh -p "/usr/local/bin/" -y
 else
     printf "\033[31mCANNOT INSTALL yt-dlp FROM PACKAGE\033[0m. Please, install manually later using 'install_yt-dlp.sh' command.\n"
-if
+fi
 
 exit 0
