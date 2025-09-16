@@ -125,7 +125,31 @@ bool showChoiceWindow(const char* message, bool& keepShowingFlag) {
     return choice_result;
 }
 
-
+//TODO: instead of locking buttons, try to lock main window or open a modal window
+//      making notice that you must wait some action to finish..
+/**
+ * Lock/unlock the following buttons: main search, pagination, preview and search channel's video.
+ */
+void lock_buttons(bool lock){
+    if (lock) {
+        mainWin->do_search_bttn->deactivate();
+        mainWin->next_results_bttn->deactivate();
+        mainWin->previous_results_bttn->deactivate();
+        for (int j=0; j < video_info_arr.size(); j++) {
+            video_info_arr[j]->thumbnail->deactivate();
+            video_info_arr[j]->userUploader->deactivate();
+        }
+    } else {
+        //unlock
+        mainWin->do_search_bttn->activate();
+        mainWin->next_results_bttn->activate();
+        mainWin->previous_results_bttn->activate();
+        for (int j=0; j < video_info_arr.size(); j++) {
+            video_info_arr[j]->thumbnail->activate();
+            video_info_arr[j]->userUploader->activate();
+        }
+    }
+}
 
 /** Callback to preview a video... */
 void preview_video_cb(Fl_Button* widget, void* video_url){
@@ -343,13 +367,15 @@ void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
         logAtTerminal(_("Channel ID is empty. Please verify the video metadata initilization!!!\n"), LogLevel::ERROR);
         return;
     }
-    mainWin->previous_results_bttn->deactivate();
     SEARCH_PAGE_INDEX = 0;
     SEARCH_BY_CHANNEL_F = true;
     char channel_videos_URL[256];
     snprintf(channel_videos_URL, sizeof(channel_videos_URL), "https://www.youtube.com/channel/%s/videos", channel_id->c_str());
     mainWin->search_term_or_url->value(channel_videos_URL);
+    lock_buttons(true);
     doSearch(channel_videos_URL, true);
+    lock_buttons(false);
+    mainWin->previous_results_bttn->deactivate();
 }
 
 
@@ -379,7 +405,11 @@ void searchButtonAction_cb(Fl_Widget *wdgt, Fl_Input *input){
     SEARCH_PAGE_INDEX = 0;
     SEARCH_BY_CHANNEL_F = false;
     const char* input_text = getSearchValue(input);
-    if (input_text != nullptr)  doSearch(input_text);
+    if (input_text != nullptr)  {
+        lock_buttons(true);
+        doSearch(input_text);
+        lock_buttons(false);
+    }
 }
 
 /** Callback for Previous results button... */
@@ -387,19 +417,27 @@ void getPreviousSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     if (SEARCH_PAGE_INDEX>0) {
         SEARCH_PAGE_INDEX--;
     }
+    const char* input_text = getSearchValue(input);
+    if (input_text != nullptr)  {
+        lock_buttons(true);
+        doSearch(input_text);
+        lock_buttons(false);
+    }
     if (SEARCH_PAGE_INDEX == 0) {
         mainWin->previous_results_bttn->deactivate();
     }
-    const char* input_text = getSearchValue(input);
-    if (input_text != nullptr)  doSearch(input_text);
 }
 /** Callback for Next results button.. */
 void getNextSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     //TODO: what to do if there is no more results? It must be controlled in some way...
     SEARCH_PAGE_INDEX++;
-    mainWin->previous_results_bttn->activate();
     const char* input_text = getSearchValue(input);
-    if (input_text != nullptr)  doSearch(input_text);
+    if (input_text != nullptr) {
+        lock_buttons(true);
+        doSearch(input_text);
+        lock_buttons(false);
+    }
+    mainWin->previous_results_bttn->activate();
 }
 
 /*

@@ -38,6 +38,7 @@ struct DownloadVideoCBData {
 void exitApp(unsigned short int exitStatusCode);
 static void closeWindow_cb(Fl_Widget*, Fl_Window *targetWindow);
 static void showMessageWindow(const char* message);
+static void lock_buttons(bool lock);
 static void preview_video_cb(Fl_Button* widget, void* video_url);
 static void logAtTerminal(std::string log_message, LogLevel log_lvl);
 static void add_video_group(int posx, int posy);
