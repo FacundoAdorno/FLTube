@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+## Remove the yt-dlp during package installation
+if [ -e /usr/local/bin/yt-dlp ]; then
+    echo "\033[34m[!] Removing yt-dlp from system...\033[0m"
+    rm -rf /usr/local/bin/yt-dlp
+fi
+
+exit 0
