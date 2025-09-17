@@ -88,7 +88,9 @@ deb_package: install
 	cp -R $(PREFIX)/usr $(DEB_BLD_DIR)
 	sed  's/-REPLACE_ARCH-/$(ARCH_CPU)/g' packaging/debian/control.template | sed 's/-REPLACE_VERSION-/$(FLTUBE_VERSION)/g' > $(DEB_BLD_DIR)/DEBIAN/control
 	cp packaging/debian/postinst $(DEB_BLD_DIR)/DEBIAN/
+	cp packaging/debian/postrm $(DEB_BLD_DIR)/DEBIAN/
 	chmod +x $(DEB_BLD_DIR)/DEBIAN/postinst
+	chmod +x $(DEB_BLD_DIR)/DEBIAN/postrm
 	chmod +x $(DEB_BLD_DIR)/usr/local/bin/*
 	dpkg-deb --root-owner-group --build $(DEB_BLD_DIR) $(DEB_BLD_DIR)/$(PACKAGE_NAME)
 	@printf "\033[32mPackage built at: $(DEB_BLD_DIR)/$(PACKAGE_NAME)\033[0m. Install using 'apt install [path_to_pkg]'...\n"
