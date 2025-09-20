@@ -12,12 +12,12 @@ Aunque inicialmente fue desarrollado para la distribución [Spirit-OS](https://s
 - Diseñado para bajas resoluciones de pantalla en pantallas pequeñas.
 - Por ahora, la aplicación sólo fue probado en GNU/Linux.
 
-![FLtube en Spirit OS!](https://i.postimg.cc/5yKTKdCG/fltube-screenshot-3.png "Fltube en Spirit OS")
+![FLtube en Spirit OS!](https://i.postimg.cc/44QyBXH8/fltube-screenshot-5.png "Fltube en Spirit OS")
 
-![FLtube en Debian 13 Trixie!](https://i.postimg.cc/pdM76Bm2/fltube-screenshot-4.png "Fltube en Debian 13 Trixie")
+![FLtube en Debian 13 Trixie!](https://i.postimg.cc/yYfdCnPc/fltube-screenshot-6.png "Fltube en Debian 13 Trixie")
 
 
-=====================================================
+------------
 
 ## Instalación
 
@@ -54,17 +54,28 @@ $ sudo make install
 $ fltube        ## Para ejecutar la aplicación.
 ```
 
-#### ADVERTENCIA
+### Desinstalación
 
-La aplicación aún no tiene una tarea de **desinstalación**, así que no estás seguro de lo que estás haciendo, puedes instalarla en una especie de **modo de desarrollo**, en lugar de ejecutar `make install`:
+Para desinstalar la aplicación, puedes ejecutar `make uninstall`.
+
+## Modo Desarrollo
+
+Puedes instalar la aplicación en una especie de **modo de desarrollo**, así que en lugar de ejecutar `make install`, puedes hacer lo siguiente:
 
 ```bash
-$ make PREFIX=./build install    ## Instala los archivos en el directorio relativo "./build"...
+$ make PREFIX=./build install    ## Compila los archivos en el directorio relativo "./build"...
 
-$ ./build/usr/local/bin/fltube   ## Para ejecutar la aplicación.
-
-$ make clean                    ## Para eliminar archivos del directorio ./build.
+$ ./build/usr/local/bin/fltube   ## Ruta relativa para ejecutar la aplicación.
 ```
+Ejecutando *make* de esta manera te permitirá eliminar la aplicación más fácilmente de tu sistema (ya que está todo concentrado en un directorio relativo), además de permitirte realizar tus propias modificaciones al código fuente y probarlas en un entorno de desarrollo controlado.
+
+```bash
+$ make clean                    ## Finalmente, ejecutar para eliminar archivos del directorio ./build.
+```
+
+### Contribuciones
+
+Si quieres contribuir (reportar problemas, corregir errores, mejorar el código, añadir nuevas funciones o traducir a tu idioma), puedes abrir una hilo en https://gitlab.com/facuA/fltube/-/issues.
 
 ## Instalación de *yt-dlp*
 

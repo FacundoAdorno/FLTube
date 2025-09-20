@@ -12,10 +12,11 @@ Although initially developed for [Spirit-OS](https://spirit-os.sourceforge.io/) 
 - Designed for low screen resolutions on small screens.
 - For now, the app only was tested on GNU/Linux.
 
-![FLtube on Spirit OS!](https://i.postimg.cc/5yKTKdCG/fltube-screenshot-3.png "Fltube on Spirit OS")
+![FLtube on Spirit OS!](https://i.postimg.cc/44QyBXH8/fltube-screenshot-5.png    "Fltube on Spirit OS")
 
-![FLtube on Debian 13 Trixie!](https://i.postimg.cc/pdM76Bm2/fltube-screenshot-4.png "Fltube on Debian 13 Trixie")
+![FLtube on Debian 13 Trixie!](https://i.postimg.cc/yYfdCnPc/fltube-screenshot-6.png "Fltube on Debian 13 Trixie")
 
+------------
 
 ## Installation
 
@@ -51,17 +52,28 @@ $ sudo make install
 $ fltube        ## To execute app.
 ```
 
-#### WARNING
+### Uninstallation
 
-The app doesn't have an **uninstall** task yet, so if not sure what you are doing, you can install it in a sort of *"development mode"*, instead of running `make install`:
+To uninstall the app from your system, you can run `make uninstall`.
+
+## Development mode
+
+You can install the app in a sort of *"development mode"*, so instead of running `make install` you can do:
 
 ```bash
-$ make PREFIX=./build install
+$ make PREFIX=./build install    ## Compile at relative path "./build"
 
-$ ./build/usr/local/bin/fltube   ##To execute app.
-
-$ make clean                    ## For clean ./build directory
+$ ./build/usr/local/bin/fltube   ## Relative path to execute app.
 ```
+Running *make* like this will let you delete the app more easily from your system (since everything is concentrated in a relative directory), besides let you make your own modifications and test them in a controlled development environment.
+
+```bash
+$ make clean    ## Finally, for clean ./build directory
+```
+
+### Contributions
+
+If you want to make a contribution (report issues, fix bugs, improve the code, add new features, translate to your language), you can open an issue at https://gitlab.com/facuA/fltube/-/issues.
 
 ## *yt-dlp* installation
 
