@@ -217,9 +217,9 @@ std::string get_videoURL_metadata(const char* video_url){
 void stream_video(const char* video_url, const MediaPlayerInfo* mp) {
     //Open Video in MPlayer
     char stream_videoplayer_cmd[2048];
-    const char* stream_format = "bestvideo[height<=360][vcodec=avc1]+bestaudio[ext=m4a]/best";
+    const char* stream_format = "res:360,+codec:avc1:m4a";
     snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                "%s %s \"$(yt-dlp -f \"%s\" -g \"%s\")\"", mp->binary_path.c_str(), mp->parameters.c_str(), stream_format, video_url);
+                "%s %s \"$(yt-dlp -S \"%s\" -g \"%s\")\"", mp->binary_path.c_str(), mp->parameters.c_str(), stream_format, video_url);
     printf("%s\n", stream_videoplayer_cmd);
     system(stream_videoplayer_cmd);
 }
