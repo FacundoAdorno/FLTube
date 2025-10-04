@@ -1,9 +1,9 @@
 # Variables
 CXX      = $(shell fltk-config --cxx)
 DEBUG    = -g
-CXXFLAGS = $(shell fltk-config --use-images --cxxflags) -Iinclude `pkg-config --cflags libcurl`
+CXXFLAGS = $(shell fltk-config --use-images --cxxflags) -fexceptions -Iinclude `pkg-config --cflags libcurl`
 #LDFLAGS  = $(shell fltk-config --use-gl --use-images --ldflags) `pkg-config --libs libcurl`
-LDSTATIC  = $(shell fltk-config --use-images --ldstaticflags) `pkg-config --libs libcurl`
+LDSTATIC  = $(shell fltk-config --use-images --ldstaticflags) -fexceptions `pkg-config --libs libcurl`
 LINK     = $(CXX)
 
 ARCH_CPU_T  != uname -m | grep -q "x86_64" && echo "amd64" || echo "i386"
@@ -65,13 +65,14 @@ install: all
 	mv $(TARGET) $(PREFIX)/usr/local/bin/
 	cp $(SCRIPTS_DIR)/install_yt-dlp.sh $(PREFIX)/usr/local/bin/
 
-	mkdir -p $(PREFIX)/usr/local/share/icons/fltube/ $(PREFIX)/usr/local/share/applications/
+	mkdir -p $(PREFIX)/usr/local/share/icons/fltube/ $(PREFIX)/usr/local/share/{applications,fltube/resources/img}
 	cp resources/desktop/FLTube.desktop $(PREFIX)/usr/local/share/applications/
 	cp resources/icons/*.png $(PREFIX)/usr/local/share/icons/fltube/
+	cp resources/img/*.png $(PREFIX)/usr/local/share/fltube/resources/img/
 
 uninstall:
-	rm $(PREFIX)/usr/local/etc/fltube/fltube.conf $(PREFIX)/usr/local/bin/fltube $(PREFIX)/usr/local/bin/install_yt-dlp.sh $(PREFIX)/usr/local/share/applications/FLTube.desktop $(PREFIX)/usr/local/share/icons/fltube/*.png $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/FLTube.mo $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/install_yt-dlp.mo
-	rmdir $(PREFIX)/usr/local/share/icons/fltube/
+	rm $(PREFIX)/usr/local/etc/fltube/fltube.conf $(PREFIX)/usr/local/bin/fltube $(PREFIX)/usr/local/bin/install_yt-dlp.sh $(PREFIX)/usr/local/share/applications/FLTube.desktop $(PREFIX)/usr/local/share/icons/fltube/*.png $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/FLTube.mo $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/install_yt-dlp.mo $(PREFIX)/usr/local/share/fltube/resources/img/*.png
+	rmdir $(PREFIX)/usr/local/share/icons/fltube/ $(PREFIX)/usr/local/etc/fltube $(PREFIX)/usr/local/share/{fltube/resources/img,fltube/resources,fltube}
 
 # Extract strings from source and update .po locale files.
 po_update:
