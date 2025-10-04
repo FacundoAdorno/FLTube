@@ -48,6 +48,8 @@ const std::string AUDIOCODEC_PREFERRED = "m4a";
 const std::string DEFAULT_STREAM_PLAYER = "mplayer";
 /** Modify the launch parameters of the DEFAULT_STREAM_PLAYER. */
 const std::string DEFAULT_PLAYER_PARAMS = "-zoom -ao alsa";
+/** Extra parameters for optimize the stream of a live video. */
+const std::string DEFAULT_PLAYER_EXTRAPARAMS_LIVE = "-demuxer lavf -cache 2048";
 
 const std::string DOWNLOAD_VIDEO_PREFERRED_EXT = "mp4";
 
@@ -102,6 +104,8 @@ struct YTDLP_Video_Metadata{
     std::string duration;
     std::string channel_id;
     std::string thumbnail_url;
+    std::string live_status;
+    std::string viewers_count;
 };
 
 struct MediaPlayerInfo {
@@ -109,6 +113,8 @@ struct MediaPlayerInfo {
     std::string binary_path;
     // Parameters to media playar (optional).
     std::string parameters;
+    // Extra parameters for stream a live video (optional).
+    std::string extra_live_parameters;
 };
 
 std::string exec(const char* cmd);
@@ -135,11 +141,13 @@ static std::string do_youtube_search(const char* byTerm);
 
 std::string get_videoURL_metadata(const char* video_url);
 
-void stream_video(const char* video_url, const MediaPlayerInfo* mp);
+void stream_video(const char* video_url, const bool is_a_live, const MediaPlayerInfo* mp);
 
 void download_video(const char* video_url, const char* download_path, VCODEC_RESOLUTIONS v_resolution, const char* vcodec);
 
 YTDLP_Video_Metadata* parse_YT_Video_Metadata(const char ytdlp_video_metadata[512]);
+
+std::string* get_metric_abbreviation(int number);
 
 static CURL* get_curl_handle(const char* forURL, FILE* output_file = nullptr);
 

@@ -16,7 +16,6 @@
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
 
-
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
 
@@ -41,6 +40,9 @@ bool SEARCH_BY_CHANNEL_F = false;
 
 std::string CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
 
+// Path to fltube resources, like images, sounds, etc. Can be modified at fltube.conf file.
+std::string RESOURCES_PATH = "/usr/local/share/fltube/resources";
+
 //If value is 0, enable the debug mode. Defaults to false (or 1).
 int DEBUG_ENABLED = 1;
 
@@ -50,6 +52,8 @@ std::string DOWNLOAD_VIDEO_CODEC;
 MediaPlayerInfo* media_player;
 
 std::unique_ptr<std::map<std::string, std::string>> configParameters = {};
+
+Fl_PNG_Image* live_image = nullptr;
 
 /**
  * Callback for main window close action. By default, exit app with success status code (0).
@@ -125,6 +129,23 @@ bool showChoiceWindow(const char* message, bool& keepShowingFlag) {
     return choice_result;
 }
 
+/**
+ * Load a PNG image from the resource directory, and return as a Fl_PNG_Image object.
+ * If image not exists, a nullptr is returned.
+ */
+Fl_PNG_Image* load_resource_image(std::string image_filename) {
+    std::string live_image_path = RESOURCES_PATH + "/img/" + image_filename;
+
+    if (std::filesystem::exists(live_image_path)) {
+        return new Fl_PNG_Image(live_image_path.c_str());
+    } else {
+        char message[1024];
+        snprintf(message, sizeof(message), _("Resource image at '%s' cannot be loaded..."), live_image_path.c_str());
+        logAtTerminal(std::string(message), LogLevel::WARN);
+    }
+    return nullptr;
+}
+
 //TODO: instead of locking buttons, try to lock main window or open a modal window
 //      making notice that you must wait some action to finish..
 /**
@@ -163,10 +184,11 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
     }
     std::string* url = static_cast<std::string*>(video_url);
     if (url){
+        VideoInfo *vi = static_cast<VideoInfo *>(widget->parent());
         char message[256];
-        snprintf(message, sizeof(message), _("Starting streaming preview of video '%s'..."), url->c_str());
+        snprintf(message, sizeof(message), _("Starting streaming preview of video '%s' - (%s)..."), vi->title->label(), url->c_str());
         logAtTerminal(message,LogLevel::INFO);
-        stream_video(url->c_str(), media_player);
+        stream_video(url->c_str(), vi->is_live_image->visible(), media_player);
     } else {
         logAtTerminal(_("Cannot get video URL. Review the video metadata enabling app debugging..."), LogLevel::ERROR);
     }
@@ -179,8 +201,11 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
  */
 void update_video_info() {
     YTDLP_Video_Metadata* ytvm = nullptr;
+    char text_buffer[128];
+    bool is_livestream;
     for (int j=0; j < video_metadata.size(); j++) {
-        if(video_metadata[j] != nullptr){
+      if (video_metadata[j] != nullptr) {
+            is_livestream = (video_metadata[j]->live_status == "is_live");
             video_info_arr[j]->show();
             video_info_arr[j]->title->label(video_metadata[j]->title.c_str());
             video_info_arr[j]->title->tooltip(video_metadata[j]->title.c_str());
@@ -188,21 +213,41 @@ void update_video_info() {
             video_info_arr[j]->uploadDate->label(video_metadata[j]->upload_date.c_str());
             video_info_arr[j]->userUploader->label(video_metadata[j]->creators.c_str());
             video_info_arr[j]->userUploader->user_data(static_cast<void*>(&video_metadata[j]->channel_id));
-
+            if (is_livestream) {
+                video_info_arr[j]->is_live_image->show();
+            } else {
+                video_info_arr[j]->is_live_image->hide();
+            }
+            try {
+                snprintf(text_buffer, sizeof(text_buffer), "%s %s", get_metric_abbreviation(std::stoi(video_metadata[j]->viewers_count))->c_str(), (is_livestream) ? _("viewers") : _("views"));
+            } catch (const std::invalid_argument& ex) {
+                char err_msg[256];
+                snprintf(err_msg, sizeof(err_msg), _("Error when getting count of viewers of video: (title: \"%s\", ID: \"%s\")"), video_metadata[j]->title.c_str(), video_metadata[j]->id.c_str());
+                logAtTerminal(err_msg, LogLevel::WARN);
+                logAtTerminal(ex.what(), LogLevel::DEBUG);
+                strcpy(text_buffer, _("Unknown"));
+            }
+            video_info_arr[j]->views_spectators->copy_label(text_buffer);
             //Setting URL for streaming a video preview...
             video_info_arr[j]->thumbnail->user_data(static_cast<void*>(&video_metadata[j]->url));
 
             //Download, resize and update the video thumbnail image...
             std::string thumbn_url = video_metadata[j]->thumbnail_url.substr(0, video_metadata[j]->thumbnail_url.find("?"));
             std::string thumbn_name = "th_" + video_metadata[j]->id + ".jpg";
-            download_file(thumbn_url, FLTUBE_TEMPORAL_DIR, thumbn_name);
-            int targetWidth = video_info_arr[j]->thumbnail->w();
-            Fl_Image* resized_thumbnail = create_resized_image_from_jpg(FLTUBE_TEMPORAL_DIR + thumbn_name, targetWidth);
-            if (resized_thumbnail == nullptr) {
-                logAtTerminal(_("Something went wrong when generating a resize thumbnail for video with ID=") + video_metadata[j]->id, LogLevel::ERROR);
+            if (download_file(thumbn_url, FLTUBE_TEMPORAL_DIR, thumbn_name) != FLT_DOWNLOAD_FL_FAILED) {
+                int targetWidth = video_info_arr[j]->thumbnail->w();
+                Fl_Image* resized_thumbnail = create_resized_image_from_jpg(FLTUBE_TEMPORAL_DIR + thumbn_name, targetWidth);
+                if (resized_thumbnail == nullptr) {
+                    logAtTerminal(_("Something went wrong when generating a resize thumbnail for video with ID=") + video_metadata[j]->id, LogLevel::ERROR);
+                } else {
+                    delete video_info_arr[j]->thumbnail->image();
+                    video_info_arr[j]->thumbnail->image(resized_thumbnail);
+                    video_info_arr[j]->thumbnail->redraw();
+                }
             } else {
-                delete video_info_arr[j]->thumbnail->image();
-                video_info_arr[j]->thumbnail->image(resized_thumbnail);
+                //If thumbnail cannot be downloaded, then load a generic one...
+                Fl_PNG_Image* generic_thumbnail = load_resource_image("no_thumbnail_available.png");
+                video_info_arr[j]->thumbnail->image(generic_thumbnail);
                 video_info_arr[j]->thumbnail->redraw();
             }
 
@@ -233,10 +278,16 @@ void pre_init() {
     if(existProperty("STREAM_PLAYER_PATH", configParameters)) {
         media_player->binary_path = getProperty("STREAM_PLAYER_PATH", "", configParameters);
         media_player->parameters = getProperty("STREAM_PLAYER_PARAMS", "", configParameters);
+        media_player->extra_live_parameters = getProperty("STREAM_PLAYER_EXTRA_PARAMS_FOR_LIVE", "" , configParameters);
     } else {
         media_player->binary_path = DEFAULT_STREAM_PLAYER;
         media_player->parameters = DEFAULT_PLAYER_PARAMS;
+        media_player->extra_live_parameters = DEFAULT_PLAYER_EXTRAPARAMS_LIVE;
     }
+    if(existProperty("RESOURCES_PATH", configParameters)) {
+        RESOURCES_PATH = getProperty("RESOURCES_PATH", RESOURCES_PATH.c_str(), configParameters);
+    }
+    live_image = load_resource_image("livebutton_18p.png");
 
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
@@ -294,6 +345,7 @@ VideoInfo* create_video_group(int posx, int posy) {
     VideoInfo *video_info = new VideoInfo (posx, posy, 600, 90, "");
     video_info->thumbnail->callback((Fl_Callback*)preview_video_cb);
     video_info->userUploader->callback((Fl_Callback*)getYTChannelVideo_cb);
+    if (live_image != nullptr) video_info->is_live_image->image(live_image);
     return video_info;
 }
 
@@ -475,19 +527,23 @@ void parseOptions(int argc, char **argv){
         printf("FLtube v.%s\n", VERSION);
         exit(FLT_OK);
     }
-    if (existsCmdOption(argc, argv, "-d") || existsCmdOption(argc, argv, "--debug")) {
-        printf(_("DEBUG MODE enabled.\n"));
-        DEBUG_ENABLED = 0;
-    }
     if (existsCmdOption(argc, argv, "--config")){
         const std::string path = getOptionValue(argc, argv, "--config");
-        if (path != ""){
+        if (path != "" && std::filesystem::exists(path)){
             CONFIGFILE_PATH = path;
             printf(_("Loading custom config file %s.\n"), CONFIGFILE_PATH.c_str());
         } else {
-            printf(_("--config parameter with no path specified.\n"));
+            if (!std::filesystem::exists(path)) {
+                printf(_("Specified path at --config parameter does not exist.\n"));
+            } else {
+                printf(_("--config parameter with no path specified.\n"));
+            }
             exit(FLT_INVALID_CMD_PARAM);
         }
+    }
+    if (existsCmdOption(argc, argv, "-d") || existsCmdOption(argc, argv, "--debug")) {
+        printf(_("DEBUG MODE enabled.\n"));
+        DEBUG_ENABLED = 0;
     }
 }
 

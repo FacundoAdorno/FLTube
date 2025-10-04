@@ -68,22 +68,28 @@ widget_class FLTubeMainWindow {
 }
 
 widget_class VideoInfo {open
-  xywh {609 283 577 91} hide position_relative
+  xywh {690 282 577 91} visible position_relative
 } {
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
   }
-  Fl_Box title {
-    xywh {105 8 455 40} labelfont 1 align 213
+  Fl_Box views_spectators {
+    tooltip {Total video views, or if live current count of concurrent spectators.} bind_image 1 xywh {110 45 110 20} align 372
+  }
+  Fl_Box is_live_image {
+    tooltip {The video is live.} bind_image 1 xywh {220 45 40 20} align 288 hide
+  }
+  Fl_Box title {selected
+    xywh {105 6 450 37} labelfont 1 align 213
   }
   Fl_Box duration {
-    tooltip {Duration expressed as H:MM:SS.} xywh {110 57 70 20} labelfont 2 align 20
+    tooltip {Duration expressed as H:MM:SS.} xywh {110 65 70 20} labelfont 2 align 20
   }
   Fl_Box uploadDate {
-    tooltip {Video upload date.} xywh {190 57 95 20} labelfont 2 align 20
+    tooltip {Video upload date.} xywh {190 65 95 20} labelfont 2 align 20
   }
-  Fl_Button userUploader {selected
-    tooltip {Click to list all channel's video.} xywh {295 57 260 20} labelfont 2 align 20
+  Fl_Button userUploader {
+    tooltip {Click to list all channel's video.} xywh {295 65 260 20} labelfont 2 align 20
   }
 }
 

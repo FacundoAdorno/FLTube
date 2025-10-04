@@ -170,7 +170,7 @@ bool checkForYTDLP() {
 /** Metadata print template for youtube search videos.  **/
 const std::string PRINT_METADATA_TEMPLATE = "title=\\\"%(title)s\\\">>thumbnail=\\\"%(thumbnails.0.url)s" \
 "\\\">>creators=\\\"%(uploader,playlist_channel)s\\\">>video_id=\\\"%(id)s\\\">>upload_date=\\\"%(upload_date>%Y-%m-%d)s" \
-"\\\">>duration=\\\"%(duration>%H:%M:%S)s\\\">>channel_id=\\\"%(playlist_channel_id,channel_id)s\\\">>";
+"\\\">>duration=\\\"%(duration>%H:%M:%S)s\\\">>channel_id=\\\"%(playlist_channel_id,channel_id)s\\\">>live_status=\\\"%(live_status)s\\\">>viewers_count=\\\"%(view_count,concurrent_view_count)s\\\">>";
 static std::string do_youtube_search(const char* search_text, bool is_a_channel ,Pagination_Info page_info){
     char search_component[128];
     if(is_a_channel){
@@ -213,13 +213,19 @@ std::string get_videoURL_metadata(const char* video_url){
 
 /**
  * Stream a video from a its URL using the configured multimedia player at @DEFAULT_STREAM_PLAYER. The stream resolution is 360p.
+ * Also, you can specify if the video to stream is a "live video".
  */
-void stream_video(const char* video_url, const MediaPlayerInfo* mp) {
+void stream_video(const char* video_url, const bool is_a_live, const MediaPlayerInfo* mp) {
     //Open Video in MPlayer
     char stream_videoplayer_cmd[2048];
     const char* stream_format = "res:360,+codec:avc1:m4a";
-    snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
+    if (is_a_live) {
+        snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
+                 "yt-dlp -S \"%s\" -o - \"%s\" | %s %s %s -", stream_format, video_url, mp->binary_path.c_str(), mp->parameters.c_str(), mp->extra_live_parameters.c_str());
+    } else {
+        snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
                 "%s %s \"$(yt-dlp -S \"%s\" -g \"%s\")\"", mp->binary_path.c_str(), mp->parameters.c_str(), stream_format, video_url);
+    }
     printf("%s\n", stream_videoplayer_cmd);
     system(stream_videoplayer_cmd);
 }
@@ -270,12 +276,32 @@ YTDLP_Video_Metadata* parse_YT_Video_Metadata(const char ytdlp_video_metadata[51
                     metadata->thumbnail_url = value;
                 } else if (key == "channel_id"){
                     metadata->channel_id = value;
+                } else if (key == "live_status"){
+                  metadata->live_status = value;
+                } else if (key == "viewers_count"){
+                    metadata->viewers_count = value;
                 }
             }
         }
     }
     metadata->url =  YOUTUBE_URL_PREFIX + metadata->id;
     return metadata;
+}
+
+/**
+ * Return a metric abbreviation from a number, for example: 1520
+ * = 1.5K, 1.450.000 = 1.4M
+ */
+std::string* get_metric_abbreviation(int number) {
+    char metric_abbr[32];
+    if (number < 1000) {
+        snprintf(metric_abbr, sizeof(metric_abbr), "%d", number );
+    } else if (number < 1000000) {
+        snprintf(metric_abbr, sizeof(metric_abbr), "%.1fK", (number/1000.0));
+    } else {
+        snprintf(metric_abbr, sizeof(metric_abbr), "%.1fM", (number/1000000.0));
+    }
+    return new std::string(metric_abbr);
 }
 
 /**
@@ -322,6 +348,7 @@ FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::
         if (response != CURLE_OK) {
             fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(response));
             returnCode = FLT_DOWNLOAD_FL_FAILED;
+            std::filesystem::remove(fullpath.c_str());
         }
         curl_easy_cleanup(curl);
         fclose(fp);

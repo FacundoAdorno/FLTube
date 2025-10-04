@@ -86,21 +86,30 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
   { thumbnail = new Fl_Button(6, 5, 95, 80);
     thumbnail->tooltip(_("Click to stream the video (preview it)..."));
   } // Fl_Button* thumbnail
-  { title = new Fl_Box(105, 8, 455, 40);
+  { views_spectators = new Fl_Box(110, 45, 110, 20);
+    views_spectators->tooltip(_("Total video views, or if live current count of concurrent spectators."));
+    views_spectators->align(Fl_Align(356|FL_ALIGN_INSIDE));
+  } // Fl_Box* views_spectators
+  { is_live_image = new Fl_Box(220, 45, 40, 20);
+    is_live_image->tooltip(_("The video is live."));
+    is_live_image->align(Fl_Align(288));
+    is_live_image->hide();
+  } // Fl_Box* is_live_image
+  { title = new Fl_Box(105, 6, 450, 37);
     title->labelfont(1);
     title->align(Fl_Align(197|FL_ALIGN_INSIDE));
   } // Fl_Box* title
-  { duration = new Fl_Box(110, 57, 70, 20);
+  { duration = new Fl_Box(110, 65, 70, 20);
     duration->tooltip(_("Duration expressed as H:MM:SS."));
     duration->labelfont(2);
     duration->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
   } // Fl_Box* duration
-  { uploadDate = new Fl_Box(190, 57, 95, 20);
+  { uploadDate = new Fl_Box(190, 65, 95, 20);
     uploadDate->tooltip(_("Video upload date."));
     uploadDate->labelfont(2);
     uploadDate->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
   } // Fl_Box* uploadDate
-  { userUploader = new Fl_Button(295, 57, 260, 20);
+  { userUploader = new Fl_Button(295, 65, 260, 20);
     userUploader->tooltip(_("Click to list all channel\'s video."));
     userUploader->labelfont(2);
     userUploader->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));

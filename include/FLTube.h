@@ -17,6 +17,7 @@
 #include <FL/Fl_File_Chooser.H>
 #include <FL/Enumerations.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_PNG_Image.H>
 #include <array>
 #include <sstream>
 #include <map>
