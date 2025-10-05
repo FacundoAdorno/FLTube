@@ -29,7 +29,7 @@ TARGET = $(BUILD_DIR)/fltube
 SOURCES_LIST = fltube_utils.cxx gnugettext_utils.cxx FLTube_View.cxx FLTube.cxx
 SOURCES = $(addprefix $(SRC_DIR)/, $(SOURCES_LIST))
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cxx=$(BUILD_DIR)/%.o)
-FLTUBE_VERSION=2.0.1
+FLTUBE_VERSION=2.0.2
 PACKAGE_NAME=FLTube_$(FLTUBE_VERSION)-$(ARCH_CPU).deb
 
 # Rules
