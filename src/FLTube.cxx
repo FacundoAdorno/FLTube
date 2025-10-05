@@ -28,6 +28,9 @@ int SEARCH_PAGE_INDEX = 0;
 // Count of search results per page. BEWARE: don't modify this value unless you change the view at Fltube_View.cxx file.'
 const int SEARCH_PAGE_SIZE = 4;
 
+// Default resolution for video streaming
+VCODEC_RESOLUTIONS STREAM_VIDEO_RESOLUTION = R360p;
+
 // Array that holds the search results WIDGETS, in groups of size @SEARCH_PAGE_SIZE...
 std::array <VideoInfo*,SEARCH_PAGE_SIZE> video_info_arr{ nullptr, nullptr, nullptr, nullptr };
 // Array that holds the search results METADATA, in groups of size @SEARCH_PAGE_SIZE...
@@ -188,7 +191,7 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
         char message[256];
         snprintf(message, sizeof(message), _("Starting streaming preview of video '%s' - (%s)..."), vi->title->label(), url->c_str());
         logAtTerminal(message,LogLevel::INFO);
-        stream_video(url->c_str(), vi->is_live_image->visible(), media_player);
+        stream_video(url->c_str(), vi->is_live_image->visible(), STREAM_VIDEO_RESOLUTION, media_player);
     } else {
         logAtTerminal(_("Cannot get video URL. Review the video metadata enabling app debugging..."), LogLevel::ERROR);
     }
@@ -286,6 +289,18 @@ void pre_init() {
     }
     if(existProperty("RESOURCES_PATH", configParameters)) {
         RESOURCES_PATH = getProperty("RESOURCES_PATH", RESOURCES_PATH.c_str(), configParameters);
+    }
+    if (existProperty("STREAM_VIDEO_RESOLUTION", configParameters)) {
+        int pretended_resolution = getIntProperty("STREAM_VIDEO_RESOLUTION", DEFAULT_STREAM_VIDEO_RESOLUTION, configParameters);
+        std::vector<VCODEC_RESOLUTIONS> resolutions = {R240p, R360p, R480p, R720p, R1080p};
+        for (auto res: resolutions){
+            if (res == pretended_resolution) {
+                STREAM_VIDEO_RESOLUTION = res;
+                break;
+            }
+        }
+        if (STREAM_VIDEO_RESOLUTION != DEFAULT_STREAM_VIDEO_RESOLUTION)
+            logAtTerminal(_("Default streaming resolution (360p) changed at configuration to this new resolution: ") + std::to_string(STREAM_VIDEO_RESOLUTION), LogLevel::DEBUG);
     }
     live_image = load_resource_image("livebutton_18p.png");
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-04 12:09-0300\n"
+"POT-Creation-Date: 2025-10-04 21:16-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,128 +17,134 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/FLTube.cxx:65
+#: src/FLTube.cxx:67
 #, c-format
 msgid "Cleaning temporal files at %s."
 msgstr ""
 
-#: src/FLTube.cxx:69
+#: src/FLTube.cxx:71
 msgid "Closing FLtube... Bye!\n"
 msgstr ""
 
-#: src/FLTube.cxx:144
+#: src/FLTube.cxx:146
 #, c-format
 msgid "Resource image at '%s' cannot be loaded..."
 msgstr ""
 
-#: src/FLTube.cxx:181 src/FLTube.cxx:362
+#: src/FLTube.cxx:183 src/FLTube.cxx:376
 msgid "Your device is offline. Check your internet connection."
 msgstr ""
 
-#: src/FLTube.cxx:182 src/FLTube.cxx:363
+#: src/FLTube.cxx:184 src/FLTube.cxx:377
 msgid ""
 "There seems that you don't have access to the Internet. Please, verify you "
 "network connection before proceed..."
 msgstr ""
 
-#: src/FLTube.cxx:190
+#: src/FLTube.cxx:192
 #, c-format
 msgid "Starting streaming preview of video '%s' - (%s)..."
 msgstr ""
 
-#: src/FLTube.cxx:194
+#: src/FLTube.cxx:196
 msgid ""
 "Cannot get video URL. Review the video metadata enabling app debugging..."
 msgstr ""
 
-#: src/FLTube.cxx:223
+#: src/FLTube.cxx:225
 msgid "viewers"
 msgstr ""
 
-#: src/FLTube.cxx:223
+#: src/FLTube.cxx:225
 msgid "views"
 msgstr ""
 
-#: src/FLTube.cxx:226
+#: src/FLTube.cxx:228
 #, c-format
 msgid ""
 "Error when getting count of viewers of video: (title: \"%s\", ID: \"%s\")"
 msgstr ""
 
-#: src/FLTube.cxx:229
+#: src/FLTube.cxx:231
 msgid "Unknown"
 msgstr ""
 
-#: src/FLTube.cxx:242
+#: src/FLTube.cxx:244
 msgid ""
 "Something went wrong when generating a resize thumbnail for video with ID="
 msgstr ""
 
-#: src/FLTube.cxx:267
+#: src/FLTube.cxx:269
 msgid ""
 "yt-dlp is not installed on your system or its binary is not at $PATH system "
 "variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run "
 "in a terminal the 'install_yt-dlp' script."
 msgstr ""
 
-#: src/FLTube.cxx:268
+#: src/FLTube.cxx:270
 msgid "yt-dlp is not installed. Closing app...\n"
 msgstr ""
 
-#: src/FLTube.cxx:369
+#: src/FLTube.cxx:303
+msgid ""
+"Default streaming resolution (360p) changed at configuration to this new "
+"resolution: "
+msgstr ""
+
+#: src/FLTube.cxx:383
 #, c-format
 msgid "Searching for results for '%s' user input..."
 msgstr ""
 
-#: src/FLTube.cxx:374
+#: src/FLTube.cxx:388
 msgid ""
 "For now, only Youtube URL's are valid for download. Please, edit your input "
 "text or search using a generic term."
 msgstr ""
 
-#: src/FLTube.cxx:414
+#: src/FLTube.cxx:428
 msgid "The Fl_Button is inexistent when search videos for a channel!!!\n"
 msgstr ""
 
-#: src/FLTube.cxx:420
+#: src/FLTube.cxx:434
 msgid ""
 "Channel ID is empty. Please verify the video metadata initilization!!!\n"
 msgstr ""
 
-#: src/FLTube.cxx:440
+#: src/FLTube.cxx:454
 msgid "The Fl_Input search widget inexistent!!!\n"
 msgstr ""
 
-#: src/FLTube.cxx:446
+#: src/FLTube.cxx:460
 msgid "Search input is empty. Please, retry and enter a valid text."
 msgstr ""
 
-#: src/FLTube.cxx:535
+#: src/FLTube.cxx:549
 #, c-format
 msgid "Loading custom config file %s.\n"
 msgstr ""
 
-#: src/FLTube.cxx:538
+#: src/FLTube.cxx:552
 #, c-format
 msgid "Specified path at --config parameter does not exist.\n"
 msgstr ""
 
-#: src/FLTube.cxx:540
+#: src/FLTube.cxx:554
 #, c-format
 msgid "--config parameter with no path specified.\n"
 msgstr ""
 
-#: src/FLTube.cxx:546
+#: src/FLTube.cxx:560
 #, c-format
 msgid "DEBUG MODE enabled.\n"
 msgstr ""
 
-#: src/FLTube.cxx:559
+#: src/FLTube.cxx:573
 #, c-format
 msgid "Starting FLTube v.%s\n"
 msgstr ""
 
-#: src/FLTube.cxx:574
+#: src/FLTube.cxx:588
 msgid "The FLTube main window has loaded."
 msgstr ""
 
@@ -155,6 +161,20 @@ msgstr ""
 #: src/fltube_utils.cxx:377
 #, c-format
 msgid "Connection testing failure: %s. Check your connectivity.\n"
+msgstr ""
+
+#: src/fltube_utils.cxx:514
+#, c-format
+msgid ""
+"Invalid configuration at property '%s' (CURRENT VALUE: %s). Please, modify "
+"it to a valid integer value.\n"
+msgstr ""
+
+#: src/fltube_utils.cxx:516
+#, c-format
+msgid ""
+"Invalid configuration at property '%s' (CURRENT VALUE: %s). Value out of "
+"range: %s.\n"
 msgstr ""
 
 #: src/FLTube_View.cxx:53

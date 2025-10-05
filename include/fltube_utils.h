@@ -59,7 +59,8 @@ enum VCODEC_RESOLUTIONS {
     R240p = 240, R360p = 360, R480p = 480, R720p = 720, R1080p = 1080 };
 
 static std::array<const char*,2> VCODEC_IMPL_NAMES = {"avc1", "av01"};
-
+// The default resolution used to streaming videos.
+const int DEFAULT_STREAM_VIDEO_RESOLUTION = VCODEC_RESOLUTIONS::R360p;
 
 /** FLtube custom status codes definition... */
 enum FLTUBE_STATUS_CODES {
@@ -141,7 +142,7 @@ static std::string do_youtube_search(const char* byTerm);
 
 std::string get_videoURL_metadata(const char* video_url);
 
-void stream_video(const char* video_url, const bool is_a_live, const MediaPlayerInfo* mp);
+void stream_video(const char* video_url, const bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp);
 
 void download_video(const char* video_url, const char* download_path, VCODEC_RESOLUTIONS v_resolution, const char* vcodec);
 
@@ -166,6 +167,8 @@ void trim(std::string &s);
 std::unique_ptr<std::map<std::string, std::string>> loadConfFile(const char* path_to_conf);
 
 std::string getProperty(const char* config_name, const char* default_value, const std::unique_ptr<std::map<std::string, std::string>> &config_map);
+
+int getIntProperty(const char *config_name, int default_value, const std::unique_ptr<std::map<std::string, std::string>> &config_map);
 
 bool existProperty(const char* config_name, const std::unique_ptr<std::map<std::string, std::string>> &config_map);
 

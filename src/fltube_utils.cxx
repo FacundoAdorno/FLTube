@@ -12,6 +12,7 @@
  */
 
 #include "../include/fltube_utils.h"
+#include <string>
 
 const std::string HTTP_PREFIX = "http://";
 const std::string HTTPS_PREFIX = "https://";
@@ -215,10 +216,10 @@ std::string get_videoURL_metadata(const char* video_url){
  * Stream a video from a its URL using the configured multimedia player at @DEFAULT_STREAM_PLAYER. The stream resolution is 360p.
  * Also, you can specify if the video to stream is a "live video".
  */
-void stream_video(const char* video_url, const bool is_a_live, const MediaPlayerInfo* mp) {
-    //Open Video in MPlayer
+void stream_video(const char* video_url, const bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp) {
     char stream_videoplayer_cmd[2048];
-    const char* stream_format = "res:360,+codec:avc1:m4a";
+    char stream_format[100];
+    snprintf(stream_format, sizeof(stream_format), "res:%d,+codec:avc1:m4a", v_resolution);
     if (is_a_live) {
         snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
                  "yt-dlp -S \"%s\" -o - \"%s\" | %s %s %s -", stream_format, video_url, mp->binary_path.c_str(), mp->parameters.c_str(), mp->extra_live_parameters.c_str());
@@ -494,6 +495,28 @@ std::string getProperty(const char* config_name, const char* default_value, cons
         return config_map->find(config_name)->second;
     }
     return std::string((default_value) ? default_value : "");
+}
+
+/** Return the value of a INTEGER property configuration loaded with @loadConfFile() method.
+ * If no property is found, returns @default_value.
+ */
+int getIntProperty(
+    const char *config_name, int default_value,
+    const std::unique_ptr<std::map<std::string, std::string>> &config_map) {
+
+    char default_value_bff[20];
+    snprintf(default_value_bff, sizeof(default_value_bff), "%d", default_value);
+    std::string prop = getProperty(config_name, default_value_bff, config_map);
+
+    try {
+        return std::stoi(prop);
+    } catch (const std::invalid_argument& e) {
+        fprintf(stderr, _("Invalid configuration at property '%s' (CURRENT VALUE: %s). Please, modify it to a valid integer value.\n"), config_name, prop.c_str());
+    } catch (const std::out_of_range& e) {
+        fprintf(stderr, _("Invalid configuration at property '%s' (CURRENT VALUE: %s). Value out of range: %s.\n"), config_name, prop.c_str(), e.what());
+    }
+
+    return default_value;
 }
 
 bool existProperty(const char* config_name, const std::unique_ptr<std::map<std::string, std::string>> &config_map) {

@@ -86,7 +86,7 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
   { thumbnail = new Fl_Button(6, 5, 95, 80);
     thumbnail->tooltip(_("Click to stream the video (preview it)..."));
   } // Fl_Button* thumbnail
-  { views_spectators = new Fl_Box(110, 45, 110, 20);
+  { views_spectators = new Fl_Box(105, 45, 110, 20);
     views_spectators->tooltip(_("Total video views, or if live current count of concurrent spectators."));
     views_spectators->align(Fl_Align(356|FL_ALIGN_INSIDE));
   } // Fl_Box* views_spectators
@@ -99,7 +99,7 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
     title->labelfont(1);
     title->align(Fl_Align(197|FL_ALIGN_INSIDE));
   } // Fl_Box* title
-  { duration = new Fl_Box(110, 65, 70, 20);
+  { duration = new Fl_Box(105, 65, 70, 20);
     duration->tooltip(_("Duration expressed as H:MM:SS."));
     duration->labelfont(2);
     duration->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
