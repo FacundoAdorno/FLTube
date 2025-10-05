@@ -15,6 +15,7 @@
 #include "../include/FLTube.h"
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
+#include <FL/Fl_PNG_Image.H>
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -132,22 +133,26 @@ bool showChoiceWindow(const char* message, bool& keepShowingFlag) {
     return choice_result;
 }
 
+Fl_PNG_Image* load_image(std::string path) {
+    if (std::filesystem::exists(path)) {
+        return new Fl_PNG_Image(path.c_str());
+    } else {
+        char message[1024];
+        snprintf(message, sizeof(message), _("Resource image at '%s' cannot be loaded..."), path.c_str());
+        logAtTerminal(std::string(message), LogLevel::WARN);
+    }
+    return nullptr;
+}
+
 /**
  * Load a PNG image from the resource directory, and return as a Fl_PNG_Image object.
  * If image not exists, a nullptr is returned.
  */
 Fl_PNG_Image* load_resource_image(std::string image_filename) {
-    std::string live_image_path = RESOURCES_PATH + "/img/" + image_filename;
-
-    if (std::filesystem::exists(live_image_path)) {
-        return new Fl_PNG_Image(live_image_path.c_str());
-    } else {
-        char message[1024];
-        snprintf(message, sizeof(message), _("Resource image at '%s' cannot be loaded..."), live_image_path.c_str());
-        logAtTerminal(std::string(message), LogLevel::WARN);
-    }
-    return nullptr;
+    std::string resource_image_path = RESOURCES_PATH + "/img/" + image_filename;
+    return load_image(resource_image_path);
 }
+
 
 //TODO: instead of locking buttons, try to lock main window or open a modal window
 //      making notice that you must wait some action to finish..
@@ -584,6 +589,7 @@ int main(int argc, char **argv) {
 
     post_init();
     //mainWin->show(argc, argv);    //TODO Avoid passing parameters to the mainWin function to prevent undesirable logs.
+    mainWin->icon(load_image("/usr/local/share/icons/fltube/64x64.png"));
     mainWin->show();
     logAtTerminal(_("The FLTube main window has loaded."), LogLevel::DEBUG);
     return Fl::run();
