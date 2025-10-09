@@ -12,6 +12,7 @@
  */
 
 #include "../include/fltube_utils.h"
+#include <memory>
 #include <string>
 
 const std::string HTTP_PREFIX = "http://";
@@ -454,15 +455,9 @@ void trim(std::string &s){
 }
 
 
-
-// TODO: all of this, the configuration map and the logic to check the configs, should be abstracted in a Configuration Class...
-/**
- * Load configurations at a .conf file, with the following format: config_key=value.
- */
-std::unique_ptr<std::map<std::string, std::string>> loadConfFile(const char* path_to_conf){
-    auto configs = std::make_unique<std::map<std::string,std::string>>();
+ConfigutationManager::ConfigutationManager(std::string path_to_conf) {
+    configurations = std::make_unique<std::map<std::string, std::string>>();
     std::ifstream infile(path_to_conf);
-
     std::string line, config_key, config_value;
     while (std::getline(infile, line)) {
         config_key = config_value = "";
@@ -475,38 +470,31 @@ std::unique_ptr<std::map<std::string, std::string>> loadConfFile(const char* pat
                 config_value = line.substr(found + 1);
                 trim(config_key);
                 trim(config_value);
-                (*configs)[config_key] = config_value;
+                (*configurations)[config_key] = config_value;
             }
         }
     }
-
-    return configs;
 }
 
-/*
- * Return the value of a property configuration loaded with @loadConfFile() method.
- * If no property is found, returns @default_value or empty string ("") if no default value is specified..
- */
-std::string getProperty(const char* config_name, const char* default_value, const std::unique_ptr<std::map<std::string, std::string>> &config_map){
+bool ConfigutationManager::existProperty(const char* config_name) {
+    return (config_name && configurations && configurations->find(config_name) != configurations->end());
+}
+
+std::string ConfigutationManager::getProperty(const char* config_name, const char* default_value){
     if (!config_name || std::strlen(config_name) == 0) {
         return "";
     }
-    else if (config_map && config_map->find(config_name) != config_map->end()) {
-        return config_map->find(config_name)->second;
+    else if (this->existProperty(config_name)) {
+        return configurations->find(config_name)->second;
     }
     return std::string((default_value) ? default_value : "");
 }
 
-/** Return the value of a INTEGER property configuration loaded with @loadConfFile() method.
- * If no property is found, returns @default_value.
- */
-int getIntProperty(
-    const char *config_name, int default_value,
-    const std::unique_ptr<std::map<std::string, std::string>> &config_map) {
+int ConfigutationManager::getIntProperty(const char *config_name, int default_value) {
 
     char default_value_bff[20];
     snprintf(default_value_bff, sizeof(default_value_bff), "%d", default_value);
-    std::string prop = getProperty(config_name, default_value_bff, config_map);
+    std::string prop = this->getProperty(config_name, default_value_bff);
 
     try {
         return std::stoi(prop);
@@ -517,8 +505,4 @@ int getIntProperty(
     }
 
     return default_value;
-}
-
-bool existProperty(const char* config_name, const std::unique_ptr<std::map<std::string, std::string>> &config_map) {
-    return (config_name && config_map && config_map->find(config_name) != config_map->end());
 }

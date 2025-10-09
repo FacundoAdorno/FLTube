@@ -164,12 +164,33 @@ bool existsCmdOption(int argc, char* argv[], const std::string& option);
 
 void trim(std::string &s);
 
-std::unique_ptr<std::map<std::string, std::string>> loadConfFile(const char* path_to_conf);
+/**
+ * Class used for parse and load configurations defined at a .conf file.
+ * The properties must follow the next format:
+ *          config_key = value.
+ * Comments starts with "#".
+ */
+class ConfigutationManager {
+    private:
+        std::string filepath;
+        std::unique_ptr<std::map<std::string, std::string>> configurations;
 
-std::string getProperty(const char* config_name, const char* default_value, const std::unique_ptr<std::map<std::string, std::string>> &config_map);
-
-int getIntProperty(const char *config_name, int default_value, const std::unique_ptr<std::map<std::string, std::string>> &config_map);
-
-bool existProperty(const char* config_name, const std::unique_ptr<std::map<std::string, std::string>> &config_map);
+public:
+        ConfigutationManager(std::string path_to_conf);
+        ~ConfigutationManager();
+        /*
+         *   Returns true if the configuration is set in the configuration file.
+         */
+        bool existProperty(const char* config_name);
+        /*
+         * Return the value of a property configuration loaded with @loadConfFile() method.
+         * If no property is found, returns @default_value or empty string ("") if no default value is specified..
+         */
+        std::string getProperty(const char* config_name, const char* default_value);
+        /** Return the value of a INTEGER property configuration loaded with @loadConfFile() method.
+         * If no property is found, returns @default_value.
+         */
+        int getIntProperty(const char *config_name, int default_value);
+};
 
 #endif

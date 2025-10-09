@@ -15,7 +15,9 @@
 #include "../include/FLTube.h"
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
+#include <FL/Enumerations.H>
 #include <FL/Fl_PNG_Image.H>
+#include <cstdio>
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -55,7 +57,7 @@ std::string DOWNLOAD_VIDEO_CODEC;
 
 MediaPlayerInfo* media_player;
 
-std::unique_ptr<std::map<std::string, std::string>> configParameters = {};
+ConfigutationManager* config = nullptr;
 
 Fl_PNG_Image* live_image = nullptr;
 
@@ -277,26 +279,26 @@ void pre_init() {
     }
 
     ///// LOAD CONFIGURATIONS  //////
-    configParameters = loadConfFile(CONFIGFILE_PATH.c_str());
+    config = new ConfigutationManager(CONFIGFILE_PATH.c_str());
 
     //Init Localization. Use locale path specified at config, or custom config default_locale_path().
-    setup_gettext("", getProperty("LOCALE_PATH", default_locale_path().c_str(), configParameters));
+    setup_gettext("", config->getProperty("LOCALE_PATH", default_locale_path().c_str()));
 
     media_player = new MediaPlayerInfo();
-    if(existProperty("STREAM_PLAYER_PATH", configParameters)) {
-        media_player->binary_path = getProperty("STREAM_PLAYER_PATH", "", configParameters);
-        media_player->parameters = getProperty("STREAM_PLAYER_PARAMS", "", configParameters);
-        media_player->extra_live_parameters = getProperty("STREAM_PLAYER_EXTRA_PARAMS_FOR_LIVE", "" , configParameters);
+    if(config->existProperty("STREAM_PLAYER_PATH")) {
+        media_player->binary_path = config->getProperty("STREAM_PLAYER_PATH", "");
+        media_player->parameters = config->getProperty("STREAM_PLAYER_PARAMS", "");
+        media_player->extra_live_parameters = config->getProperty("STREAM_PLAYER_EXTRA_PARAMS_FOR_LIVE", "");
     } else {
         media_player->binary_path = DEFAULT_STREAM_PLAYER;
         media_player->parameters = DEFAULT_PLAYER_PARAMS;
         media_player->extra_live_parameters = DEFAULT_PLAYER_EXTRAPARAMS_LIVE;
     }
-    if(existProperty("RESOURCES_PATH", configParameters)) {
-        RESOURCES_PATH = getProperty("RESOURCES_PATH", RESOURCES_PATH.c_str(), configParameters);
+    if(config->existProperty("RESOURCES_PATH")) {
+        RESOURCES_PATH = config->getProperty("RESOURCES_PATH", RESOURCES_PATH.c_str());
     }
-    if (existProperty("STREAM_VIDEO_RESOLUTION", configParameters)) {
-        int pretended_resolution = getIntProperty("STREAM_VIDEO_RESOLUTION", DEFAULT_STREAM_VIDEO_RESOLUTION, configParameters);
+    if (config->existProperty("STREAM_VIDEO_RESOLUTION")) {
+        int pretended_resolution = config->getIntProperty("STREAM_VIDEO_RESOLUTION", DEFAULT_STREAM_VIDEO_RESOLUTION);
         std::vector<VCODEC_RESOLUTIONS> resolutions = {R240p, R360p, R480p, R720p, R1080p};
         for (auto res: resolutions){
             if (res == pretended_resolution) {
