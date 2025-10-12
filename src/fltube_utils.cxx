@@ -12,8 +12,6 @@
  */
 
 #include "../include/fltube_utils.h"
-#include <memory>
-#include <string>
 
 const std::string HTTP_PREFIX = "http://";
 const std::string HTTPS_PREFIX = "https://";
@@ -454,55 +452,17 @@ void trim(std::string &s){
     }).base(), s.end());
 }
 
-
-ConfigutationManager::ConfigutationManager(std::string path_to_conf) {
-    configurations = std::make_unique<std::map<std::string, std::string>>();
-    std::ifstream infile(path_to_conf);
-    std::string line, config_key, config_value;
-    while (std::getline(infile, line)) {
-        config_key = config_value = "";
-        trim(line);
-        if(!line.empty() && line.at(0) != '#') {
-            std::size_t found = line.find_first_of("=");
-            if (found != std::string::npos){
-                //Only is a value specified if "=" is present.
-                config_key = line.substr(0, found);
-                config_value = line.substr(found + 1);
-                trim(config_key);
-                trim(config_value);
-                (*configurations)[config_key] = config_value;
-            }
-        }
+/** A quick way to split strings separated via any character delimiter.
+* A trim is made (delete initial or final spaces) over each token. */
+std::vector<std::string> tokenize(std::string s, const char delimiter) {
+    std::vector<std::string> tokens = {};
+    std::stringstream ss(s);
+    std::string word;
+    while (!ss.eof()) {
+        getline(ss, word, delimiter);
+        trim(word);
+        tokens.push_back(word);
     }
+    return tokens;
 }
 
-bool ConfigutationManager::existProperty(const char* config_name) {
-    return (config_name && configurations && configurations->find(config_name) != configurations->end());
-}
-
-std::string ConfigutationManager::getProperty(const char* config_name, const char* default_value){
-    if (!config_name || std::strlen(config_name) == 0) {
-        return "";
-    }
-    else if (this->existProperty(config_name)) {
-        return configurations->find(config_name)->second;
-    }
-    return std::string((default_value) ? default_value : "");
-}
-
-int ConfigutationManager::getIntProperty(const char *config_name, int default_value) {
-
-    char default_value_bff[20];
-    snprintf(default_value_bff, sizeof(default_value_bff), "%d", default_value);
-    std::string prop = this->getProperty(config_name, default_value_bff);
-
-    try {
-        return std::stoi(prop);
-    } catch (const std::invalid_argument& e) {
-        fprintf(stderr, _("Invalid configuration at property '%s' (CURRENT VALUE: %s). Please, modify it to a valid integer value.\n"), config_name, prop.c_str());
-    } catch (const std::out_of_range& e) {
-        fprintf(stderr, _("Invalid configuration at property '%s' (CURRENT VALUE: %s). Value out of range: %s.\n"), config_name, prop.c_str(), e.what());
-    }
-
-    return default_value;
-}

@@ -15,9 +15,7 @@
 #include "../include/FLTube.h"
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
-#include <FL/Enumerations.H>
-#include <FL/Fl_PNG_Image.H>
-#include <cstdio>
+#include "../include/configuration_manager.h"
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -57,7 +55,7 @@ std::string DOWNLOAD_VIDEO_CODEC;
 
 MediaPlayerInfo* media_player;
 
-ConfigutationManager* config = nullptr;
+ConfigurationManager* config = nullptr;
 
 Fl_PNG_Image* live_image = nullptr;
 
@@ -277,10 +275,8 @@ void pre_init() {
         logAtTerminal(_("yt-dlp is not installed. Closing app...\n"), LogLevel::ERROR);
         exitApp(FLT_GENERAL_FAILED);
     }
-
     ///// LOAD CONFIGURATIONS  //////
-    config = new ConfigutationManager(CONFIGFILE_PATH.c_str());
-
+    config = new ConfigurationManager(CONFIGFILE_PATH.c_str());
     //Init Localization. Use locale path specified at config, or custom config default_locale_path().
     setup_gettext("", config->getProperty("LOCALE_PATH", default_locale_path().c_str()));
 
@@ -325,6 +321,8 @@ void post_init() {
 
     for (int i = 0; i < video_info_arr.size(); i++) {
         video_info_arr[i] = create_video_group(15, y_refernce_pos + (90 * i));
+        video_info_arr[i]->thumbnail->shortcut(config->getShortcutFor("FOCUS_VIDEO_" + std::to_string(i + 1)));
+        video_info_arr[i]->userUploader->shortcut(config->getShortcutFor("FOCUS_CHANNEL_" + std::to_string(i + 1)));
         mainWin->add(video_info_arr[i]);
     }
 
@@ -583,6 +581,9 @@ int main(int argc, char **argv) {
     char win_title[30] = "FLTube ";
     mainWin = new FLTubeMainWindow(593, 540, strcat(win_title, VERSION));
     mainWin->callback((Fl_Callback*)exitApp);
+    mainWin->search_term_or_url->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
+    mainWin->search_term_or_url->when(FL_WHEN_ENTER_KEY);
+    mainWin->search_term_or_url->shortcut(config->getShortcutFor(SHORTCUTS::FOCUS_SEARCH));
     mainWin->do_search_bttn->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->callback((Fl_Callback*)getPreviousSearchResults_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->deactivate();
