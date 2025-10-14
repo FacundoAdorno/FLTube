@@ -134,7 +134,7 @@ widget_class TinyChoiceWindow {
 }
 
 widget_class HelpFLTubeWindow {
-  label {FLTube Help} open selected
+  label {FLTube Help} open
   xywh {620 195 480 352}
   class Fl_Double_Window modal visible
 } {
@@ -145,28 +145,28 @@ widget_class HelpFLTubeWindow {
       xywh {15 21 128 128}
     }
     Fl_Box hlp_app_name {
-      label FLTube
-      xywh {143 14 320 24} labelfont 1 labelsize 20 labelcolor 32 align 21 h_label_margin 10
+      label FLTube selected
+      xywh {153 14 310 24} labelfont 1 labelsize 20 labelcolor 32 align 21
     }
     Fl_Box about_version {
       label {Version x.y.z}
-      xywh {143 38 312 19} labelfont 2 align 21 h_label_margin 10
+      xywh {153 38 302 19} labelfont 2 align 21
     }
     Fl_Box {} {
       label {Watch YouTube videos in your very old PC.}
-      xywh {143 57 320 21} labelsize 15 align 149 h_label_margin 10
+      xywh {153 57 310 21} labelsize 15 align 149
     }
     Fl_Box {} {
       label {Technologies:}
-      xywh {143 86 114 24} align 22 h_label_margin 10
+      xywh {153 86 114 24} align 22
     }
     Fl_Box {} {
       label {Source code at:}
-      xywh {144 110 120 20} align 22 h_label_margin 10
+      xywh {153 110 110 20} align 22
     }
     Fl_Box {} {
       label {Licensed under GNU GPL v3.0.}
-      xywh {144 132 319 18} align 22 h_label_margin 10
+      xywh {153 132 309 18} align 22
     }
     Fl_Button hlp_fltk_link {
       label FLTK
@@ -193,7 +193,7 @@ widget_class HelpFLTubeWindow {
       xywh {15 183 450 158} selection_color 47 labelfont 1
     } {
       Fl_Text_Display howtouse_txt {
-        xywh {19 189 442 148} box NO_BOX color 49 align 129 h_label_margin 4 v_label_margin 4
+        xywh {19 189 442 148} box NO_BOX color 49 align 129
       }
     }
     Fl_Group {} {
@@ -201,7 +201,7 @@ widget_class HelpFLTubeWindow {
       xywh {15 183 450 158} selection_color 47 labelfont 1 hide
     } {
       Fl_Text_Display shortcuts_txt {
-        xywh {19 189 442 148} box NO_BOX color 49 align 129 h_label_margin 4 v_label_margin 4
+        xywh {19 189 442 148} box NO_BOX color 49 align 129
       }
     }
   }

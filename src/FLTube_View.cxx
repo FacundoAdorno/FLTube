@@ -243,33 +243,27 @@ void HelpFLTubeWindow::_HelpFLTubeWindow() {
   { Fl_Group* o = new Fl_Group(15, 14, 448, 144);
     { hlp_fltube_img = new Fl_Box(15, 21, 128, 128);
     } // Fl_Box* hlp_fltube_img
-    { hlp_app_name = new Fl_Box(143, 14, 320, 24, _("FLTube"));
+    { hlp_app_name = new Fl_Box(153, 14, 310, 24, _("FLTube"));
       hlp_app_name->labelfont(1);
       hlp_app_name->labelsize(20);
       hlp_app_name->labelcolor(FL_GRAY0);
-      hlp_app_name->horizontal_label_margin(10);
       hlp_app_name->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
     } // Fl_Box* hlp_app_name
-    { about_version = new Fl_Box(143, 38, 312, 19, _("Version x.y.z"));
+    { about_version = new Fl_Box(153, 38, 302, 19, _("Version x.y.z"));
       about_version->labelfont(2);
-      about_version->horizontal_label_margin(10);
       about_version->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
     } // Fl_Box* about_version
-    { Fl_Box* o = new Fl_Box(143, 57, 320, 21, _("Watch YouTube videos in your very old PC."));
+    { Fl_Box* o = new Fl_Box(153, 57, 310, 21, _("Watch YouTube videos in your very old PC."));
       o->labelsize(15);
-      o->horizontal_label_margin(10);
       o->align(Fl_Align(133|FL_ALIGN_INSIDE));
     } // Fl_Box* o
-    { Fl_Box* o = new Fl_Box(143, 86, 114, 24, _("Technologies:"));
-      o->horizontal_label_margin(10);
+    { Fl_Box* o = new Fl_Box(153, 86, 114, 24, _("Technologies:"));
       o->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
     } // Fl_Box* o
-    { Fl_Box* o = new Fl_Box(144, 110, 120, 20, _("Source code at:"));
-      o->horizontal_label_margin(10);
+    { Fl_Box* o = new Fl_Box(153, 110, 110, 20, _("Source code at:"));
       o->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
     } // Fl_Box* o
-    { Fl_Box* o = new Fl_Box(144, 132, 319, 18, _("Licensed under GNU GPL v3.0."));
-      o->horizontal_label_margin(10);
+    { Fl_Box* o = new Fl_Box(153, 132, 309, 18, _("Licensed under GNU GPL v3.0."));
       o->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
     } // Fl_Box* o
     { hlp_fltk_link = new Fl_Button(271, 87, 48, 23, _("FLTK"));
@@ -307,8 +301,6 @@ void HelpFLTubeWindow::_HelpFLTubeWindow() {
       { howtouse_txt = new Fl_Text_Display(19, 189, 442, 148);
         howtouse_txt->box(FL_NO_BOX);
         howtouse_txt->color(FL_BACKGROUND_COLOR);
-        howtouse_txt->horizontal_label_margin(4);
-        howtouse_txt->vertical_label_margin(4);
         howtouse_txt->align(Fl_Align(129));
       } // Fl_Text_Display* howtouse_txt
       o->end();
@@ -320,8 +312,6 @@ void HelpFLTubeWindow::_HelpFLTubeWindow() {
       { shortcuts_txt = new Fl_Text_Display(19, 189, 442, 148);
         shortcuts_txt->box(FL_NO_BOX);
         shortcuts_txt->color(FL_BACKGROUND_COLOR);
-        shortcuts_txt->horizontal_label_margin(4);
-        shortcuts_txt->vertical_label_margin(4);
         shortcuts_txt->align(Fl_Align(129));
       } // Fl_Text_Display* shortcuts_txt
       o->end();
