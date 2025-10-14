@@ -77,6 +77,9 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     } // Fl_Button* next_results_bttn
     pagination_controls->end();
   } // Fl_Group* pagination_controls
+  { about_bttn = new Fl_Button(521, 9, 64, 22, _("Help"));
+    about_bttn->tooltip(_("Show info about this application and some help of how to use it."));
+  } // Fl_Button* about_bttn
   end();
 }
 
@@ -203,6 +206,128 @@ void TinyChoiceWindow::_TinyChoiceWindow() {
     warnme_again_check->labelfont(2);
     warnme_again_check->labelsize(12);
   } // Fl_Check_Button* warnme_again_check
+  set_modal();
+  end();
+}
+
+HelpFLTubeWindow::HelpFLTubeWindow(int X, int Y, int W, int H, const char *L) :
+  Fl_Double_Window(X, Y, W, H, L)
+{
+  _HelpFLTubeWindow();
+}
+
+HelpFLTubeWindow::HelpFLTubeWindow(int W, int H, const char *L) :
+  Fl_Double_Window(0, 0, W, H, L)
+{
+  clear_flag(16);
+  _HelpFLTubeWindow();
+}
+
+HelpFLTubeWindow::HelpFLTubeWindow() :
+  Fl_Double_Window(0, 0, 480, 352, "FLTube Help")
+{
+  clear_flag(16);
+  _HelpFLTubeWindow();
+}
+
+void HelpFLTubeWindow::_HelpFLTubeWindow() {
+  this->box(FL_FLAT_BOX);
+  this->color(FL_BACKGROUND_COLOR);
+  this->selection_color(FL_BACKGROUND_COLOR);
+  this->labeltype(FL_NO_LABEL);
+  this->labelfont(0);
+  this->labelsize(14);
+  this->labelcolor(FL_FOREGROUND_COLOR);
+  this->align(Fl_Align(FL_ALIGN_TOP));
+  this->when(FL_WHEN_RELEASE);
+  { Fl_Group* o = new Fl_Group(15, 14, 448, 144);
+    { hlp_fltube_img = new Fl_Box(15, 21, 128, 128);
+    } // Fl_Box* hlp_fltube_img
+    { hlp_app_name = new Fl_Box(143, 14, 320, 24, _("FLTube"));
+      hlp_app_name->labelfont(1);
+      hlp_app_name->labelsize(20);
+      hlp_app_name->labelcolor(FL_GRAY0);
+      hlp_app_name->horizontal_label_margin(10);
+      hlp_app_name->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
+    } // Fl_Box* hlp_app_name
+    { about_version = new Fl_Box(143, 38, 312, 19, _("Version x.y.z"));
+      about_version->labelfont(2);
+      about_version->horizontal_label_margin(10);
+      about_version->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
+    } // Fl_Box* about_version
+    { Fl_Box* o = new Fl_Box(143, 57, 320, 21, _("Watch YouTube videos in your very old PC."));
+      o->labelsize(15);
+      o->horizontal_label_margin(10);
+      o->align(Fl_Align(133|FL_ALIGN_INSIDE));
+    } // Fl_Box* o
+    { Fl_Box* o = new Fl_Box(143, 86, 114, 24, _("Technologies:"));
+      o->horizontal_label_margin(10);
+      o->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
+    } // Fl_Box* o
+    { Fl_Box* o = new Fl_Box(144, 110, 120, 20, _("Source code at:"));
+      o->horizontal_label_margin(10);
+      o->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
+    } // Fl_Box* o
+    { Fl_Box* o = new Fl_Box(144, 132, 319, 18, _("Licensed under GNU GPL v3.0."));
+      o->horizontal_label_margin(10);
+      o->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
+    } // Fl_Box* o
+    { hlp_fltk_link = new Fl_Button(271, 87, 48, 23, _("FLTK"));
+      hlp_fltk_link->tooltip(_("Click to open FLTK official website."));
+      hlp_fltk_link->box(FL_NO_BOX);
+      hlp_fltk_link->color(FL_LIGHT1);
+      hlp_fltk_link->labelcolor((Fl_Color)137);
+      hlp_fltk_link->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
+    } // Fl_Button* hlp_fltk_link
+    { hlp_source_code = new Fl_Button(269, 110, 180, 19, _("gitlab.com/facuA/fltube"));
+      hlp_source_code->tooltip(_("Click to open FLTube repository."));
+      hlp_source_code->box(FL_NO_BOX);
+      hlp_source_code->color(FL_LIGHT1);
+      hlp_source_code->labelcolor((Fl_Color)137);
+      hlp_source_code->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
+    } // Fl_Button* hlp_source_code
+    { hlp_ytdlp_link = new Fl_Button(333, 88, 52, 22, _("yt-dlp"));
+      hlp_ytdlp_link->tooltip(_("Click to open yt-dlp official website."));
+      hlp_ytdlp_link->box(FL_NO_BOX);
+      hlp_ytdlp_link->labelcolor((Fl_Color)137);
+      hlp_ytdlp_link->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
+    } // Fl_Button* hlp_ytdlp_link
+    { hlp_cpp_link = new Fl_Button(399, 87, 38, 23, _("C++"));
+      hlp_cpp_link->tooltip(_("Click to open C++ official website."));
+      hlp_cpp_link->box(FL_NO_BOX);
+      hlp_cpp_link->labelcolor((Fl_Color)137);
+      hlp_cpp_link->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
+    } // Fl_Button* hlp_cpp_link
+    o->end();
+  } // Fl_Group* o
+  { help_info_tabs = new Fl_Tabs(15, 158, 450, 183);
+    { Fl_Group* o = new Fl_Group(15, 183, 450, 158, _("How to use"));
+      o->selection_color(FL_DARK1);
+      o->labelfont(1);
+      { howtouse_txt = new Fl_Text_Display(19, 189, 442, 148);
+        howtouse_txt->box(FL_NO_BOX);
+        howtouse_txt->color(FL_BACKGROUND_COLOR);
+        howtouse_txt->horizontal_label_margin(4);
+        howtouse_txt->vertical_label_margin(4);
+        howtouse_txt->align(Fl_Align(129));
+      } // Fl_Text_Display* howtouse_txt
+      o->end();
+    } // Fl_Group* o
+    { Fl_Group* o = new Fl_Group(15, 183, 450, 158, _("Shortcuts"));
+      o->selection_color(FL_DARK1);
+      o->labelfont(1);
+      o->hide();
+      { shortcuts_txt = new Fl_Text_Display(19, 189, 442, 148);
+        shortcuts_txt->box(FL_NO_BOX);
+        shortcuts_txt->color(FL_BACKGROUND_COLOR);
+        shortcuts_txt->horizontal_label_margin(4);
+        shortcuts_txt->vertical_label_margin(4);
+        shortcuts_txt->align(Fl_Align(129));
+      } // Fl_Text_Display* shortcuts_txt
+      o->end();
+    } // Fl_Group* o
+    help_info_tabs->end();
+  } // Fl_Tabs* help_info_tabs
   set_modal();
   end();
 }

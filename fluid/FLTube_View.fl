@@ -37,7 +37,7 @@ widget_class FLTubeMainWindow {
   class Fl_Double_Window visible
 } {
   Fl_Group {} {
-    label {Search box:} open
+    label {Search box:}
     xywh {10 35 575 85} box UP_FRAME labelfont 1 align 5
   } {
     Fl_Input search_term_or_url {
@@ -53,7 +53,7 @@ widget_class FLTubeMainWindow {
   Fl_Group search_result_selectors {
     xywh {10 126 575 380} box THIN_UP_BOX
   } {}
-  Fl_Group pagination_controls {open
+  Fl_Group pagination_controls {
     xywh {9 508 577 30}
   } {
     Fl_Button previous_results_bttn {
@@ -65,10 +65,14 @@ widget_class FLTubeMainWindow {
       tooltip {Get following results of current search results set.} xywh {450 510 135 23}
     }
   }
+  Fl_Button about_bttn {
+    label Help
+    tooltip {Show info about this application and some help of how to use it.} xywh {521 9 64 22}
+  }
 }
 
-widget_class VideoInfo {open
-  xywh {690 282 577 91} visible position_relative
+widget_class VideoInfo {
+  xywh {690 282 577 91} hide position_relative
 } {
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
@@ -82,7 +86,7 @@ widget_class VideoInfo {open
   Fl_Box title {
     xywh {105 6 450 37} labelfont 1 align 213
   }
-  Fl_Box duration {selected
+  Fl_Box duration {
     tooltip {Duration expressed as H:MM:SS.} xywh {105 65 70 20} labelfont 2 align 20
   }
   Fl_Box uploadDate {
@@ -94,7 +98,7 @@ widget_class VideoInfo {open
 }
 
 widget_class TinyMessageWindow {
-  label Error open
+  label Error
   xywh {632 398 649 100} hide
   class Fl_Double_Window modal
 } {
@@ -108,7 +112,7 @@ widget_class TinyMessageWindow {
 }
 
 widget_class TinyChoiceWindow {
-  label Warn open
+  label Warn
   xywh {620 599 649 118} hide
   class Fl_Double_Window modal
 } {
@@ -126,5 +130,79 @@ widget_class TinyChoiceWindow {
   Fl_Check_Button warnme_again_check {
     label {Don't warn me again and ACCEPT always.}
     tooltip {Check if don't want to be warn again, assuming all risks.} xywh {30 60 590 20} down_box DOWN_BOX labelfont 2 labelsize 12
+  }
+}
+
+widget_class HelpFLTubeWindow {
+  label {FLTube Help} open selected
+  xywh {620 195 480 352}
+  class Fl_Double_Window modal visible
+} {
+  Fl_Group {} {open
+    xywh {15 14 448 144}
+  } {
+    Fl_Box hlp_fltube_img {
+      xywh {15 21 128 128}
+    }
+    Fl_Box hlp_app_name {
+      label FLTube
+      xywh {143 14 320 24} labelfont 1 labelsize 20 labelcolor 32 align 21 h_label_margin 10
+    }
+    Fl_Box about_version {
+      label {Version x.y.z}
+      xywh {143 38 312 19} labelfont 2 align 21 h_label_margin 10
+    }
+    Fl_Box {} {
+      label {Watch YouTube videos in your very old PC.}
+      xywh {143 57 320 21} labelsize 15 align 149 h_label_margin 10
+    }
+    Fl_Box {} {
+      label {Technologies:}
+      xywh {143 86 114 24} align 22 h_label_margin 10
+    }
+    Fl_Box {} {
+      label {Source code at:}
+      xywh {144 110 120 20} align 22 h_label_margin 10
+    }
+    Fl_Box {} {
+      label {Licensed under GNU GPL v3.0.}
+      xywh {144 132 319 18} align 22 h_label_margin 10
+    }
+    Fl_Button hlp_fltk_link {
+      label FLTK
+      tooltip {Click to open FLTK official website.} xywh {271 87 48 23} box NO_BOX color 50 labelcolor 137 align 22
+    }
+    Fl_Button hlp_source_code {
+      label {gitlab.com/facuA/fltube}
+      tooltip {Click to open FLTube repository.} xywh {269 110 180 19} box NO_BOX color 50 labelcolor 137 align 22
+    }
+    Fl_Button hlp_ytdlp_link {
+      label {yt-dlp}
+      tooltip {Click to open yt-dlp official website.} xywh {333 88 52 22} box NO_BOX labelcolor 137 align 22
+    }
+    Fl_Button hlp_cpp_link {
+      label {C++}
+      tooltip {Click to open C++ official website.} xywh {399 87 38 23} box NO_BOX labelcolor 137 align 22
+    }
+  }
+  Fl_Tabs help_info_tabs {open
+    xywh {15 158 450 183}
+  } {
+    Fl_Group {} {
+      label {How to use} open
+      xywh {15 183 450 158} selection_color 47 labelfont 1
+    } {
+      Fl_Text_Display howtouse_txt {
+        xywh {19 189 442 148} box NO_BOX color 49 align 129 h_label_margin 4 v_label_margin 4
+      }
+    }
+    Fl_Group {} {
+      label Shortcuts open
+      xywh {15 183 450 158} selection_color 47 labelfont 1 hide
+    } {
+      Fl_Text_Display shortcuts_txt {
+        xywh {19 189 442 148} box NO_BOX color 49 align 129 h_label_margin 4 v_label_margin 4
+      }
+    }
   }
 }

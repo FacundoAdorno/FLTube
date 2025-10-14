@@ -37,6 +37,7 @@ public:
   Fl_Group *pagination_controls;
   Fl_Button *previous_results_bttn;
   Fl_Button *next_results_bttn;
+  Fl_Button *about_bttn;
 };
 #include <FL/Fl_Box.H>
 
@@ -73,5 +74,25 @@ public:
   Fl_Button *accept_bttn;
   Fl_Button *cancel_bttn;
   Fl_Check_Button *warnme_again_check;
+};
+#include <FL/Fl_Tabs.H>
+#include <FL/Fl_Text_Display.H>
+
+class HelpFLTubeWindow : public Fl_Double_Window {
+  void _HelpFLTubeWindow();
+public:
+  HelpFLTubeWindow(int X, int Y, int W, int H, const char *L = 0);
+  HelpFLTubeWindow(int W, int H, const char *L = 0);
+  HelpFLTubeWindow();
+  Fl_Box *hlp_fltube_img;
+  Fl_Box *hlp_app_name;
+  Fl_Box *about_version;
+  Fl_Button *hlp_fltk_link;
+  Fl_Button *hlp_source_code;
+  Fl_Button *hlp_ytdlp_link;
+  Fl_Button *hlp_cpp_link;
+  Fl_Tabs *help_info_tabs;
+  Fl_Text_Display *howtouse_txt;
+  Fl_Text_Display *shortcuts_txt;
 };
 #endif

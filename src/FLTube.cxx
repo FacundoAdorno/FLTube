@@ -20,6 +20,9 @@
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
 
+/** Help window. */
+HelpFLTubeWindow* helpWin = (HelpFLTubeWindow*) 0;
+
 /** Generic message window.*/
 TinyMessageWindow* message_window = (TinyMessageWindow *)0;
 
@@ -68,6 +71,9 @@ void exitApp(unsigned short int exitStatusCode = FLT_OK) {
     snprintf(message, sizeof(message), _("Cleaning temporal files at %s."), FLTUBE_TEMPORAL_DIR.c_str());
     logAtTerminal(std::string(message), LogLevel::INFO);
     std::filesystem::remove_all(FLTUBE_TEMPORAL_DIR);
+    if (helpWin != nullptr) delete helpWin;
+    if (message_window != nullptr) delete message_window;
+    delete mainWin;
     //Exiting the app...
     logAtTerminal(_("Closing FLtube... Bye!\n"), LogLevel::INFO);
     exit(exitStatusCode);
@@ -151,6 +157,54 @@ Fl_PNG_Image* load_image(std::string path) {
 Fl_PNG_Image* load_resource_image(std::string image_filename) {
     std::string resource_image_path = RESOURCES_PATH + "/img/" + image_filename;
     return load_image(resource_image_path);
+}
+
+void openURI(const char* uri) {
+    char errmsg[512];
+    if ( !fl_open_uri(uri, errmsg, sizeof(errmsg)) ) {
+        char warnmsg[768];
+        sprintf(warnmsg, "Error: %s", errmsg);
+        fl_alert("%s", warnmsg);
+    }
+}
+
+void showFLTubeHelpWindow(Fl_Widget* w) {
+    if (helpWin == nullptr) {
+        helpWin = new HelpFLTubeWindow(480, 352, _("FLTube Help"));
+        helpWin->callback([](Fl_Widget* w) { w->hide(); });
+        char version_text[20];
+        snprintf(version_text, sizeof(version_text), _("Version %s"), VERSION);
+        helpWin->about_version->copy_label(version_text);
+        helpWin->hlp_fltube_img->image(load_image("/usr/local/share/icons/fltube/128x128.png"));
+        helpWin->hlp_source_code->callback([](Fl_Widget*) {openURI("https://gitlab.com/facuA/fltube");});
+        helpWin->hlp_fltk_link->callback([](Fl_Widget*) {openURI("https://www.fltk.org/");});
+        helpWin->hlp_ytdlp_link->callback([](Fl_Widget*) {openURI("https://github.com/yt-dlp/yt-dlp");});
+        helpWin->hlp_cpp_link->callback([](Fl_Widget*) {openURI("https://isocpp.org/");});
+        helpWin->howtouse_txt->buffer(new Fl_Text_Buffer());
+        helpWin->howtouse_txt->buffer()->text(_("FLTube is an application for search & stream Youtube videos.\n"
+        "You can search by a search term or by entering the URL of a\nspecific YouTube video.\n\n"
+        "Once the results are returned, you can watch any of these\nvideos by clicking on their thumbnail. The stream\n"
+        "resolution is 360p by default, but can be changed at\nfltube.conf configuration file.\n\n"
+        "You can also view the latest videos by the creator of a\nspecific video by clicking on their name (a button at the\n"
+        "bottom right of each result).\n\nIf a search returns multiple results, they will be paginated,\n"
+        "and you can navigate through them using the \"<Previous\"\nand \"Next>\" buttons at the bottom of the window."));
+        helpWin->shortcuts_txt->buffer(new Fl_Text_Buffer());
+        char shortcuts_help_text[1024];
+        snprintf(shortcuts_help_text, sizeof(shortcuts_help_text),
+                 _("- Focus at search input: %s\n- Search videos: %s\n"
+            "- Get previous results: %s\n- Get next results: %s\n- Open video 1: %s\n- Open video 2: %s\n"
+            "- Open video 3: %s\n- Open video 4: %s\n- Search videos of Channel 1: %s\n- Search videos of Channel 2: %s\n"
+            "- Search videos of Channel 3: %s\n- Search videos of Channel 4: %s\n- Show this Help Window: %s\n\n"
+            "[NOTE] Default shortcuts can be modified at fltube.conf."),
+                 "Ctrl + l", "Alt + s | Intro", "Alt + p", "Alt + n", "Ctrl + 1", "Ctrl + 2", "Ctrl + 3", "Ctrl + 4",
+                 "Ctrl + Shift + 1", "Ctrl + Shift + 2", "Ctrl + Shift + 3", "Ctrl + Shift + 4", "Ctrl + ?");
+        helpWin->shortcuts_txt->buffer()->text(shortcuts_help_text);
+    }
+    helpWin->show();
+    // Loop until the message window is closed...
+    while (helpWin->shown()) {
+        Fl::wait();
+    }
 }
 
 
@@ -329,6 +383,9 @@ void post_init() {
     for (VideoInfo* videoInfo: video_info_arr) {
         videoInfo->hide();
     }
+
+    mainWin->about_bttn->callback((Fl_Callback*)showFLTubeHelpWindow);
+    mainWin->about_bttn->shortcut(config->getShortcutFor(SHORTCUTS::SHOW_HELP));
 
     // Redraw the window to show the new button
     mainWin->redraw();
