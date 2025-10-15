@@ -53,6 +53,9 @@ std::string RESOURCES_PATH = "/usr/local/share/fltube/resources";
 //If value is 0, enable the debug mode. Defaults to false (or 1).
 int DEBUG_ENABLED = 1;
 
+//If value is 0, enable the initial verifications. Defaults to false (or 1).
+bool AVOID_INITIAL_CHECKS = 1;
+
 // This variable holds the configured video codec used when download a video.
 std::string DOWNLOAD_VIDEO_CODEC;
 
@@ -324,13 +327,15 @@ void update_video_info() {
  * Hook: Actions to execute before main window is drawn...
  */
 void pre_init() {
-    if ( !checkForYTDLP() ) {
+    ///// LOAD CONFIGURATIONS  //////
+    config = new ConfigurationManager(CONFIGFILE_PATH.c_str());
+    AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
+
+    if ( !AVOID_INITIAL_CHECKS && !isInstalledYTDLP() ) {
         showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run in a terminal the 'install_yt-dlp' script."));
         logAtTerminal(_("yt-dlp is not installed. Closing app...\n"), LogLevel::ERROR);
         exitApp(FLT_GENERAL_FAILED);
     }
-    ///// LOAD CONFIGURATIONS  //////
-    config = new ConfigurationManager(CONFIGFILE_PATH.c_str());
     //Init Localization. Use locale path specified at config, or custom config default_locale_path().
     setup_gettext("", config->getProperty("LOCALE_PATH", default_locale_path().c_str()));
 

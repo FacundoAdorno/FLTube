@@ -134,7 +134,7 @@ bool checkDirectoryPermissions(const char* directory, std::array<SIMPLE_FS_PERMI
 
 bool canWriteOnDir(const char* directory);
 
-bool checkForYTDLP();
+bool isInstalledYTDLP();
 
 std::string do_ytdlp_search(const char* search_term, const char* extractor_name, Pagination_Info page_info, bool get_channel_videos = false);
 

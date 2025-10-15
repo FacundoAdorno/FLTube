@@ -157,7 +157,7 @@ bool canWriteOnDir(const char* directory){
 /**
  * Returns true if yt-dlp exists on system path...
  */
-bool checkForYTDLP() {
+bool isInstalledYTDLP() {
     printf("Cheking if yt-dlp is at your system PATH...\n");
     int yt_dlp_version_status = system ("yt-dlp --version");
     if ( yt_dlp_version_status != 0 ) {

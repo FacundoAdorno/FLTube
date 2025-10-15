@@ -73,6 +73,16 @@ int ConfigurationManager::getIntProperty(const char *config_name, int default_va
     return default_value;
 }
 
+bool ConfigurationManager::getBoolProperty(const char* config_name, bool default_value) {
+    std::string p = getProperty(config_name, "");
+    if (!p.empty()) {
+        if (p == "True" || p == "true") return true;
+        else if (p == "False" || p == "false") return false;
+    }
+    // If configuration is not defined, or value not equal to "True", "true", "False", or "false"...
+    return default_value;
+}
+
 int ConfigurationManager::getShortcutFor(SHORTCUTS s){
     return this->shortcuts->getShortcut(s);
 }

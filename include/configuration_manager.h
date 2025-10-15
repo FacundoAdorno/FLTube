@@ -48,14 +48,17 @@ public:
      */
     bool existProperty(const char* config_name);
     /*
-     * Return the value of a property configuration loaded with @loadConfFile() method.
+     * Return the value of a property configuration.
      * If no property is found, returns @default_value or empty string ("") if no default value is specified..
      */
     std::string getProperty(const char* config_name, const char* default_value);
-    /** Return the value of a INTEGER property configuration loaded with @loadConfFile() method.
-     * If no property is found, returns @default_value.
-     */
+    /** Return the value of a INTEGER property configuration.
+     *  If no property is found, returns @default_value. */
     int getIntProperty(const char *config_name, int default_value);
+
+    /** Return the value of a BOOLEAN property configuration.
+     *  If no property is found, returns @default_value. */
+    bool getBoolProperty(const char *config_name, bool default_value);
 
     /**
      * Return the specific keybindings for some shortcut name. As underlying implementation, a KeyboardShortcuts object is used.
