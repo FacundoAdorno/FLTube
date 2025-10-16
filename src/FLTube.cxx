@@ -16,6 +16,7 @@
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
 #include "../include/configuration_manager.h"
+#include <filesystem>
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -45,7 +46,11 @@ const std::string FLTUBE_TEMPORAL_DIR(std::filesystem::temp_directory_path().gen
 //This FLAG changes over the application usage. If user wants to see all videos of a channel, is set to true (0). Defaults to false.
 bool SEARCH_BY_CHANNEL_F = false;
 
-std::string CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
+std::string USER_CONFIGFILE_PATH = std::string(getHomePathOr("")) + "/.config/fltube/fltube.conf";
+
+std::string SYSTEM_CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
+
+std::string CONFIGFILE_PATH = "";
 
 // Path to fltube resources, like images, sounds, etc. Can be modified at fltube.conf file.
 std::string RESOURCES_PATH = "/usr/local/share/fltube/resources";
@@ -328,6 +333,10 @@ void update_video_info() {
  */
 void pre_init() {
     ///// LOAD CONFIGURATIONS  //////
+    // If not specified custom configuration file through parameter "--config"...
+    if (CONFIGFILE_PATH.empty())
+        CONFIGFILE_PATH = (std::filesystem::exists(USER_CONFIGFILE_PATH)) ? USER_CONFIGFILE_PATH : SYSTEM_CONFIGFILE_PATH;
+    logAtTerminal(_("Loading configurations from ") + CONFIGFILE_PATH, LogLevel::DEBUG);
     config = new ConfigurationManager(CONFIGFILE_PATH.c_str());
     AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
 
@@ -586,8 +595,10 @@ USAGE:
 
 OPTIONS:
   --config=[PATH_TO_FILE]   Please specify the ABSOLUTE path to the custom configuration file, which should be
-                              a copy of the original fltube.config. Use this option when you want to apply a
+                              a copy of the original fltube.conf. Use this option when you want to apply a
                               development configuration file for development purposes.
+                              By default, the configuration file is searched for in the following locations,
+                              in this order: '~/.config/fltube/' and '/usr/local/etc/fltube'.
   -d, --debug               Enable the debug mode through more verbose log messages.
   -h, --help                Show this text help.
   -v, --version             Show the program version.
