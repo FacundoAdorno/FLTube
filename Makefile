@@ -30,7 +30,8 @@ SOURCES_LIST = fltube_utils.cxx gnugettext_utils.cxx FLTube_View.cxx FLTube.cxx 
 SOURCES = $(addprefix $(SRC_DIR)/, $(SOURCES_LIST))
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cxx=$(BUILD_DIR)/%.o)
 FLTUBE_VERSION=2.0.2
-PACKAGE_NAME=FLTube_$(FLTUBE_VERSION)-$(ARCH_CPU).deb
+DEB_PACKAGE_NAME=fltube_$(FLTUBE_VERSION)-$(ARCH_CPU).deb
+TCZ_PACKAGE_NAME=fltube_$(FLTUBE_VERSION)_tcz.tar.gz
 
 # Rules
 .SUFFIXES: .o .cxx
@@ -94,8 +95,27 @@ deb_package: install
 	chmod +x $(DEB_BLD_DIR)/DEBIAN/postinst
 	chmod +x $(DEB_BLD_DIR)/DEBIAN/postrm
 	chmod +x $(DEB_BLD_DIR)/usr/local/bin/*
-	dpkg-deb --root-owner-group --build $(DEB_BLD_DIR) $(DEB_BLD_DIR)/$(PACKAGE_NAME)
-	@printf "\033[32mPackage built at: $(DEB_BLD_DIR)/$(PACKAGE_NAME)\033[0m. Install using 'apt install [path_to_pkg]'...\n"
+	dpkg-deb --root-owner-group --build $(DEB_BLD_DIR) $(DEB_BLD_DIR)/$(DEB_PACKAGE_NAME)
+	@printf "\033[32mPackage built at: $(DEB_BLD_DIR)/$(DEB_PACKAGE_NAME)\033[0m. Install using 'apt install [path_to_pkg]'...\n"
+
+TCZ_BLD_DIR=/tmp/fltube_tcz_build
+tcz_package: install
+	rm -rf $(TCZ_BLD_DIR) && mkdir -p $(TCZ_BLD_DIR)/build
+	cp -R $(PREFIX)/usr $(TCZ_BLD_DIR)/build
+	cp -R packaging/tinycore/tce.installed $(TCZ_BLD_DIR)/build/usr/local/
+# 	Setting permissions according to Chapter 16 of book "Into the Core" (http://tinycorelinux.net/corebook.pdf).
+	chown -R tc:staff $(TCZ_BLD_DIR)/build/usr/local/tce.installed/* && chmod +x $(TCZ_BLD_DIR)/build/usr/local/tce.installed/*
+#	chown root:staff $(TCZ_BLD_DIR)/usr/local/tce.installed && chmod 755 $(TCZ_BLD_DIR)/usr/local/tce.installed
+	mksquashfs $(TCZ_BLD_DIR)/build $(TCZ_BLD_DIR)/fltube.tcz -progress
+	cp packaging/tinycore/fltube.tcz.dep $(TCZ_BLD_DIR)
+	sed  's/-REPLACE_FLTUBE_VERSION-/$(FLTUBE_VERSION)/g' packaging/tinycore/fltube.tcz.info_TEMPLATE > $(TCZ_BLD_DIR)/fltube.tcz.info
+	CURDIR=`pwd` && cd $(TCZ_BLD_DIR)/build
+	find /usr -not -type d > $(TCZ_BLD_DIR)/fltube.tcz.list
+	cd $(TCZ_BLD_DIR) && md5sum fltube.tcz > $(TCZ_BLD_DIR)/fltube.tcz.md5.txt
+	tar czf $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME) -C $(TCZ_BLD_DIR) fltube.tcz fltube.tcz.dep fltube.tcz.info fltube.tcz.list fltube.tcz.md5.txt
+	cd $(CURDIR)
+	@printf "\033[32mPackage built at: $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME)\033[0m...\n"
+
 
 # Rule to compile FLUID files
 compile_fluid:
@@ -109,4 +129,4 @@ clean:
 	fi
 	rm -f $(BUILD_DIR)/*.o $(TARGET) 2> /dev/null && rm -rf $(BUILD_DIR)/usr/local $(BUILD_DIR)/usr/ $(BUILD_DIR)/usr/local/etc/fltube $(BUILD_DIR)/usr/local/etc && rmdir $(BUILD_DIR)
 
-.PHONY: all clean build compile_fluid po_update install uninstall deb_package
+.PHONY: all clean build compile_fluid po_update install uninstall deb_package tcz_package

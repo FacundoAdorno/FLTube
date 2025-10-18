@@ -1,0 +1,10 @@
+Title:          fltube.tcz
+Description:    Very lighweight application to watch YouTube videos.
+Version:        -REPLACE_FLTUBE_VERSION-
+Author:         Facundo Adorno
+Original-site:  https://gitlab.com/facuA/fltube
+Copying-policy: GPL 3.0
+Extension_by:   Facundo Adorno
+Tags:           FLTK YouTube yt-dlp
+Comments:       yt-dlp must be installed on your system. If not,
+                this package install it under HOME directory.
