@@ -51,6 +51,9 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cxx
 build:
 	mkdir -p build
 
+set-build_prefix:
+	PREFIX=./build
+
 # Install program. If $(PREFIX) is specified, all will be installed relative to that directory.
 install: all
 	mkdir -p $(PREFIX)$(LOCALE_INSTALL_DIR)/es/LC_MESSAGES
@@ -85,7 +88,7 @@ po_update:
 
 
 DEB_BLD_DIR=/tmp/fltube_deb_build
-deb_package: install
+deb_package: set-build_prefix install
 	rm -rf $(DEB_BLD_DIR)
 	mkdir -p $(DEB_BLD_DIR)/DEBIAN
 	cp -R $(PREFIX)/usr $(DEB_BLD_DIR)
@@ -99,7 +102,7 @@ deb_package: install
 	@printf "\033[32mPackage built at: $(DEB_BLD_DIR)/$(DEB_PACKAGE_NAME)\033[0m. Install using 'apt install [path_to_pkg]'...\n"
 
 TCZ_BLD_DIR=/tmp/fltube_tcz_build
-tcz_package: install
+tcz_package: set-build_prefix install
 	rm -rf $(TCZ_BLD_DIR) && mkdir -p $(TCZ_BLD_DIR)/build
 	cp -R $(PREFIX)/usr $(TCZ_BLD_DIR)/build
 	cp -R packaging/tinycore/tce.installed $(TCZ_BLD_DIR)/build/usr/local/
