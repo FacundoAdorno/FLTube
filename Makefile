@@ -100,18 +100,17 @@ deb_package: install
 
 TCZ_BLD_DIR=/tmp/fltube_tcz_build
 tcz_package: install
-	[ -z "$PREFIX" ] && PREFIX=$BUILD_DIR
 	rm -rf $(TCZ_BLD_DIR) && mkdir $(TCZ_BLD_DIR)
 	cp -R $(PREFIX)/usr $(TCZ_BLD_DIR)
 	cp -R packaging/tinycore/tce.installed $(TCZ_BLD_DIR)/usr/local/
 	## Setting permissions according to Chapter 16 of book "Into the Core" (http://tinycorelinux.net/corebook.pdf).
 	chown -R tc:staff $(TCZ_BLD_DIR)/usr/local/tce.installed/* && chmod +x $(TCZ_BLD_DIR)/usr/local/tce.installed/*
 	chown root:staff $(TCZ_BLD_DIR)/usr/local/tce.installed && chmod 755 $(TCZ_BLD_DIR)/usr/local/tce.installed
+	mksquashfs $(TCZ_BLD_DIR)/usr $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME) -progress
 	cp packaging/tinycore/fltube.tcz.dep $(TCZ_BLD_DIR)
 	sed  's/-REPLACE_FLTUBE_VERSION-/$(FLTUBE_VERSION)/g' packaging/tinycore/fltube.tcz.info_TEMPLATE > $(TCZ_BLD_DIR)/fltube.tcz.info
-	md5sum packaging/tinycore/fltube.tcz > $(TCZ_BLD_DIR)/fltube.tcz.md5.txt
 	find $(TCZ_BLD_DIR)/usr -not -type d > $(TCZ_BLD_DIR)/fltube.tcz.list
-	mksquashfs $(TCZ_BLD_DIR)/usr $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME) -progress
+	md5sum packaging/tinycore/fltube.tcz > $(TCZ_BLD_DIR)/fltube.tcz.md5.txt
 	tar czf $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME).tar.gz -C $(TCZ_BLD_DIR) .
 	@printf "\033[32mPackage built at: $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME).tar.gz\033[0m...\n"
 
@@ -128,4 +127,4 @@ clean:
 	fi
 	rm -f $(BUILD_DIR)/*.o $(TARGET) 2> /dev/null && rm -rf $(BUILD_DIR)/usr/local $(BUILD_DIR)/usr/ $(BUILD_DIR)/usr/local/etc/fltube $(BUILD_DIR)/usr/local/etc && rmdir $(BUILD_DIR)
 
-.PHONY: all clean build compile_fluid po_update install uninstall deb_package
+.PHONY: all clean build compile_fluid po_update install uninstall deb_package tcz_package
