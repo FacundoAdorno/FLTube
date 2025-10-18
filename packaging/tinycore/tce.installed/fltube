@@ -4,7 +4,7 @@
 ## and install yt-dlp at $HOME/.local/bin if not reachable from PATH...
 
 nonroot_user="$(cat /etc/sysconfig/tcuser)"
-su "$nonroot_user"
+su "$nonroot_user" <<EOF
 FLTUBE_USER_CONFIGDIR=/home/$nonroot_user/.config/fltube
 if [ ! -f "$FLTUBE_USER_CONFIGDIR"/fltube.conf ]; then
     [ ! -d "$FLTUBE_USER_CONFIGDIR" ] && mkdir -p "$FLTUBE_USER_CONFIGDIR"
@@ -12,3 +12,4 @@ if [ ! -f "$FLTUBE_USER_CONFIGDIR"/fltube.conf ]; then
 fi
 
 command -v yt-dlp >/dev/null 2>&1 || { /tmp/tcloop/fltube/usr/local/bin/install_yt-dlp.sh -y; }
+EOF
