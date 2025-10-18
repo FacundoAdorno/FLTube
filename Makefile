@@ -100,7 +100,7 @@ deb_package: install
 
 TCZ_BLD_DIR=/tmp/fltube_tcz_build
 tcz_package: install
-	rm -rf $(TCZ_BLD_DIR) && mkdir $(TCZ_BLD_DIR)/build
+	rm -rf $(TCZ_BLD_DIR) && mkdir -p $(TCZ_BLD_DIR)/build
 	cp -R $(PREFIX)/usr $(TCZ_BLD_DIR)/build
 	cp -R packaging/tinycore/tce.installed $(TCZ_BLD_DIR)/build/usr/local/
 # 	Setting permissions according to Chapter 16 of book "Into the Core" (http://tinycorelinux.net/corebook.pdf).
