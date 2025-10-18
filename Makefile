@@ -113,7 +113,7 @@ tcz_package: install
 	find /usr -not -type d > $(TCZ_BLD_DIR)/fltube.tcz.list
 	cd $(TCZ_BLD_DIR) && md5sum fltube.tcz > $(TCZ_BLD_DIR)/fltube.tcz.md5.txt
 	tar czf $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME) -C $(TCZ_BLD_DIR) fltube.tcz fltube.tcz.dep fltube.tcz.info fltube.tcz.list fltube.tcz.md5.txt
-	cd $CURDIR
+	cd $(CURDIR)
 	@printf "\033[32mPackage built at: $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME)\033[0m...\n"
 
 
