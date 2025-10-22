@@ -108,11 +108,12 @@ tcz_package: install
 #	chown root:staff $(TCZ_BLD_DIR)/usr/local/tce.installed && chmod 755 $(TCZ_BLD_DIR)/usr/local/tce.installed
 	mksquashfs $(TCZ_BLD_DIR)/build $(TCZ_BLD_DIR)/fltube.tcz -progress
 	cp packaging/tinycore/fltube.tcz.dep $(TCZ_BLD_DIR)
+	cp packaging/tinycore/install.sh $(TCZ_BLD_DIR) && chmod +x $(TCZ_BLD_DIR)/install.sh
 	sed  's/-REPLACE_FLTUBE_VERSION-/$(FLTUBE_VERSION)/g' packaging/tinycore/fltube.tcz.info_TEMPLATE > $(TCZ_BLD_DIR)/fltube.tcz.info
 	CURDIR=`pwd` && cd $(TCZ_BLD_DIR)/build
 	find /usr -not -type d > $(TCZ_BLD_DIR)/fltube.tcz.list
 	cd $(TCZ_BLD_DIR) && md5sum fltube.tcz > $(TCZ_BLD_DIR)/fltube.tcz.md5.txt
-	tar czf $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME) -C $(TCZ_BLD_DIR) fltube.tcz fltube.tcz.dep fltube.tcz.info fltube.tcz.list fltube.tcz.md5.txt
+	tar czf $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME) -C $(TCZ_BLD_DIR) fltube.tcz fltube.tcz.dep fltube.tcz.info fltube.tcz.list fltube.tcz.md5.txt install.sh
 	cd $(CURDIR)
 	@printf "\033[32mPackage built at: $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME)\033[0m...\n"
 
