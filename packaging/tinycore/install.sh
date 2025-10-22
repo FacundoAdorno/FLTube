@@ -13,7 +13,7 @@ partition_name=$(basename "$root_partition")
 IS_ONBOOT=`cat /mnt/"$partition_name"/tce/onboot.lst | grep "fltube.tcz"`
 [ -z "$IS_ONBOOT" ] && echo "fltube.tcz" >> /mnt/"$partition_name"/tce/onboot.lst
 rm -f /mnt/"$partition_name"/tce/optional/fltube.tcz*
-cp fltube.tcz* /mnt/"$partition_name"/tce/optional/
+mv fltube.tcz* /mnt/"$partition_name"/tce/optional/
 echo "Installing FLTube and required dependencies. This can take a while, please wait..."
 tce-load -i fltube.tcz      #Dependencies are installed from .dep file...
 echo "FLTube was installed succesfully."
