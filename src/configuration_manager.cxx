@@ -91,11 +91,16 @@ int ConfigurationManager::getShortcutFor(std::string s){
     return this->shortcuts->getShortcut(s);
 }
 
+std::string ConfigurationManager::getShortcutTextFor(SHORTCUTS s) {
+    return this->shortcuts->getShortcutText(s);
+}
+
 // KeyboardShortcuts methods implementation. //
 
 int KeyboardShortcuts::getShortcut(SHORTCUTS s){
     if (this->keybindings->find(s) != this->keybindings->end()) {
-        return this->keybindings->find(s)->second;
+        std::pair shortcut = this->keybindings->find(s)->second;
+        return shortcut.first;
     }
     // If no shortcut can be returned, return 0.
     return this->NO_SHORTCUT;
@@ -105,6 +110,15 @@ int KeyboardShortcuts::getShortcut(std::string shtct) {
     return this->getShortcut(this->toShortcut(shtct));
 }
 
+std::string KeyboardShortcuts::getShortcutText(SHORTCUTS s) {
+    if (this->keybindings->find(s) != this->keybindings->end()) {
+        std::pair shortcut = this->keybindings->find(s)->second;
+        return shortcut.second;
+    }
+    // If no shortcut can be returned, return 0.
+    return "Unknown";
+}
+
 SHORTCUTS KeyboardShortcuts::toShortcut(std::string shtct) {
     for (auto iter = shortcuts_str->begin(); iter != shortcuts_str->end(); ++iter) {
         if (iter->second == shtct) return iter->first;
@@ -112,8 +126,10 @@ SHORTCUTS KeyboardShortcuts::toShortcut(std::string shtct) {
     return SHORTCUTS::UNDEFINED;
 }
 
-void KeyboardShortcuts::setShortcut(SHORTCUTS s, int value) {
-    (*this->keybindings)[s] = value;
+void KeyboardShortcuts::setShortcut(SHORTCUTS s, int value, std::string keybinding_text) {
+    std::pair<int, std::string>& shortcut = this->keybindings->at(s);
+    shortcut.first = value;
+    shortcut.second = keybinding_text;
 }
 
 int KeyboardShortcuts::isWellDefined(std::string shortcut_def) {
@@ -208,7 +224,7 @@ void KeyboardShortcuts::overwriteDefaults(ConfigurationManager* config) {
             // printf("Value 1: %d - Value 2: %d", FL_CTRL + FL_F + 1 ,shtc_value_int);
             // If the shortcut is well defined, then overwrite the default with user custom shortcut...
             if(shtc_value_int > 0) {
-              if (!isUsed(shtc_value_int)) this->setShortcut(iter->first, shtc_value_int);
+              if (!isUsed(shtc_value_int)) this->setShortcut(iter->first, shtc_value_int, shtc_value);
               else printf(_("Keybinding for shortcut '%s' already in use. Please, change it for an unused combination of keys.\n"), iter->second);
             }
             else printf(_("Invalid keybinding for shortcut '%s'. Please, change it for a valid combination of keys.\n"), iter->second);
@@ -218,7 +234,7 @@ void KeyboardShortcuts::overwriteDefaults(ConfigurationManager* config) {
 
 bool KeyboardShortcuts::isUsed(int shortcut){
     for ( auto iter = this->keybindings->begin(); iter != this->keybindings->end(); ++iter) {
-        if (iter->second == shortcut) return true;
+        if (iter->second.first == shortcut) return true;
     }
     return false;
 }

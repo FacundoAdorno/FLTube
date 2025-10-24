@@ -204,8 +204,12 @@ void showFLTubeHelpWindow(Fl_Widget* w) {
             "- Open video 3: %s\n- Open video 4: %s\n- Search videos of Channel 1: %s\n- Search videos of Channel 2: %s\n"
             "- Search videos of Channel 3: %s\n- Search videos of Channel 4: %s\n- Show this Help Window: %s\n\n"
             "[NOTE] Default shortcuts can be modified at fltube.conf."),
-                 "Ctrl + l", "Alt + s | Intro", "Alt + p", "Alt + n", "Ctrl + 1", "Ctrl + 2", "Ctrl + 3", "Ctrl + 4",
-                 "Ctrl + Shift + 1", "Ctrl + Shift + 2", "Ctrl + Shift + 3", "Ctrl + Shift + 4", "Ctrl + ?");
+            config->getShortcutTextFor(SHORTCUTS::FOCUS_SEARCH).c_str(), "Alt + s | Intro", "Alt + p", "Alt + n",
+            config->getShortcutTextFor(SHORTCUTS::FOCUS_VIDEO_1).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_VIDEO_2).c_str(),
+            config->getShortcutTextFor(SHORTCUTS::FOCUS_VIDEO_3).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_VIDEO_4).c_str(),
+            config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_1).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_2).c_str(),
+            config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_3).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_4).c_str(),
+            config->getShortcutTextFor(SHORTCUTS::SHOW_HELP).c_str());
         helpWin->shortcuts_txt->buffer()->text(shortcuts_help_text);
     }
     helpWin->show();

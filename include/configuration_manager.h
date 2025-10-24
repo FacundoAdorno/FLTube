@@ -65,6 +65,7 @@ public:
      */
     int getShortcutFor(SHORTCUTS s);
     int getShortcutFor(std::string s);
+    std::string getShortcutTextFor(SHORTCUTS s);
 };
 
 /** Define the program shortcuts, and overwrite the defaults based on the fltube configuration file.
@@ -85,12 +86,12 @@ public:
  */
 class KeyboardShortcuts {
     protected:
-        const char* CTRL_S = "Ctrl";
-        const char* ALT_S = "Alt";
-        const char* SHIFT_S = "Shift";
+        const std::string CTRL_S = "Ctrl";
+        const std::string ALT_S = "Alt";
+        const std::string SHIFT_S = "Shift";
         /** 0 for shortcuts in FLTK means 'no shortcut for specific widget'. */
         const int  NO_SHORTCUT = 0;
-        std::unique_ptr<std::map<SHORTCUTS, int>> keybindings;
+        std::unique_ptr<std::map<SHORTCUTS, std::pair<int, std::string>>> keybindings;
         /** Holds the names of the properties at fltube.conf corresponding to each shortcut. */
         std::unique_ptr<std::map<SHORTCUTS, char[32]>> shortcuts_str;
         /** Check if keybinding is being used for some SHORTCUT. */
@@ -103,19 +104,19 @@ class KeyboardShortcuts {
         static const int INVALID_SHORTCUT = -1;
         /** Constructor that set the defaults keybindings for the widgets shortcuts. */
         KeyboardShortcuts()
-            : keybindings(std::make_unique<std::map<SHORTCUTS, int>>()),
+            : keybindings(std::make_unique<std::map<SHORTCUTS, std::pair<int, std::string>>>()),
               shortcuts_str(std::make_unique<std::map<SHORTCUTS, char[32]>>()){
 
-            (*keybindings)[SHORTCUTS::FOCUS_SEARCH] = FL_CTRL + 'l';
-            (*keybindings)[SHORTCUTS::FOCUS_VIDEO_1] = FL_CTRL + '1';
-            (*keybindings)[SHORTCUTS::FOCUS_VIDEO_2] = FL_CTRL + '2';
-            (*keybindings)[SHORTCUTS::FOCUS_VIDEO_3] = FL_CTRL + '3';
-            (*keybindings)[SHORTCUTS::FOCUS_VIDEO_4] = FL_CTRL + '4';
-            (*keybindings)[SHORTCUTS::FOCUS_CHANNEL_1] = FL_CTRL + FL_SHIFT + '1';
-            (*keybindings)[SHORTCUTS::FOCUS_CHANNEL_2] = FL_CTRL + FL_SHIFT + '2';
-            (*keybindings)[SHORTCUTS::FOCUS_CHANNEL_3] = FL_CTRL + FL_SHIFT + '3';
-            (*keybindings)[SHORTCUTS::FOCUS_CHANNEL_4] = FL_CTRL + FL_SHIFT + '4';
-            (*keybindings)[SHORTCUTS::SHOW_HELP] = FL_CTRL + '?';
+            (*keybindings)[SHORTCUTS::FOCUS_SEARCH] = std::make_pair(FL_CTRL + 'l', CTRL_S + " + l");
+            (*keybindings)[SHORTCUTS::FOCUS_VIDEO_1] = std::make_pair(FL_CTRL + '1', CTRL_S + " + 1");
+            (*keybindings)[SHORTCUTS::FOCUS_VIDEO_2] = std::make_pair(FL_CTRL + '2', CTRL_S + " + 2");
+            (*keybindings)[SHORTCUTS::FOCUS_VIDEO_3] = std::make_pair(FL_CTRL + '3', CTRL_S + " + 3");
+            (*keybindings)[SHORTCUTS::FOCUS_VIDEO_4] = std::make_pair(FL_CTRL + '4', CTRL_S + " + 4");
+            (*keybindings)[SHORTCUTS::FOCUS_CHANNEL_1] = std::make_pair(FL_CTRL + FL_SHIFT + '1', CTRL_S + " + " + SHIFT_S + " + 1");
+            (*keybindings)[SHORTCUTS::FOCUS_CHANNEL_2] = std::make_pair(FL_CTRL + FL_SHIFT + '2', CTRL_S + " + " + SHIFT_S + " + 2");
+            (*keybindings)[SHORTCUTS::FOCUS_CHANNEL_3] = std::make_pair(FL_CTRL + FL_SHIFT + '3', CTRL_S + " + " + SHIFT_S + " + 3");
+            (*keybindings)[SHORTCUTS::FOCUS_CHANNEL_4] = std::make_pair(FL_CTRL + FL_SHIFT + '4', CTRL_S + " + " + SHIFT_S + " + 4");
+            (*keybindings)[SHORTCUTS::SHOW_HELP] = std::make_pair(FL_CTRL + '?', CTRL_S + " + ?");
 
             std::strcpy((*shortcuts_str)[SHORTCUTS::FOCUS_SEARCH], "FOCUS_SEARCH");
             std::strcpy((*shortcuts_str)[SHORTCUTS::FOCUS_VIDEO_1], "FOCUS_VIDEO_1");
@@ -129,18 +130,17 @@ class KeyboardShortcuts {
             std::strcpy((*shortcuts_str)[SHORTCUTS::SHOW_HELP], "SHOW_HELP");
             };
 
-        ~KeyboardShortcuts() {
-            delete CTRL_S; delete ALT_S; delete SHIFT_S;
-        };
+        ~KeyboardShortcuts() {};
 
         /** OVerwrite the defaults keybindings if defined in a ConfigurationManager. */
         void overwriteDefaults(ConfigurationManager* config);
         /** Set an individual shortcut. */
-        void setShortcut(SHORTCUTS s , int value);
+        void setShortcut(SHORTCUTS s , int value, std::string keybinding_text);
         /** Return the configured keybinding for an specific shortcut.
          *  If not defined, returns 0 (NO_SHORTCUT). */
         int getShortcut(SHORTCUTS s);
         int getShortcut(std::string s);
+        std::string getShortcutText(SHORTCUTS s);
         /** Check if a shortcut configuration is well defined according to the shortcut rules.
          *      For example: 'Ctrl + a' is well defined, not 'a + Ctrl' or 'Crl + a'...
          *  If the shortcut is valid, then return the corresponding "int" value, otherwise return -1 if invalid.
