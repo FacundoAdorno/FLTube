@@ -548,7 +548,6 @@ const char* getSearchValue(Fl_Input *input){
  */
 void searchButtonAction_cb(Fl_Widget *wdgt, Fl_Input *input){
     //Reset global pagination index and "deactivate" previos button...
-    mainWin->previous_results_bttn->deactivate();
     SEARCH_PAGE_INDEX = 0;
     SEARCH_BY_CHANNEL_F = false;
     const char* input_text = getSearchValue(input);
@@ -557,6 +556,7 @@ void searchButtonAction_cb(Fl_Widget *wdgt, Fl_Input *input){
         doSearch(input_text);
         lock_buttons(false);
     }
+    mainWin->previous_results_bttn->deactivate();
 }
 
 /** Callback for Previous results button... */
