@@ -1,5 +1,5 @@
 mplayer-cli.tcz
-python3.9.tcz
+python3.11.tcz
 libEGL.tcz
 curl.tcz
 ffmpeg4.tcz
