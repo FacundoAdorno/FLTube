@@ -16,6 +16,7 @@
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
 #include "../include/configuration_manager.h"
+#include <FL/Fl_Text_Display.H>
 #include <filesystem>
 
 /** Main Fltube window. */
@@ -189,21 +190,18 @@ void showFLTubeHelpWindow(Fl_Widget* w) {
         helpWin->hlp_ytdlp_link->callback([](Fl_Widget*) {openURI("https://github.com/yt-dlp/yt-dlp");});
         helpWin->hlp_cpp_link->callback([](Fl_Widget*) {openURI("https://isocpp.org/");});
         helpWin->howtouse_txt->buffer(new Fl_Text_Buffer());
-        helpWin->howtouse_txt->buffer()->text(_("FLTube is an application for search & stream Youtube videos.\n"
-        "You can search by a search term or by entering the URL of a\nspecific YouTube video.\n\n"
-        "Once the results are returned, you can watch any of these\nvideos by clicking on their thumbnail. The stream\n"
-        "resolution is 360p by default, but can be changed at\nfltube.conf configuration file.\n\n"
-        "You can also view the latest videos by the creator of a\nspecific video by clicking on their name (a button at the\n"
-        "bottom right of each result).\n\nIf a search returns multiple results, they will be paginated,\n"
-        "and you can navigate through them using the \"<Previous\"\nand \"Next>\" buttons at the bottom of the window."));
+        helpWin->howtouse_txt->wrap_mode(Fl_Text_Display::WRAP_AT_COLUMN, 50);
+        helpWin->howtouse_txt->buffer()->text(_("FLTube is an application for search & stream Youtube videos. You can search by a search term or by entering the URL of a specific YouTube video.\n\nOnce the results are returned, you can watch any of these videos by clicking on their thumbnail. The stream resolution is 360p by default, but can be changed at fltube.conf configuration file.\n\n"
+        "You can also view the latest videos by the creator of a specific video by clicking on their name (a button at the bottom right of each result).\n\nIf a search returns multiple results, they will be paginated, and you can navigate through them using the \"<Previous\" and \"Next>\" buttons at the bottom of the window.\n"));
         helpWin->shortcuts_txt->buffer(new Fl_Text_Buffer());
+        helpWin->shortcuts_txt->wrap_mode(Fl_Text_Display::WRAP_AT_COLUMN, 50);
         char shortcuts_help_text[1024];
         snprintf(shortcuts_help_text, sizeof(shortcuts_help_text),
                  _("- Focus at search input: %s\n- Search videos: %s\n"
             "- Get previous results: %s\n- Get next results: %s\n- Open video 1: %s\n- Open video 2: %s\n"
             "- Open video 3: %s\n- Open video 4: %s\n- Search videos of Channel 1: %s\n- Search videos of Channel 2: %s\n"
             "- Search videos of Channel 3: %s\n- Search videos of Channel 4: %s\n- Show this Help Window: %s\n\n"
-            "[NOTE] Default shortcuts can be modified at %s."),
+            "[NOTE] Default shortcuts can be modified at %s.\n"),
             config->getShortcutTextFor(SHORTCUTS::FOCUS_SEARCH).c_str(), "Alt + s | Intro", "Alt + p", "Alt + n",
             config->getShortcutTextFor(SHORTCUTS::FOCUS_VIDEO_1).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_VIDEO_2).c_str(),
             config->getShortcutTextFor(SHORTCUTS::FOCUS_VIDEO_3).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_VIDEO_4).c_str(),
