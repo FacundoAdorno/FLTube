@@ -36,7 +36,7 @@ $ sudo make install
 
 On some distribution more minimalist, like [FLinux](https://flinux-distro.sourceforge.io/), you must install some extra packages: 
 ```bash
-$ tce-load -wi ffmpeg4.tcz libEGL.tcz bash.tcz
+$ tce-load -wi ffmpeg4.tcz libEGL.tcz bash.tcz squashfs-tools.tcz
 ``` 
 
 ### On a Debian-based distro

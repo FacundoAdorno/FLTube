@@ -38,7 +38,7 @@ $ fltube        ## Para ejecutar la aplicación.
 
 En algunas distribuciones más minimalistas, como [FLinux](https://flinux-distro.sourceforge.io/), debes instalar algunos paquetes extra:
 ```bash
-$ tce-load -wi ffmpeg4.tcz libEGL.tcz bash.tcz
+$ tce-load -wi ffmpeg4.tcz libEGL.tcz bash.tcz squashfs-tools.tcz
 ``` 
 
 ### En distribuciones basadas en Debian
