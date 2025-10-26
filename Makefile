@@ -68,12 +68,12 @@ install: all
 	cp $(SCRIPTS_DIR)/install_yt-dlp.sh $(PREFIX)/usr/local/bin/
 
 	mkdir -p $(PREFIX)/usr/local/share/icons/fltube/ $(PREFIX)/usr/local/share/{applications,fltube/resources/img}
-	cp resources/desktop/FLTube.desktop $(PREFIX)/usr/local/share/applications/
+	cp resources/desktop/fltube.desktop $(PREFIX)/usr/local/share/applications/
 	cp resources/icons/*.png $(PREFIX)/usr/local/share/icons/fltube/
 	cp resources/img/*.png $(PREFIX)/usr/local/share/fltube/resources/img/
 
 uninstall:
-	rm $(PREFIX)/usr/local/etc/fltube/fltube.conf $(PREFIX)/usr/local/bin/fltube $(PREFIX)/usr/local/bin/install_yt-dlp.sh $(PREFIX)/usr/local/share/applications/FLTube.desktop $(PREFIX)/usr/local/share/icons/fltube/*.png $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/FLTube.mo $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/install_yt-dlp.mo $(PREFIX)/usr/local/share/fltube/resources/img/*.png
+	rm $(PREFIX)/usr/local/etc/fltube/fltube.conf $(PREFIX)/usr/local/bin/fltube $(PREFIX)/usr/local/bin/install_yt-dlp.sh $(PREFIX)/usr/local/share/applications/fltube.desktop $(PREFIX)/usr/local/share/icons/fltube/*.png $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/FLTube.mo $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/install_yt-dlp.mo $(PREFIX)/usr/local/share/fltube/resources/img/*.png
 	rmdir $(PREFIX)/usr/local/share/icons/fltube/ $(PREFIX)/usr/local/etc/fltube $(PREFIX)/usr/local/share/{fltube/resources/img,fltube/resources,fltube}
 
 # Extract strings from source and update .po locale files.

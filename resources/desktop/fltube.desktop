@@ -10,6 +10,7 @@ Comment[es]=Busca y reproduce videos desde Youtube. Para PC's de bajos recursos.
 TryExec=/usr/local/bin/fltube
 Exec=fltube
 Icon=/usr/local/share/icons/fltube/256x256.png
+X-FullPathIcon=/usr/local/share/icons/fltube/256x256.png
 Terminal=false
 Categories=AudioVideo;Video;
 SingleMainWindow=true
