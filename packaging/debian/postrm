@@ -7,4 +7,11 @@ if [ -e /usr/local/bin/yt-dlp ]; then
     rm -rf /usr/local/bin/yt-dlp
 fi
 
+USER_HOME=`eval echo ~$(logname)`   #This is the home of the user that run the "apt remove" command
+FLTUBE_USER_CONFIGDIR=$USER_HOME/.config/fltube
+if [ -f "$FLTUBE_USER_CONFIGDIR"/fltube.conf ]; then
+    printf "\033[34m[!] Deleting user configurations at \"$FLTUBE_USER_CONFIGDIR/fltube.conf\"...\033[0m\n"
+    rm -f "$FLTUBE_USER_CONFIGDIR"/fltube.conf && rmdir "$FLTUBE_USER_CONFIGDIR"
+fi
+
 exit 0

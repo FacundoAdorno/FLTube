@@ -16,4 +16,15 @@ else
     fi
 fi
 
+nonroot_user=$(logname)   #This is the name of the user that run the "apt install" command
+
+su "$nonroot_user" <<EOF
+FLTUBE_USER_CONFIGDIR=\$HOME/.config/fltube
+if [ ! -f "\$FLTUBE_USER_CONFIGDIR"/fltube.conf ]; then
+    [ ! -d "\$FLTUBE_USER_CONFIGDIR" ] && mkdir -p "\$FLTUBE_USER_CONFIGDIR"
+	echo "Creating user configuration file at \$FLTUBE_USER_CONFIGDIR."
+	cp /usr/local/etc/fltube/fltube.conf "\$FLTUBE_USER_CONFIGDIR"
+fi
+EOF
+
 exit 0

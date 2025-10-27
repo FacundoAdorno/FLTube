@@ -16,8 +16,6 @@
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
 #include "../include/configuration_manager.h"
-#include <FL/Fl_Text_Display.H>
-#include <filesystem>
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
