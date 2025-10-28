@@ -193,8 +193,8 @@ void showFLTubeHelpWindow(Fl_Widget* w) {
         "You can also view the latest videos by the creator of a specific video by clicking on their name (a button at the bottom right of each result).\n\nIf a search returns multiple results, they will be paginated, and you can navigate through them using the \"<Previous\" and \"Next>\" buttons at the bottom of the window.\n"));
         helpWin->shortcuts_txt->buffer(new Fl_Text_Buffer());
         helpWin->shortcuts_txt->wrap_mode(Fl_Text_Display::WRAP_AT_COLUMN, 50);
-        char shortcuts_help_text[1024];
-        snprintf(shortcuts_help_text, sizeof(shortcuts_help_text),
+        char help_text_bffr[1024];
+        snprintf(help_text_bffr, sizeof(help_text_bffr),
                  _("- Focus at search input: %s\n- Search videos: %s\n"
             "- Get previous results: %s\n- Get next results: %s\n- Open video 1: %s\n- Open video 2: %s\n"
             "- Open video 3: %s\n- Open video 4: %s\n- Search videos of Channel 1: %s\n- Search videos of Channel 2: %s\n"
@@ -206,7 +206,19 @@ void showFLTubeHelpWindow(Fl_Widget* w) {
             config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_1).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_2).c_str(),
             config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_3).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_4).c_str(),
             config->getShortcutTextFor(SHORTCUTS::SHOW_HELP).c_str(), CONFIGFILE_PATH.c_str());
-        helpWin->shortcuts_txt->buffer()->text(shortcuts_help_text);
+        helpWin->shortcuts_txt->buffer()->text(help_text_bffr);
+        helpWin->config_txt->buffer(new Fl_Text_Buffer());
+        helpWin->config_txt->wrap_mode(Fl_Text_Display::WRAP_AT_COLUMN, 50);
+        snprintf(help_text_bffr, sizeof(help_text_bffr),
+                _("The current instance of FLTube is loading the configurations from %s file.\n\n*** EXAMPLES ***\n[*] CHANGE THE DEFAULT STREAM RESOLUTION TO 720p:\n - Uncomment or add this property, and set the desire resolution (240, 360, 480, 720 or 1080).\n      %s = 720\n\n[*] CHANGE THE VIDEO PLAYER TO mpv INSTEAD OF mplayer:\n - Add or uncomment the following properties:\n      %s = mpv\n      %s = --ao=pulse\n      %s = \n The last two params can be empty, but MUST be set uncomment if you change the video player.\n"),
+                CONFIGFILE_PATH.c_str(), "STREAM_VIDEO_RESOLUTION", "STREAM_PLAYER_PATH", "STREAM_PLAYER_PARAMS", "STREAM_PLAYER_EXTRA_PARAMS_FOR_LIVE");
+        helpWin->config_txt->buffer()->text(help_text_bffr);
+        helpWin->authors_txt->buffer(new Fl_Text_Buffer());
+        helpWin->authors_txt->wrap_mode(Fl_Text_Display::WRAP_AT_COLUMN, 50);
+        snprintf(help_text_bffr, sizeof(help_text_bffr),
+                 _("[*_ DEVELOPERS _*]\n  Facundo Gabriel Adorno (Argentina)\n    -Contact: adorno.facundo@gmail.com\n\n"
+                     "[*_ CONTRIBUTORS _*]\n  Nicolás Longardi (Uruguay)\n   -Contact: nico@locosporlinux.com\n"));
+        helpWin->authors_txt->buffer()->text(help_text_bffr);
     }
     helpWin->show();
     // Loop until the message window is closed...

@@ -92,7 +92,13 @@ public:
   Fl_Button *hlp_ytdlp_link;
   Fl_Button *hlp_cpp_link;
   Fl_Tabs *help_info_tabs;
+  Fl_Group *howtouse_tab;
   Fl_Text_Display *howtouse_txt;
+  Fl_Group *shortcuts_tab;
   Fl_Text_Display *shortcuts_txt;
+  Fl_Group *config_tab;
+  Fl_Text_Display *config_txt;
+  Fl_Group *authors_tab;
+  Fl_Text_Display *authors_txt;
 };
 #endif

@@ -138,14 +138,14 @@ widget_class HelpFLTubeWindow {
   xywh {620 195 480 352}
   class Fl_Double_Window modal visible
 } {
-  Fl_Group {} {open
+  Fl_Group {} {
     xywh {15 14 448 144}
   } {
     Fl_Box hlp_fltube_img {
       xywh {15 21 128 128}
     }
     Fl_Box hlp_app_name {
-      label FLTube selected
+      label FLTube
       xywh {153 14 310 24} labelfont 1 labelsize 20 labelcolor 32 align 21
     }
     Fl_Box about_version {
@@ -188,19 +188,35 @@ widget_class HelpFLTubeWindow {
   Fl_Tabs help_info_tabs {open
     xywh {15 158 450 183}
   } {
-    Fl_Group {} {
-      label {How to use} open
+    Fl_Group howtouse_tab {
+      label {How to use} open selected
       xywh {15 183 450 158} selection_color 47 labelfont 1
     } {
       Fl_Text_Display howtouse_txt {
         xywh {19 189 442 148} box NO_BOX color 49 align 129
       }
     }
-    Fl_Group {} {
+    Fl_Group shortcuts_tab {
       label Shortcuts open
       xywh {15 183 450 158} selection_color 47 labelfont 1 hide
     } {
       Fl_Text_Display shortcuts_txt {
+        xywh {19 189 442 148} box NO_BOX color 49 align 129
+      }
+    }
+    Fl_Group config_tab {
+      label Configuration open
+      xywh {15 183 450 158} selection_color 47 labelfont 1 hide
+    } {
+      Fl_Text_Display config_txt {
+        xywh {19 189 442 148} box NO_BOX color 49 align 129
+      }
+    }
+    Fl_Group authors_tab {
+      label Authors open
+      xywh {15 183 450 158} selection_color 47 labelfont 1 hide
+    } {
+      Fl_Text_Display authors_txt {
         xywh {19 189 442 148} box NO_BOX color 49 align 129
       }
     }

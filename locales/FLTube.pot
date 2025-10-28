@@ -8,13 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-25 13:28-0300\n"
+"POT-Creation-Date: 2025-10-28 15:41-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/configuration_manager.cxx:68
@@ -45,30 +45,30 @@ msgid ""
 "combination of keys.\n"
 msgstr ""
 
-#: src/FLTube.cxx:80
+#: src/FLTube.cxx:79
 #, c-format
 msgid "Cleaning temporal files at %s."
 msgstr ""
 
-#: src/FLTube.cxx:87
+#: src/FLTube.cxx:86
 msgid "Closing FLtube... Bye!\n"
 msgstr ""
 
-#: src/FLTube.cxx:156
+#: src/FLTube.cxx:155
 #, c-format
 msgid "Resource image at '%s' cannot be loaded..."
 msgstr ""
 
-#: src/FLTube.cxx:182
+#: src/FLTube.cxx:181
 msgid "FLTube Help"
 msgstr ""
 
-#: src/FLTube.cxx:185
+#: src/FLTube.cxx:184
 #, c-format
 msgid "Version %s"
 msgstr ""
 
-#: src/FLTube.cxx:194
+#: src/FLTube.cxx:193
 msgid ""
 "FLTube is an application for search & stream Youtube videos. You can search "
 "by a search term or by entering the URL of a specific YouTube video.\n"
@@ -85,7 +85,7 @@ msgid ""
 "bottom of the window.\n"
 msgstr ""
 
-#: src/FLTube.cxx:200
+#: src/FLTube.cxx:199
 #, c-format
 msgid ""
 "- Focus at search input: %s\n"
@@ -105,124 +105,156 @@ msgid ""
 "[NOTE] Default shortcuts can be modified at %s.\n"
 msgstr ""
 
-#: src/FLTube.cxx:252 src/FLTube.cxx:454
+#: src/FLTube.cxx:214
+#, c-format
+msgid ""
+"The current instance of FLTube is loading the configurations from %s file.\n"
+"\n"
+"*** EXAMPLES ***\n"
+"[*] CHANGE THE DEFAULT STREAM RESOLUTION TO 720p:\n"
+" - Uncomment or add this property, and set the desire resolution (240, 360, "
+"480, 720 or 1080).\n"
+"      %s = 720\n"
+"\n"
+"[*] CHANGE THE VIDEO PLAYER TO mpv INSTEAD OF mplayer:\n"
+" - Add or uncomment the following properties:\n"
+"      %s = mpv\n"
+"      %s = --ao=pulse\n"
+"      %s = \n"
+" The last two params can be empty, but MUST be set uncomment if you change "
+"the video player.\n"
+msgstr ""
+
+#: src/FLTube.cxx:220
+#, c-format
+msgid ""
+"[*_ DEVELOPERS _*]\n"
+"  Facundo Gabriel Adorno (Argentina)\n"
+"    -Contact: adorno.facundo@gmail.com\n"
+"\n"
+"[*_ CONTRIBUTORS _*]\n"
+"  Nicolás Longardi (Uruguay)\n"
+"   -Contact: nico@locosporlinux.com\n"
+msgstr ""
+
+#: src/FLTube.cxx:263 src/FLTube.cxx:465
 msgid "Your device is offline. Check your internet connection."
 msgstr ""
 
-#: src/FLTube.cxx:253 src/FLTube.cxx:455
+#: src/FLTube.cxx:264 src/FLTube.cxx:466
 msgid ""
 "There seems that you don't have access to the Internet. Please, verify you "
 "network connection before proceed..."
 msgstr ""
 
-#: src/FLTube.cxx:261
+#: src/FLTube.cxx:272
 #, c-format
 msgid "Starting streaming preview of video '%s' - (%s)..."
 msgstr ""
 
-#: src/FLTube.cxx:265
+#: src/FLTube.cxx:276
 msgid ""
 "Cannot get video URL. Review the video metadata enabling app debugging..."
 msgstr ""
 
-#: src/FLTube.cxx:294
+#: src/FLTube.cxx:305
 msgid "viewers"
 msgstr ""
 
-#: src/FLTube.cxx:294
+#: src/FLTube.cxx:305
 msgid "views"
 msgstr ""
 
-#: src/FLTube.cxx:297
+#: src/FLTube.cxx:308
 #, c-format
 msgid ""
 "Error when getting count of viewers of video: (title: \"%s\", ID: \"%s\")"
 msgstr ""
 
-#: src/FLTube.cxx:300
+#: src/FLTube.cxx:311
 msgid "Unknown"
 msgstr ""
 
-#: src/FLTube.cxx:313
+#: src/FLTube.cxx:324
 msgid ""
 "Something went wrong when generating a resize thumbnail for video with ID="
 msgstr ""
 
-#: src/FLTube.cxx:341
+#: src/FLTube.cxx:352
 msgid "Loading configurations from "
 msgstr ""
 
-#: src/FLTube.cxx:346
+#: src/FLTube.cxx:357
 msgid ""
 "yt-dlp is not installed on your system or its binary is not at $PATH system "
 "variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run "
 "in a terminal the 'install_yt-dlp' script."
 msgstr ""
 
-#: src/FLTube.cxx:347
+#: src/FLTube.cxx:358
 msgid "yt-dlp is not installed. Closing app...\n"
 msgstr ""
 
-#: src/FLTube.cxx:376
+#: src/FLTube.cxx:387
 msgid ""
 "Default streaming resolution (360p) changed at configuration to this new "
 "resolution: "
 msgstr ""
 
-#: src/FLTube.cxx:461
+#: src/FLTube.cxx:472
 #, c-format
 msgid "Searching for results for '%s' user input..."
 msgstr ""
 
-#: src/FLTube.cxx:466
+#: src/FLTube.cxx:477
 msgid ""
 "For now, only Youtube URL's are valid for download. Please, edit your input "
 "text or search using a generic term."
 msgstr ""
 
-#: src/FLTube.cxx:506
+#: src/FLTube.cxx:517
 msgid "The Fl_Button is inexistent when search videos for a channel!!!\n"
 msgstr ""
 
-#: src/FLTube.cxx:512
+#: src/FLTube.cxx:523
 msgid ""
 "Channel ID is empty. Please verify the video metadata initilization!!!\n"
 msgstr ""
 
-#: src/FLTube.cxx:532
+#: src/FLTube.cxx:543
 msgid "The Fl_Input search widget inexistent!!!\n"
 msgstr ""
 
-#: src/FLTube.cxx:538
+#: src/FLTube.cxx:549
 msgid "Search input is empty. Please, retry and enter a valid text."
-msgstr ""
-
-#: src/FLTube.cxx:629
-#, c-format
-msgid "Loading custom config file %s.\n"
-msgstr ""
-
-#: src/FLTube.cxx:632
-#, c-format
-msgid "Specified path at --config parameter does not exist.\n"
-msgstr ""
-
-#: src/FLTube.cxx:634
-#, c-format
-msgid "--config parameter with no path specified.\n"
 msgstr ""
 
 #: src/FLTube.cxx:640
 #, c-format
+msgid "Loading custom config file %s.\n"
+msgstr ""
+
+#: src/FLTube.cxx:643
+#, c-format
+msgid "Specified path at --config parameter does not exist.\n"
+msgstr ""
+
+#: src/FLTube.cxx:645
+#, c-format
+msgid "--config parameter with no path specified.\n"
+msgstr ""
+
+#: src/FLTube.cxx:651
+#, c-format
 msgid "DEBUG MODE enabled.\n"
 msgstr ""
 
-#: src/FLTube.cxx:653
+#: src/FLTube.cxx:664
 #, c-format
 msgid "Starting FLTube v.%s\n"
 msgstr ""
 
-#: src/FLTube.cxx:672
+#: src/FLTube.cxx:683
 msgid "The FLTube main window has loaded."
 msgstr ""
 
@@ -392,4 +424,12 @@ msgstr ""
 
 #: src/FLTube_View.cxx:308
 msgid "Shortcuts"
+msgstr ""
+
+#: src/FLTube_View.cxx:319
+msgid "Configuration"
+msgstr ""
+
+#: src/FLTube_View.cxx:330
+msgid "Authors"
 msgstr ""

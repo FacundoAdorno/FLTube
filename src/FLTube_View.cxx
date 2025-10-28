@@ -295,27 +295,49 @@ void HelpFLTubeWindow::_HelpFLTubeWindow() {
     o->end();
   } // Fl_Group* o
   { help_info_tabs = new Fl_Tabs(15, 158, 450, 183);
-    { Fl_Group* o = new Fl_Group(15, 183, 450, 158, _("How to use"));
-      o->selection_color(FL_DARK1);
-      o->labelfont(1);
+    { howtouse_tab = new Fl_Group(15, 183, 450, 158, _("How to use"));
+      howtouse_tab->selection_color(FL_DARK1);
+      howtouse_tab->labelfont(1);
       { howtouse_txt = new Fl_Text_Display(19, 189, 442, 148);
         howtouse_txt->box(FL_NO_BOX);
         howtouse_txt->color(FL_BACKGROUND_COLOR);
         howtouse_txt->align(Fl_Align(129));
       } // Fl_Text_Display* howtouse_txt
-      o->end();
-    } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(15, 183, 450, 158, _("Shortcuts"));
-      o->selection_color(FL_DARK1);
-      o->labelfont(1);
-      o->hide();
+      howtouse_tab->end();
+    } // Fl_Group* howtouse_tab
+    { shortcuts_tab = new Fl_Group(15, 183, 450, 158, _("Shortcuts"));
+      shortcuts_tab->selection_color(FL_DARK1);
+      shortcuts_tab->labelfont(1);
+      shortcuts_tab->hide();
       { shortcuts_txt = new Fl_Text_Display(19, 189, 442, 148);
         shortcuts_txt->box(FL_NO_BOX);
         shortcuts_txt->color(FL_BACKGROUND_COLOR);
         shortcuts_txt->align(Fl_Align(129));
       } // Fl_Text_Display* shortcuts_txt
-      o->end();
-    } // Fl_Group* o
+      shortcuts_tab->end();
+    } // Fl_Group* shortcuts_tab
+    { config_tab = new Fl_Group(15, 183, 450, 158, _("Configuration"));
+      config_tab->selection_color(FL_DARK1);
+      config_tab->labelfont(1);
+      config_tab->hide();
+      { config_txt = new Fl_Text_Display(19, 189, 442, 148);
+        config_txt->box(FL_NO_BOX);
+        config_txt->color(FL_BACKGROUND_COLOR);
+        config_txt->align(Fl_Align(129));
+      } // Fl_Text_Display* config_txt
+      config_tab->end();
+    } // Fl_Group* config_tab
+    { authors_tab = new Fl_Group(15, 183, 450, 158, _("Authors"));
+      authors_tab->selection_color(FL_DARK1);
+      authors_tab->labelfont(1);
+      authors_tab->hide();
+      { authors_txt = new Fl_Text_Display(19, 189, 442, 148);
+        authors_txt->box(FL_NO_BOX);
+        authors_txt->color(FL_BACKGROUND_COLOR);
+        authors_txt->align(Fl_Align(129));
+      } // Fl_Text_Display* authors_txt
+      authors_tab->end();
+    } // Fl_Group* authors_tab
     help_info_tabs->end();
   } // Fl_Tabs* help_info_tabs
   set_modal();
