@@ -86,9 +86,9 @@ if [ $? -ne 0 ]; then
     done < /mnt/"$partition_name"/tce/optional/fltube.tcz.dep
     echo "Loading again FLTube to system..."
     tce-load -i fltube.tcz
-    echo "Cleaning up..."
-    rm -f install.sh
 fi
 
+echo "Cleaning up some files..."
+rm -f install.sh
 echo "FLTube was installed succesfully!"
 exit $EXITCODE_SUCCESS
