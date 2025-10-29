@@ -1,6 +1,7 @@
+ca-certificates.tcz
 mplayer-cli.tcz
-python3.11.tcz
 libEGL.tcz
 curl.tcz
 ffmpeg4.tcz
 bash.tcz
+python3.11.tcz
