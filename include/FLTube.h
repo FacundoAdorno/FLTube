@@ -27,7 +27,7 @@
 #include <cstring>
 #include <string>
 
-static const char* VERSION = "2.0.2";
+static const char* VERSION = "2.0.3";
 
 enum LogLevel { INFO, WARN, ERROR, DEBUG };
 
