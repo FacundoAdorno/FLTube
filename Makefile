@@ -88,10 +88,12 @@ DEB_BLD_DIR=/tmp/fltube_deb_build
 deb_package: install
 	rm -rf $(DEB_BLD_DIR)
 	mkdir -p $(DEB_BLD_DIR)/DEBIAN
+	mkdir -p $(DEB_BLD_DIR)/tmp
 	cp -R $(PREFIX)/usr $(DEB_BLD_DIR)
 	sed  's/-REPLACE_ARCH-/$(ARCH_CPU)/g' packaging/debian/control.template | sed 's/-REPLACE_VERSION-/$(FLTUBE_VERSION)/g' > $(DEB_BLD_DIR)/DEBIAN/control
 	cp packaging/debian/postinst $(DEB_BLD_DIR)/DEBIAN/
 	cp packaging/debian/postrm $(DEB_BLD_DIR)/DEBIAN/
+	cp packaging/common/yt-dlp_config $(DEB_BLD_DIR)/tmp/
 	chmod +x $(DEB_BLD_DIR)/DEBIAN/postinst
 	chmod +x $(DEB_BLD_DIR)/DEBIAN/postrm
 	chmod +x $(DEB_BLD_DIR)/usr/local/bin/*
@@ -103,6 +105,7 @@ tcz_package: install
 	rm -rf $(TCZ_BLD_DIR) && mkdir -p $(TCZ_BLD_DIR)/build
 	cp -R $(PREFIX)/usr $(TCZ_BLD_DIR)/build
 	cp -R packaging/tinycore/tce.installed $(TCZ_BLD_DIR)/build/usr/local/
+	mkdir $(TCZ_BLD_DIR)/build/tmp/ && cp packaging/common/yt-dlp_config $(TCZ_BLD_DIR)/build/tmp/
 # 	Setting permissions according to Chapter 16 of book "Into the Core" (http://tinycorelinux.net/corebook.pdf).
 	chown -R tc:staff $(TCZ_BLD_DIR)/build/usr/local/tce.installed/* && chmod +x $(TCZ_BLD_DIR)/build/usr/local/tce.installed/*
 #	chown root:staff $(TCZ_BLD_DIR)/usr/local/tce.installed && chmod 755 $(TCZ_BLD_DIR)/usr/local/tce.installed
@@ -112,6 +115,7 @@ tcz_package: install
 	sed  's/-REPLACE_FLTUBE_VERSION-/$(FLTUBE_VERSION)/g' packaging/tinycore/fltube.tcz.info_TEMPLATE > $(TCZ_BLD_DIR)/fltube.tcz.info
 	CURDIR=`pwd`
 	cd $(TCZ_BLD_DIR)/build && find usr/ -not -type d > $(TCZ_BLD_DIR)/fltube.tcz.list
+	echo "tmp/yt-dlp_config" >> $(TCZ_BLD_DIR)/fltube.tcz.list
 	cd $(TCZ_BLD_DIR) && md5sum fltube.tcz > $(TCZ_BLD_DIR)/fltube.tcz.md5.txt
 	tar czf $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME) -C $(TCZ_BLD_DIR) fltube.tcz fltube.tcz.dep fltube.tcz.info fltube.tcz.list fltube.tcz.md5.txt install.sh
 	cd $(CURDIR)

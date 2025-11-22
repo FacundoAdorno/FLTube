@@ -20,10 +20,17 @@ nonroot_user=$(logname)   #This is the name of the user that run the "apt instal
 
 su "$nonroot_user" <<EOF
 FLTUBE_USER_CONFIGDIR=\$HOME/.config/fltube
+YTDLP_USER_CONFIGDIR=\$HOME/.config/yt-dlp
 if [ ! -f "\$FLTUBE_USER_CONFIGDIR"/fltube.conf ]; then
     [ ! -d "\$FLTUBE_USER_CONFIGDIR" ] && mkdir -p "\$FLTUBE_USER_CONFIGDIR"
 	echo "Creating user configuration file at \$FLTUBE_USER_CONFIGDIR."
 	cp /usr/local/etc/fltube/fltube.conf "\$FLTUBE_USER_CONFIGDIR"
+fi
+
+if [ ! -f "\$YTDLP_USER_CONFIGDIR"/config ]; then
+    [ ! -d "\$YTDLP_USER_CONFIGDIR" ] && mkdir -p "\$YTDLP_USER_CONFIGDIR"
+	echo "Creating user configuration file for 'yt-dlp' at \$YTDLP_USER_CONFIGDIR."
+	cp /tmp/yt-dlp_config "\$YTDLP_USER_CONFIGDIR/config"
 fi
 EOF
 

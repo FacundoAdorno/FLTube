@@ -15,6 +15,9 @@
 
 yt_dlp_DOWNLOAD_URL="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
 yt_dlp_INSTALL_DIR="$HOME/.local/bin"
+quickjs_DOWNLOAD_FILENAME="quickjs-linux-i686-2025-09-13.zip"
+quickjs_DOWNLOAD_URL="https://bellard.org/quickjs/binary_releases/$quickjs_DOWNLOAD_FILENAME"
+quickjs_BINARY_NAME="qjs"
 ## Global booleans flags. Keep in mind this bash convention: 0 is true, and 1 is false.
 YES_TO_ALL=1    #Defaults to false
 ALTERNATIVE_PATH=1    #Defaults to false
@@ -31,7 +34,8 @@ _() {
 }
 
 USAGE=$(_ "[ == HELP == ]
-    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system.
+    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system,
+    besides it installs the External JS Runtime required since 'yt-dlp@2025.11.12'.
     Advice that this software require that Python 3.X been installed on your
     system (more info at: %s).
 
@@ -71,6 +75,7 @@ questionAndWait() {
 
 updateYTDLP(){
   $yt_dlp_INSTALL_DIR/yt-dlp -U
+  [ ! -e $yt_dlp_INSTALL_DIR/$quickjs_BINARY_NAME ] && download_quickjs
 }
 
 download_ytdlp() {
@@ -89,8 +94,27 @@ download_ytdlp() {
   showInfo "$LOC_TEXT"
   wget $yt_dlp_DOWNLOAD_URL -O $yt_dlp_INSTALL_DIR/yt-dlp
   chmod a+rx $yt_dlp_INSTALL_DIR/yt-dlp
-  LOC_TEXT=$(_ "'yt-dlp' installed at %s/yt-dlp directory.")
+  LOC_TEXT=$(_ "'yt-dlp' installed at %s/yt-dlp path.")
   showInfo "$LOC_TEXT" "$yt_dlp_INSTALL_DIR"
+
+  #Now proceed to download and install an external JS runtime (quickjs)
+  download_quickjs
+
+}
+
+download_quickjs() {
+  LOC_TEXT=$(_ "Starting 'quickjs' DOWNLOAD...")
+  showInfo "$LOC_TEXT"
+  wget -P /tmp $quickjs_DOWNLOAD_URL
+  if [ -e /tmp/$quickjs_DOWNLOAD_FILENAME ]; then
+        unzip /tmp/$quickjs_DOWNLOAD_FILENAME $quickjs_BINARY_NAME -d $yt_dlp_INSTALL_DIR
+        rm -f /tmp/$quickjs_DOWNLOAD_FILENAME
+        LOC_TEXT=$(_ "'quickjs' installed at %s/%s path.")
+        showInfo "$LOC_TEXT" "$yt_dlp_INSTALL_DIR" "$quickjs_BINARY_NAME"
+  else
+        LOC_TEXT=$(_ "'quickjs' cannot be downloaded for some reason. Download manually or run this script again...")
+        showInfo "$LOC_TEXT"
+  fi
 }
 
 #Parse parameters

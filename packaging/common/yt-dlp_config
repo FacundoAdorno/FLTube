@@ -1,0 +1,4 @@
+#yt-dlp configuration. Use this file according to instructions at https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#configuration.
+
+#Configure the external javascript runtime to use. Must be installed and reachable from $PATH environment variable.
+--js-runtimes quickjs
