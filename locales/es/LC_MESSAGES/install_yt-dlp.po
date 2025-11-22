@@ -8,21 +8,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: install_yt-dlp by FLTube\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-01 23:24-0300\n"
-"PO-Revision-Date: 2025-09-01 21:39-0300\n"
+"POT-Creation-Date: 2025-11-22 20:25-0300\n"
+"PO-Revision-Date: 2025-11-22 20:39-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.6\n"
+"X-Generator: Poedit 3.8\n"
 
-#: scripts/install_yt-dlp.sh:33
+#: scripts/install_yt-dlp.sh:36
 #, sh-printf-format
 msgid ""
 "[ == HELP == ]\n"
-"    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system.\n"
+"    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system,\n"
+"    besides it installs the External JS Runtime required since 'yt-"
+"dlp@2025.11.12'.\n"
 "    Advice that this software require that Python 3.X been installed on "
 "your\n"
 "    system (more info at: %s).\n"
@@ -40,7 +42,9 @@ msgid ""
 msgstr ""
 "[ == AYUDA == ] \n"
 "     Usa este script para INSTALAR o ACTUALIZAR la herramienta 'yt-dlp' en "
-"tu sistema.\n"
+"tu sistema,\n"
+"     además de instalar el External JS Runtime requerido desde 'yt-"
+"dlp@2025.11.12'.\n"
 "     Advierte que este software requiere que Python 3.X esté instalado en "
 "su\n"
 "     sistema (más información en: %s).\n"
@@ -56,31 +60,48 @@ msgstr ""
 "acepta todo.\n"
 "  -h,   Muestra este texto de ayuda."
 
-#: scripts/install_yt-dlp.sh:78
+#: scripts/install_yt-dlp.sh:83
 #, sh-printf-format
 msgid "'%s' does not exists. Do you want to create it?"
 msgstr "'%s' No existe. ¿Deseas crearlo?"
 
-#: scripts/install_yt-dlp.sh:80 scripts/install_yt-dlp.sh:86
+#: scripts/install_yt-dlp.sh:85 scripts/install_yt-dlp.sh:91
 #, sh-printf-format
 msgid "Directory '%s' created."
 msgstr "Directorio '%s' creado."
 
-#: scripts/install_yt-dlp.sh:82
+#: scripts/install_yt-dlp.sh:87
 #, sh-printf-format
 msgid "You must create '%s' before procced. Aborting installation..."
 msgstr "Debes crear '%s' antes de proceder. Abortando instalación..."
 
-#: scripts/install_yt-dlp.sh:88
+#: scripts/install_yt-dlp.sh:93
 msgid "Starting 'yt-dlp' DOWNLOAD..."
 msgstr "Comenzando la DESCARGA de 'yt-dlp'..."
 
-#: scripts/install_yt-dlp.sh:92
+#: scripts/install_yt-dlp.sh:97
 #, sh-printf-format
-msgid "'yt-dlp' installed at %s/yt-dlp directory."
-msgstr "'yt-dlp' instalado en el directorio %s/yt-dlp."
+msgid "'yt-dlp' installed at %s/yt-dlp path."
+msgstr "'yt-dlp' instalado en la ruta %s/yt-dlp."
 
-#: scripts/install_yt-dlp.sh:114
+#: scripts/install_yt-dlp.sh:106
+msgid "Starting 'quickjs' DOWNLOAD..."
+msgstr "Comenzando la DESCARGA de 'QuickJS'..."
+
+#: scripts/install_yt-dlp.sh:112
+#, sh-printf-format
+msgid "'quickjs' installed at %s/%s path."
+msgstr "'QuickJS' instalado en la ruta %s/%s."
+
+#: scripts/install_yt-dlp.sh:115
+msgid ""
+"'quickjs' cannot be downloaded for some reason. Download manually or run "
+"this script again..."
+msgstr ""
+"'QuickJS' no puede ser descargado por alguna razón. Descargalo manualmente o "
+"ejecuta este script nuevamente..."
+
+#: scripts/install_yt-dlp.sh:138
 #, sh-printf-format
 msgid ""
 "'yt-dlp' is installed globally at your system %s.\n"
@@ -94,22 +115,22 @@ msgstr ""
 "para descargar la última versión de 'yt-dlp'.\n"
 "    ¿Deseas continuar e instalar otro binario de 'yt-dlp' en el sistema?"
 
-#: scripts/install_yt-dlp.sh:129
+#: scripts/install_yt-dlp.sh:153
 #, sh-printf-format
 msgid "'yt-dlp' is not in your system. Do you want to install at '%s'?"
 msgstr "'yt-dlp' no está instalado en tu sistema. ¿Deseas instalarlo en '%s'?"
 
-#: scripts/install_yt-dlp.sh:134
+#: scripts/install_yt-dlp.sh:158
 msgid "Installation aborted by user choice..."
 msgstr "Instalación abortada por elección del usuario..."
 
-#: scripts/install_yt-dlp.sh:143
+#: scripts/install_yt-dlp.sh:167
 #, sh-printf-format
 msgid "Do you want to update 'yt-dlp@%s' to any NEW VERSION (if any)?"
 msgstr ""
 "¿Deseas actualizar 'yt-dlp@%s' a una NUEVA VERSIÓN (si es que hay otra más "
 "reciente)?"
 
-#: scripts/install_yt-dlp.sh:148
+#: scripts/install_yt-dlp.sh:172
 msgid "yt-dlp update process aborted by user choice..."
 msgstr "actualización abortada por elección del usuario..."
