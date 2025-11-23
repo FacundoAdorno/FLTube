@@ -16,6 +16,15 @@ else
     fi
 fi
 
+if ! command -v qjs >/dev/null 2>&1; then
+    printf "\033[32mTrying to install QuickJS...\033[0m\n"
+    if [ -x /usr/local/bin/install_yt-dlp.sh ]; then
+        /usr/local/bin/install_yt-dlp.sh -p "/usr/local/bin/" -j
+    else
+        printf "\033[31mCANNOT INSTALL QuickJS FROM PACKAGE\033[0m. Please, install manually later using 'install_yt-dlp.sh -j' command.\n"
+    fi
+fi
+
 nonroot_user=$(logname)   #This is the name of the user that run the "apt install" command
 
 su "$nonroot_user" <<EOF

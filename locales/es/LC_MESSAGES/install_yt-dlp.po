@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: install_yt-dlp by FLTube\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-22 20:25-0300\n"
-"PO-Revision-Date: 2025-11-22 20:39-0300\n"
+"POT-Creation-Date: 2025-11-22 23:40-0300\n"
+"PO-Revision-Date: 2025-11-22 23:42-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -18,13 +18,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.8\n"
 
-#: scripts/install_yt-dlp.sh:36
+#: scripts/install_yt-dlp.sh:37
 #, sh-printf-format
 msgid ""
 "[ == HELP == ]\n"
-"    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system,\n"
-"    besides it installs the External JS Runtime required since 'yt-"
-"dlp@2025.11.12'.\n"
+"    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system, "
+"besides it installs\n"
+"    the External JS Runtime required since 'yt-dlp@2025.11.12' "
+"(QuickJS@%s).\n"
 "    Advice that this software require that Python 3.X been installed on "
 "your\n"
 "    system (more info at: %s).\n"
@@ -36,15 +37,16 @@ msgid ""
 "  -p    Alternative PATH for binary installation/update. It must exists in "
 "case of installation.\n"
 "        Default directory is '%s'.\n"
+"  -j    Only download javascript runtime (QuickJS@%s) and exit.\n"
 "  -y    Confirm all questions. Avoid interaction with script and accept "
 "all.\n"
 "  -h,   Show this usage help."
 msgstr ""
 "[ == AYUDA == ] \n"
 "     Usa este script para INSTALAR o ACTUALIZAR la herramienta 'yt-dlp' en "
-"tu sistema,\n"
-"     además de instalar el External JS Runtime requerido desde 'yt-"
-"dlp@2025.11.12'.\n"
+"tu sistema, además de instalar\n"
+"     el External JS Runtime requerido desde 'yt-dlp@2025.11.12' "
+"(QuickJS@%s).\n"
 "     Advierte que este software requiere que Python 3.X esté instalado en "
 "su\n"
 "     sistema (más información en: %s).\n"
@@ -58,42 +60,45 @@ msgstr ""
 "        El directorio predeterminado es '%s'.\n"
 "  -y    Confirma todas las preguntas. Evita la interacción con el script y "
 "acepta todo.\n"
+"  -j    Sólo instala el javascript runtime (QuickJS@%s) y termina la "
+"ejecución.\n"
 "  -h,   Muestra este texto de ayuda."
 
-#: scripts/install_yt-dlp.sh:83
+#: scripts/install_yt-dlp.sh:85
 #, sh-printf-format
 msgid "'%s' does not exists. Do you want to create it?"
 msgstr "'%s' No existe. ¿Deseas crearlo?"
 
-#: scripts/install_yt-dlp.sh:85 scripts/install_yt-dlp.sh:91
+#: scripts/install_yt-dlp.sh:87 scripts/install_yt-dlp.sh:93
 #, sh-printf-format
 msgid "Directory '%s' created."
 msgstr "Directorio '%s' creado."
 
-#: scripts/install_yt-dlp.sh:87
+#: scripts/install_yt-dlp.sh:89
 #, sh-printf-format
 msgid "You must create '%s' before procced. Aborting installation..."
 msgstr "Debes crear '%s' antes de proceder. Abortando instalación..."
 
-#: scripts/install_yt-dlp.sh:93
+#: scripts/install_yt-dlp.sh:95
 msgid "Starting 'yt-dlp' DOWNLOAD..."
 msgstr "Comenzando la DESCARGA de 'yt-dlp'..."
 
-#: scripts/install_yt-dlp.sh:97
+#: scripts/install_yt-dlp.sh:99
 #, sh-printf-format
 msgid "'yt-dlp' installed at %s/yt-dlp path."
 msgstr "'yt-dlp' instalado en la ruta %s/yt-dlp."
 
-#: scripts/install_yt-dlp.sh:106
-msgid "Starting 'quickjs' DOWNLOAD..."
-msgstr "Comenzando la DESCARGA de 'QuickJS'..."
+#: scripts/install_yt-dlp.sh:108
+#, sh-printf-format
+msgid "Starting 'quickjs@%s' DOWNLOAD..."
+msgstr "Comenzando la DESCARGA de 'QuickJS@%s'..."
 
-#: scripts/install_yt-dlp.sh:112
+#: scripts/install_yt-dlp.sh:114
 #, sh-printf-format
 msgid "'quickjs' installed at %s/%s path."
 msgstr "'QuickJS' instalado en la ruta %s/%s."
 
-#: scripts/install_yt-dlp.sh:115
+#: scripts/install_yt-dlp.sh:117
 msgid ""
 "'quickjs' cannot be downloaded for some reason. Download manually or run "
 "this script again..."
@@ -101,7 +106,7 @@ msgstr ""
 "'QuickJS' no puede ser descargado por alguna razón. Descargalo manualmente o "
 "ejecuta este script nuevamente..."
 
-#: scripts/install_yt-dlp.sh:138
+#: scripts/install_yt-dlp.sh:142
 #, sh-printf-format
 msgid ""
 "'yt-dlp' is installed globally at your system %s.\n"
@@ -115,22 +120,22 @@ msgstr ""
 "para descargar la última versión de 'yt-dlp'.\n"
 "    ¿Deseas continuar e instalar otro binario de 'yt-dlp' en el sistema?"
 
-#: scripts/install_yt-dlp.sh:153
+#: scripts/install_yt-dlp.sh:157
 #, sh-printf-format
 msgid "'yt-dlp' is not in your system. Do you want to install at '%s'?"
 msgstr "'yt-dlp' no está instalado en tu sistema. ¿Deseas instalarlo en '%s'?"
 
-#: scripts/install_yt-dlp.sh:158
+#: scripts/install_yt-dlp.sh:162
 msgid "Installation aborted by user choice..."
 msgstr "Instalación abortada por elección del usuario..."
 
-#: scripts/install_yt-dlp.sh:167
+#: scripts/install_yt-dlp.sh:171
 #, sh-printf-format
 msgid "Do you want to update 'yt-dlp@%s' to any NEW VERSION (if any)?"
 msgstr ""
 "¿Deseas actualizar 'yt-dlp@%s' a una NUEVA VERSIÓN (si es que hay otra más "
 "reciente)?"
 
-#: scripts/install_yt-dlp.sh:172
+#: scripts/install_yt-dlp.sh:176
 msgid "yt-dlp update process aborted by user choice..."
 msgstr "actualización abortada por elección del usuario..."

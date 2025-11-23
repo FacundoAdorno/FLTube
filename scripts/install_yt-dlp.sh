@@ -15,12 +15,14 @@
 
 yt_dlp_DOWNLOAD_URL="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
 yt_dlp_INSTALL_DIR="$HOME/.local/bin"
-quickjs_DOWNLOAD_FILENAME="quickjs-linux-i686-2025-09-13.zip"
+quickjs_LATEST_VERSION="2025-09-13"
+quickjs_DOWNLOAD_FILENAME="quickjs-linux-i686-$quickjs_LATEST_VERSION.zip"
 quickjs_DOWNLOAD_URL="https://bellard.org/quickjs/binary_releases/$quickjs_DOWNLOAD_FILENAME"
 quickjs_BINARY_NAME="qjs"
 ## Global booleans flags. Keep in mind this bash convention: 0 is true, and 1 is false.
 YES_TO_ALL=1    #Defaults to false
 ALTERNATIVE_PATH=1    #Defaults to false
+ONLY_INSTALL_QJS=1    #Defaults to false
 
 #Configure GNU Gettext variables
 export TEXTDOMAIN=install_yt-dlp
@@ -34,8 +36,8 @@ _() {
 }
 
 USAGE=$(_ "[ == HELP == ]
-    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system,
-    besides it installs the External JS Runtime required since 'yt-dlp@2025.11.12'.
+    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system, besides it installs
+    the External JS Runtime required since 'yt-dlp@2025.11.12' (QuickJS@%s).
     Advice that this software require that Python 3.X been installed on your
     system (more info at: %s).
 
@@ -45,6 +47,7 @@ USAGE:
 OPTIONS:
   -p    Alternative PATH for binary installation/update. It must exists in case of installation.
         Default directory is '%s'.
+  -j    Only download javascript runtime (QuickJS@%s) and exit.
   -y    Confirm all questions. Avoid interaction with script and accept all.
   -h,   Show this usage help.")
 
@@ -103,11 +106,11 @@ download_ytdlp() {
 }
 
 download_quickjs() {
-  LOC_TEXT=$(_ "Starting 'quickjs' DOWNLOAD...")
-  showInfo "$LOC_TEXT"
+  LOC_TEXT=$(_ "Starting 'quickjs@%s' DOWNLOAD...")
+  showInfo "$LOC_TEXT" "$quickjs_LATEST_VERSION"
   wget -P /tmp $quickjs_DOWNLOAD_URL
   if [ -e /tmp/$quickjs_DOWNLOAD_FILENAME ]; then
-        unzip /tmp/$quickjs_DOWNLOAD_FILENAME $quickjs_BINARY_NAME -d $yt_dlp_INSTALL_DIR
+        unzip -o /tmp/$quickjs_DOWNLOAD_FILENAME $quickjs_BINARY_NAME -d $yt_dlp_INSTALL_DIR
         rm -f /tmp/$quickjs_DOWNLOAD_FILENAME
         LOC_TEXT=$(_ "'quickjs' installed at %s/%s path.")
         showInfo "$LOC_TEXT" "$yt_dlp_INSTALL_DIR" "$quickjs_BINARY_NAME"
@@ -118,13 +121,14 @@ download_quickjs() {
 }
 
 #Parse parameters
-while getopts p:yh opts; do
+while getopts p:yjh opts; do
    case ${opts} in
       p) ### Remove any trailing slash on specified path
          yt_dlp_INSTALL_DIR=`echo $OPTARG | sed 's/\/*$//g'`
          ALTERNATIVE_PATH=0;;
       y) YES_TO_ALL=0;;
-      h) printf "$USAGE\n" "https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#dependencies" "$yt_dlp_INSTALL_DIR"
+      j) ONLY_INSTALL_QJS=0;;
+      h) printf "$USAGE\n" "$quickjs_LATEST_VERSION" "https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#dependencies" "$yt_dlp_INSTALL_DIR" "$quickjs_LATEST_VERSION"
          exit 0;;
    esac
 done
@@ -133,6 +137,11 @@ done
 ##############################
 ## ## ## MAIN PROGRAM ## ## ##
 ##############################
+if [ $ONLY_INSTALL_QJS -eq 0 ]; then
+    download_quickjs
+    normalExit "Exiting program after QuickJS installation..."
+fi
+
 YT_DLP_GLOBAL_SYSTEM_VERSION=`yt-dlp --version 2> /dev/null`
 if [ $? -eq 0 ]; then
   LOC_TEXT=$(_ "'yt-dlp' is installed globally at your system %s.

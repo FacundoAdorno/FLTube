@@ -18,5 +18,8 @@ if [ ! -f "\$YTDLP_USER_CONFIGDIR"/config ]; then
 	cp /tmp/yt-dlp_config "\$YTDLP_USER_CONFIGDIR/config"
 fi
 
+#Install yt-dlp and external js runtime, if not already installed.
 command -v yt-dlp >/dev/null 2>&1 || { /tmp/tcloop/fltube/usr/local/bin/install_yt-dlp.sh -y; }
+command -v yt-dlp >/dev/null 2>&1 || { /tmp/tcloop/fltube/usr/local/bin/install_yt-dlp.sh -j -y; }
+
 EOF
