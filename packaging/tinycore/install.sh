@@ -87,6 +87,11 @@ if [ $? -ne 0 ]; then
     tce-load -i fltube.tcz
 fi
 
+echo "Installing following required dependencies: [*] yt-dlp and [*] QuickJS..."
+#Install yt-dlp and external js runtime, if not already installed.
+command -v yt-dlp >/dev/null 2>&1 || { ./install_yt-dlp.sh -y; }
+command -v qjs >/dev/null 2>&1 || { ./install_yt-dlp.sh -j -y; }
+
 echo "Cleaning up some files..."
 rm -f install.sh
 echo "FLTube was installed succesfully!"

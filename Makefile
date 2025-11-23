@@ -112,12 +112,14 @@ tcz_package: install
 	mksquashfs $(TCZ_BLD_DIR)/build $(TCZ_BLD_DIR)/fltube.tcz -progress
 	cp packaging/tinycore/fltube.tcz.dep $(TCZ_BLD_DIR)
 	cp packaging/tinycore/install.sh $(TCZ_BLD_DIR) && chmod +x $(TCZ_BLD_DIR)/install.sh
+#	Package tne install_yt-dlp.sh script for installation of yt-dlp and QuickJS during tcz installation process.
+	cp scripts/install_yt-dlp.sh $(TCZ_BLD_DIR) && chmod +x $(TCZ_BLD_DIR)/install_yt-dlp.sh
 	sed  's/-REPLACE_FLTUBE_VERSION-/$(FLTUBE_VERSION)/g' packaging/tinycore/fltube.tcz.info_TEMPLATE > $(TCZ_BLD_DIR)/fltube.tcz.info
 	CURDIR=`pwd`
 	cd $(TCZ_BLD_DIR)/build && find usr/ -not -type d > $(TCZ_BLD_DIR)/fltube.tcz.list
 	echo "tmp/yt-dlp_config" >> $(TCZ_BLD_DIR)/fltube.tcz.list
 	cd $(TCZ_BLD_DIR) && md5sum fltube.tcz > $(TCZ_BLD_DIR)/fltube.tcz.md5.txt
-	tar czf $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME) -C $(TCZ_BLD_DIR) fltube.tcz fltube.tcz.dep fltube.tcz.info fltube.tcz.list fltube.tcz.md5.txt install.sh
+	tar czf $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME) -C $(TCZ_BLD_DIR) fltube.tcz fltube.tcz.dep fltube.tcz.info fltube.tcz.list fltube.tcz.md5.txt install.sh install_yt-dlp.sh
 	cd $(CURDIR)
 	@printf "\033[32mPackage built at: $(TCZ_BLD_DIR)/$(TCZ_PACKAGE_NAME)\033[0m...\n"
 
