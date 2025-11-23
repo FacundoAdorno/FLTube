@@ -93,6 +93,6 @@ command -v yt-dlp >/dev/null 2>&1 || { ./install_yt-dlp.sh -y; }
 command -v qjs >/dev/null 2>&1 || { ./install_yt-dlp.sh -j -y; }
 
 echo "Cleaning up some files..."
-rm -f install.sh
+rm -f install.sh install_yt-dlp.sh
 echo "FLTube was installed succesfully!"
 exit $EXITCODE_SUCCESS
