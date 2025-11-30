@@ -33,11 +33,6 @@ FLTUBE_VERSION=2.0.3
 DEB_PACKAGE_NAME=fltube_$(FLTUBE_VERSION)-$(ARCH_CPU).deb
 TCZ_PACKAGE_NAME=fltube_$(FLTUBE_VERSION)_tcz.tar.gz
 
-## System package dependencies for compilation
-# Packages required for Compilation at Debians-based systems.
-COMPILATION_DEPS_DEBIAN = libfltk1.3-dev pkg-config libcurl4-openssl-dev g++ python3 gettext wget mplayer ffmpeg libpng-dev zlib1g-dev libjpeg-dev libxrender-dev libxcursor-dev libxfixes-dev libxext-dev libxft-dev libfontconfig1-dev libxinerama-dev
-# Packages required for Compilation at TinyCoreLinux-based systems.
-COMPILATION_DEPS_TINYCORE = make.tcz fluid.tcz pkg-config.tcz gettext.tcz curl-dev.tcz gcc.tcz glibc_base-dev.tcz tcc.tcz  mplayer-cli.tcz ffmpeg4.tcz libEGL.tcz bash.tcz squashfs-tools.tcz
 
 # Rules
 .SUFFIXES: .o .cxx
@@ -89,11 +84,6 @@ po_update:
 	xgettext --keyword=_ --keyword=ng_ --language=Shell --from-code=utf-8 --output locales/$(INSTALL_YTDLP_SCRIPTNAME).pot $(SCRIPTS_DIR)/$(INSTALL_YTDLP_SCRIPTNAME).sh
 	msgmerge --update locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po  locales/$(INSTALL_YTDLP_SCRIPTNAME).pot
 
-# Install system packages required for compilation
-deb_compile_deps:
-	@printf "Installing system packages required for compilation at Debian. \033[1m sudo password is required to proceed. Please enter password...\033[0m\n"
-	sudo install $(COMPILATION_DEPS_DEBIAN)
-
 
 DEB_BLD_DIR=/tmp/fltube_deb_build
 deb_package: install
@@ -111,12 +101,8 @@ deb_package: install
 	dpkg-deb --root-owner-group --build $(DEB_BLD_DIR) $(DEB_BLD_DIR)/$(DEB_PACKAGE_NAME)
 	@printf "\033[32mPackage built at: $(DEB_BLD_DIR)/$(DEB_PACKAGE_NAME)\033[0m. Install using 'apt install [path_to_pkg]'...\n"
 
-# Install system packages required for compilation
-tcz_compile_deps:
-	@printf "Installing system packages required for compilation at TinyCore systems.\n"
-	tce-load -i $(COMPILATION_DEPS_TINYCORE)
 
-	TCZ_BLD_DIR=/tmp/fltube_tcz_build
+TCZ_BLD_DIR=/tmp/fltube_tcz_build
 tcz_package: install
 	rm -rf $(TCZ_BLD_DIR) && mkdir -p $(TCZ_BLD_DIR)/build
 	cp -R $(PREFIX)/usr $(TCZ_BLD_DIR)/build
@@ -152,4 +138,4 @@ clean:
 	fi
 	rm -f $(BUILD_DIR)/*.o $(TARGET) 2> /dev/null && rm -rf $(BUILD_DIR)/usr/local $(BUILD_DIR)/usr/ $(BUILD_DIR)/usr/local/etc/fltube $(BUILD_DIR)/usr/local/etc && rmdir $(BUILD_DIR)
 
-.PHONY: all clean build compile_fluid po_update install uninstall deb_package deb_compile_deps tcz_package tcz_compile_deps
+.PHONY: all clean build compile_fluid po_update install uninstall deb_package tcz_package
