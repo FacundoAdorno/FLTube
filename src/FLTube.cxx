@@ -16,6 +16,7 @@
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
 #include "../include/configuration_manager.h"
+#include "../include/userdata_manager.h"
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -66,6 +67,8 @@ std::string DOWNLOAD_VIDEO_CODEC;
 MediaPlayerInfo* media_player;
 
 ConfigurationManager* config = nullptr;
+
+UserDataManager* userdata = nullptr;
 
 Fl_PNG_Image* live_image = nullptr;
 
@@ -350,6 +353,7 @@ void pre_init() {
         CONFIGFILE_PATH = (std::filesystem::exists(USER_CONFIGFILE_PATH)) ? USER_CONFIGFILE_PATH : SYSTEM_CONFIGFILE_PATH;
     logAtTerminal(_("Loading configurations from ") + CONFIGFILE_PATH, LogLevel::DEBUG);
     config = new ConfigurationManager(CONFIGFILE_PATH.c_str());
+    userdata = new UserDataManager("/home/facujosegrabacion/Documentos/Desarrollo/FLTube/src/datos2.txt", 202);
     AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
 
     if ( !AVOID_INITIAL_CHECKS && !isInstalledYTDLP() ) {
