@@ -27,6 +27,9 @@
 #include <cstring>
 #include <string>
 
+/* The @VERSION MUST be expressed as numbers separated by dots (<number>.<number>.<number>), in example: 2.10.3.
+ * MUST NOT BE something like "2.10.3.rc1"...
+ */
 static const char* VERSION = "2.0.3";
 
 enum LogLevel { INFO, WARN, ERROR, DEBUG };
@@ -56,5 +59,6 @@ static void getPreviousSearchResults_cb(Fl_Widget*, Fl_Input *input);
 static void getNextSearchResults_cb(Fl_Widget*, Fl_Input *input);
 void showUsage(bool exitApp);
 static void parseOptions(int argc, char **argv);
+static int getIntVersion();
 
 #endif

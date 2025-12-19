@@ -466,3 +466,26 @@ std::vector<std::string> tokenize(std::string s, const char delimiter) {
     return tokens;
 }
 
+// Replace from @original_text all ocurrences of @toReplace with @theReplace substring.
+void replace_all(std::string &original_text, const std::string &toReplace, const std::string &theReplace) {
+    //TODO make necessary check (empty string, etc)
+    size_t pos = 0;
+    bool keepsearching = true;
+    while (keepsearching) {
+        pos = original_text.find(toReplace, pos);
+        if (pos == std::string::npos) {
+            keepsearching = false;
+        } else {
+            original_text.erase(pos, toReplace.length());
+            original_text.insert(pos, theReplace);
+            pos += theReplace.length();
+        }
+    }
+}
+
+/**
+ * Returns true if parameter string represents a number.
+ */
+bool isNumber(const std::string& str) {
+    return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
+}

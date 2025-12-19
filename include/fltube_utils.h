@@ -166,4 +166,8 @@ void trim(std::string &s);
 
 std::vector<std::string> tokenize(std::string s, const char delimiter);
 
+void replace_all(std::string &original_text, const std::string &toReplace, const std::string &theReplace);
+
+bool isNumber(const std::string& str);
+
 #endif

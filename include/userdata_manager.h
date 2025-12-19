@@ -22,6 +22,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include "../include/fltube_utils.h"
 
 
 //TODO Delete this struct and use in its place the YTDLP_Video_Metadata struct...
@@ -35,6 +36,7 @@ struct Video {
     std::string thumbnail_url;
 };
 
+// A VideoList is only a view of videos in a List, cannot be modified directly.
 class VideoList {
     protected:
         std::string name;
@@ -42,12 +44,52 @@ class VideoList {
         std::unique_ptr<std::vector<Video*>> list;
     public:
         VideoList(std::string name, bool canBeManipulated);
-        void addVideo(Video* v);
-        void removeVideo(std::string id);
+
         int getLength();
+
         std::string getName();
+
+        Video* getVideoAt(int position);
+
+        //Print on terminal all videos from begining of videolist.
+        void printElementsOnTerminal() {
+            for (auto it=list->begin(); it != list->end() ; it++ ) {
+                Video* v = static_cast<Video*>(*it);
+                std::cout << "Video: " << v->id << "\n";
+            }
+        }
+
         //Determine if user can change the content of the list manually or not (for example, History cannot be directly manipulated)...
         bool isChangeable();
+
+        // Return a list with YTDLP_Video_Metadata objects.
+        std::vector<YTDLP_Video_Metadata*> getYTDLPVideoList() {
+            std::vector<YTDLP_Video_Metadata*> result = {};
+            for (int i = 0; i < list->size() ; ++i) {
+                YTDLP_Video_Metadata* ytdlp_v = new YTDLP_Video_Metadata();
+                Video* v = list->at(i);
+                ytdlp_v->id = v->id;
+                ytdlp_v->title = v->title;
+                ytdlp_v->creators = v->creator;
+                ytdlp_v->channel_id = v->channel_id;
+                ytdlp_v->viewers_count = v->views;
+                ytdlp_v->duration = v->duration;
+                ytdlp_v->thumbnail_url = v->thumbnail_url;
+                ytdlp_v->upload_date = "-";
+                ytdlp_v->live_status = "-";
+                result.push_back(ytdlp_v);
+            }
+            return result;
+        };
+};
+
+// A InternalVideoList can be modified directly (add, remove), only must be used by UserDataManager.class.
+class InternalVideoList: public VideoList {
+    public:
+        InternalVideoList(std::string name, bool canBeManipulated)
+            :VideoList(name, canBeManipulated) {};
+        void addVideo(Video* v);
+        void removeVideo(std::string id);
 };
 
 /**
@@ -67,25 +109,41 @@ class VideoList {
  *  Siguen las listas de IDs de videos. Existen 2 listas creadas por defecto: la @UserDataManager::HISTORY_LIST_NAME y la @UserDataManager::LIKED_LIST_NAME.
  */
 class UserDataManager {
+    //TODO this must be a base class, and create a subclass TXTUserDataManager for this case
     protected:
-        int software_version;
+        // Original version used when save the userdata file processed when instantate this manager class.
+        int userdatafile_software_version;
+        // The current version on which this program is running (@FLTube->VERSION). Used when saving a new userdata file.
+        int current_software_version;
         // Path to file containing user video data.
         std::string userdata_filepath;
         // All videos that an user has interacted (played it, liked it, saved it in a custom list, etc.)...
         std::unique_ptr<std::map<std::string, Video*>> videos;
         // Custom lists have an unique name and a vector of Video:id's.
-        std::unique_ptr<std::map<std::string, VideoList*>> custom_lists;
+        std::unique_ptr<std::map<std::string, InternalVideoList*>> custom_lists;
 
 
-        /** Loads the videos saved and the differents lists of videos (History, Likes, etc.).
+        /** Loads from @filepath the videos saved and the differents lists of videos (History, Likes, etc.).
          * Returns 0 if all was OK.
+         * HOOK METHOD (can be reimplemented if new forms of saving data is implemented)...
          */
-        int loadData(std::string filepath);
+        int loadData(std::string filepath, int current_version);
 
-        bool existsVideoList(std::string name);
 
-        // Return true if Video was saved previously saved in any VideoList.
-        bool existsVideo(Video v);
+        /* Save at @filepath the videos and the differents lists created (History, Likes, etc.).
+         * Returns 0 if all was OK.
+         * HOOK METHOD (can be reimplemented if new forms of saving data is implemented)...
+         */
+        int saveData(std::string filepath);
+
+        /*
+         * Add a video to the general list of videos hold by this class.
+         * Return true if video was added correctly and not exist previously at list.
+         */
+        bool addVideoInternal(Video* v);
+
+        InternalVideoList* getInternalVideoList(std::string name);
+
     public:
 
         static std::string HISTORY_LIST_NAME;
@@ -93,6 +151,8 @@ class UserDataManager {
 
         static std::string VIDEOS_TXT_SEPARATOR;
         static std::string LISTS_TXT_SEPARATOR;
+
+        static const char FIELD_SEPARATOR = '>';
 
         /**
          * Constructor. Parameters definition:
@@ -102,15 +162,14 @@ class UserDataManager {
         UserDataManager(std::string userdata_filepath, int current_version);
         ~UserDataManager();
 
-        /** Save at filepath the videos and the differents lists created (History, Likes, etc.).
-         * Returns 0 if all was OK.
-         */
-        int saveData(std::string filepath);
+
 
         /** Erase all data saved at userdata filepath, besides delete all elements at memory.
          * Returns 0 if all was OK.
          */
         int eraseAllUserData();
+
+        bool existsVideoList(std::string name);
 
         // If list doesnt exists, return nullptr.
         VideoList* getVideoList(std::string name);
@@ -122,10 +181,17 @@ class UserDataManager {
 
         VideoList* getLikedVideosList();
 
-        bool addVideo(Video v, std::string name);
+        // Return true if Video was saved previously saved in any VideoList.
+        bool existsVideo(Video* v);
+
+        // Add/remove videos from an existing list.
+        bool addVideo(Video* v, std::string listName);
 
         // Returns the FLTube version used to save a specific file
-        int getVersion(std::string filepath);
+        int getVersion();
+
+        // For saving data in the permanent storage.
+        int persist();
 };
 
 #endif //USERDATA_MANAGER_H

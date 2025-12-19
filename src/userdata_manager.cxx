@@ -12,7 +12,6 @@
  */
 
 #include "../include/userdata_manager.h"
-#include "../include/fltube_utils.h"
 
 std::string UserDataManager::HISTORY_LIST_NAME = "Navigation History";
 std::string UserDataManager::LIKED_LIST_NAME = "Liked";
@@ -20,34 +19,55 @@ std::string UserDataManager::VIDEOS_TXT_SEPARATOR = "===VIDEOS===";
 std::string UserDataManager::LISTS_TXT_SEPARATOR = "===LISTS===";
 
 UserDataManager::UserDataManager(std::string userdata_filepath, int current_version)
-    : userdata_filepath(userdata_filepath), software_version(current_version),
+    : userdata_filepath(userdata_filepath), userdatafile_software_version(current_version),
         videos(std::make_unique<std::map<std::string, Video*>>()),
-        custom_lists(std::make_unique<std::map<std::string, VideoList*>>())
+        current_software_version(current_version),
+        custom_lists(std::make_unique<std::map<std::string, InternalVideoList*>>())
     {
         //Ensuring create at least the two empty default lists (HISTORY and LIKED).
-        (*custom_lists)[UserDataManager::HISTORY_LIST_NAME] = new VideoList(UserDataManager::HISTORY_LIST_NAME, false);
-        (*custom_lists)[UserDataManager::LIKED_LIST_NAME] = new VideoList(UserDataManager::LIKED_LIST_NAME, false);
+        (*custom_lists)[UserDataManager::HISTORY_LIST_NAME] = new InternalVideoList(UserDataManager::HISTORY_LIST_NAME, false);
+        (*custom_lists)[UserDataManager::LIKED_LIST_NAME] = new InternalVideoList(UserDataManager::LIKED_LIST_NAME, false);
 
+        if ( loadData(userdata_filepath, current_version) != 0) {
+            std::string bkp_filepath = userdata_filepath + ".bkp";
+            std::cerr << "There was an error when loading data from " << userdata_filepath
+                      << ". The file will be rewritted, and previous copied to a backup file "
+                      << bkp_filepath  << ".\n";
+            std::filesystem::copy_file(userdata_filepath, bkp_filepath, std::filesystem::copy_options::overwrite_existing);
+            return;
+        }
+
+        std::cout << "User Data was loaded correctly from " << userdata_filepath << ".\n";
+
+        //NOTE: If userdata_filepath doesn't exists, then this file will be created when close and exiting FLTube.
+    }
+
+    int UserDataManager::loadData(std::string filepath, int current_version) {
         //Load userdata file if exists and parse it if exists...
-        if ( std::filesystem::exists(userdata_filepath)) {
+        if ( std::filesystem::exists(filepath)) {
             std::ifstream userdata_file;
-            userdata_file.open(userdata_filepath, std::ofstream::in);
+            userdata_file.open(filepath, std::ofstream::in);
             if (!userdata_file.is_open())
-                std::cerr << "The user data file at " << userdata_filepath << " doesn't exists. Will be created at program exit...\n";
+                std::cerr << "The user data file at " << filepath << " doesn't exists. Will be created at program exit...\n";
 
             //Read the first line, the VERSION used to saved the current state of the userdata file
             std::string line, version_str, data;
-            int version_i;
             std::getline(userdata_file, version_str);
-            try {
-                version_i = std::stoi(version_str);
-            } catch (const std::invalid_argument& e) {
-                fprintf(stderr, _("Error while parsing version number at '%s' userdata file. Aborting the processing...\n"), userdata_filepath.c_str());
-                //Exit without continue processing file...
-                return;
+            if (!isNumber(version_str)) {
+                std::cout << "ERROR: version specified at first line is not valid. Abort processing...\n";
+                return 1;
+            } else {
+                int version_i;
+                try {
+                    version_i = std::stoi(version_str);
+                } catch (const std::invalid_argument& e) {
+                    fprintf(stderr, _("Error while parsing version number at '%s' userdata file. Abort processing...\n"), filepath.c_str());
+                    return 1;   //Exit without continue processing file...
+                }
+                this->userdatafile_software_version = version_i;
+                std::cout << "VERSION USED TO SAVE CURRENT USERDATA FILE: " << version_str.at(0) << "."
+                            << version_str.at(1) << "." << version_str.substr(2) <<"\n";
             }
-            std::cout << "VERSION USED TO SAVE CURRENT USERDATA FILE: " << version_str.at(0) << "."
-                << version_str.at(1) << "." << version_str.substr(2) <<"\n";
             // TODO determine what to do if version of a saved file is older than current FLTube version...
 
             // Parsing userdata from loaded file...
@@ -69,7 +89,7 @@ UserDataManager::UserDataManager(std::string userdata_filepath, int current_vers
                         continue;
                     }
                     if (parse_videos_flag) {
-                        auto video_fields = tokenize(line,'>');
+                        auto video_fields = tokenize(line, FIELD_SEPARATOR);
                         if (video_fields.size() < 7 || video_fields.size() > 7) {
                             // If video data has a bad format, then avoid processing of current line...
                             printf("ABORT VIDEO PROCESSING. Video field size = %lu \n", video_fields.size());
@@ -97,11 +117,15 @@ UserDataManager::UserDataManager(std::string userdata_filepath, int current_vers
                         if (list_elements.empty() || list_elements.at(0).empty())
                             continue;   // A list must have at least a name, otherwise avoid current line processing...
                         std::string list_name = list_elements.at(0);
-                        VideoList* vl;
+                        InternalVideoList* vl;
+                        if (existsVideoList(list_name) && list_name != UserDataManager::HISTORY_LIST_NAME && list_name != UserDataManager::LIKED_LIST_NAME) {
+                            std::cout << "List '" << list_name << "' is duplicated at userdata file. Avoiding to add duplication...\n";
+                            continue;
+                        }
                         if (list_name != UserDataManager::HISTORY_LIST_NAME && list_name != UserDataManager::LIKED_LIST_NAME)
-                            vl = new VideoList(list_name, true);
+                            vl = new InternalVideoList(list_name, true);
                         else
-                           vl = (*custom_lists)[list_name];
+                            vl = (*custom_lists)[list_name];
                         for (auto i = 1; i < list_elements.size() ; i++) {
                             if (list_elements.at(i) == "") continue;
                             //Add the the videos to the list, only if they exists at videos general list...
@@ -109,7 +133,7 @@ UserDataManager::UserDataManager(std::string userdata_filepath, int current_vers
                             if (video_at_list != videos->end()) {
                                 vl->addVideo(video_at_list->second);
                             } else {
-                               std::cout << "Video not found: " << list_elements.at(i) << "\n";
+                                std::cout << "Video not found: " << list_elements.at(i) << "\n";
                             }
                         }
                         (*custom_lists)[list_name] = vl;
@@ -120,11 +144,130 @@ UserDataManager::UserDataManager(std::string userdata_filepath, int current_vers
             }
             userdata_file.close();
         }
+        return 0;
+    }
 
-        // printf("Video {%s, %s, %s, %s, %s, %s, %s}\n", v->id.c_str(), v->title.c_str(), v->creator.c_str(), v->channel_id.c_str(), v->views.c_str(), v->duration.c_str(), v->thumbnail_url.c_str());
+UserDataManager::~UserDataManager(){
+    if ( this->saveData(this->userdata_filepath) == 0) {
+        std::cout << "Userdata was saved succesfully at '" << this->userdata_filepath << "' file.\n";
+    } else {
+        std::cerr << "Userdata file cannot be saved at '"<< this->userdata_filepath << "'!!! Check if you have write permission on directory...";
+    }
 
-        //NOTE: If userdata_filepath doesn't exists, then this file will be created when close and exiting FLTube.
-    };
+    for (auto& pair : *videos) {
+        delete pair.second;
+    }
+    videos->clear();
+
+    for (auto& pair : *custom_lists) {
+        delete pair.second;
+    }
+    custom_lists->clear();
+}
+
+int UserDataManager::saveData(std::string filepath) {
+    std::ofstream outputfile;
+    if ( std::filesystem::exists(userdata_filepath) ) {
+        //Making a backup of previous file (if exists) before saving new data...
+        std::filesystem::copy_file(userdata_filepath, filepath + ".bkp", std::filesystem::copy_options::overwrite_existing);
+    }
+    //Open file (and create if not exists) for write.
+    outputfile.open(filepath, std::ofstream::trunc);
+    outputfile << current_software_version << "\n";
+    //Write video info...
+    outputfile << UserDataManager::VIDEOS_TXT_SEPARATOR << "\n";
+    Video* v;
+    for (auto it = videos->begin(); it != videos->end() ;it++) {
+        //id>title>creator>channel_id>views>duration>thumbnail_url
+        v = it->second;
+        outputfile << v->id << FIELD_SEPARATOR << v->title << FIELD_SEPARATOR << v->creator << FIELD_SEPARATOR
+                    << v->channel_id << FIELD_SEPARATOR << v->views << FIELD_SEPARATOR << v->duration << FIELD_SEPARATOR
+                    << v->thumbnail_url << "\n";
+    }
+    //Write video lists info...
+    outputfile << UserDataManager::LISTS_TXT_SEPARATOR << "\n";
+    InternalVideoList* vl;
+    for (auto it = custom_lists->begin(); it != custom_lists->end() ;it++) {
+        vl = it->second;
+        outputfile << vl->getName() << FIELD_SEPARATOR;
+        for (int pos = 0; pos < vl->getLength(); pos++) {
+            outputfile << vl->getVideoAt(pos)->id;
+            if (pos < vl->getLength() - 1) outputfile << FIELD_SEPARATOR;
+        }
+        outputfile << "\n";
+    }
+    outputfile.close();
+    return 0;
+}
+
+bool UserDataManager::existsVideoList(std::string name) {
+    auto it = custom_lists->find(name);
+    return (it != custom_lists->end());
+}
+
+bool UserDataManager::existsVideo(Video* v) {
+    if (v == nullptr) {
+        std::cerr << "Video is a null pointer... Cannot proceed.\n";
+        return false;
+    }
+    auto it = videos->find(v->id);
+    return (it != videos->end());
+}
+
+InternalVideoList* UserDataManager::getInternalVideoList(std::string name) {
+    if (existsVideoList(name))
+        return custom_lists->find(name)->second;
+    else
+        return nullptr;
+}
+
+VideoList* UserDataManager::getVideoList(std::string name) {
+    return getInternalVideoList(name);
+}
+
+VideoList* UserDataManager::getHistoryList() {
+    return this->getVideoList(UserDataManager::HISTORY_LIST_NAME);
+}
+
+VideoList* UserDataManager::getLikedVideosList() {
+    return this->getVideoList(UserDataManager::LIKED_LIST_NAME);
+}
+
+int UserDataManager::getVersion() {
+    return this->userdatafile_software_version;
+}
+
+bool UserDataManager::addVideoInternal(Video* v) {
+    if ( !this->existsVideo(v) ) {
+        (*videos)[v->id] = v;
+        return true;
+    }
+    return false;
+}
+
+bool UserDataManager::addVideo(Video* v, std::string listName) {
+    if (v == nullptr || listName.empty()) {
+        std::cerr << "Cannot add video because one of the parameters, list or name, is empty...\n";
+        return false;
+    }
+    if ( !this->existsVideoList(listName) ) {
+        std::cerr << "Cannot add video to an inexisting list '" << listName <<"'.\n";
+        return false;
+    }
+
+    if ( !existsVideo(v) ) this->addVideoInternal(v);
+    getInternalVideoList(listName)->addVideo(v);
+    return true;
+}
+
+int UserDataManager::persist() {
+    return this->saveData(this->userdata_filepath);
+}
+
+int UserDataManager::eraseAllUserData() {
+    //TODO finish it...
+    return 0;
+}
 
 
 //  ---------------
@@ -136,15 +279,38 @@ VideoList::VideoList(std::string name, bool canBeManipulated):
         list = std::make_unique<std::vector<Video*>>();
     };
 
-void VideoList::addVideo(Video* v) {
+int VideoList::getLength() {
+    return list->size();
+}
+
+std::string VideoList::getName() {
+    return name;
+}
+
+Video* VideoList::getVideoAt(int position) {
+    if (position >= this->getLength()) return nullptr;
+    else return this->list->at(position);
+}
+
+//Determine if user can change the content of the list manually or not (for example, History cannot be directly manipulated)...
+bool VideoList::isChangeable() {
+    return canBeManiputaledByUser;
+}
+
+// This method only adds a video to the list if this was not previously added.
+void InternalVideoList::addVideo(Video* v) {
     if (v == nullptr) {
         std::cout << "Error: Cannot add a null video.\n";
         return;
     }
-    if (list != nullptr) list->push_back(v);
+    for (int i = 0; i < list->size(); ++i) {
+        if (list->at(i)->id == v->id)
+            return; // Avoid adding a video if already exists at list...
+    }
+    list->push_back(v);
 }
 
-void VideoList::removeVideo(std::string id) {
+void InternalVideoList::removeVideo(std::string id) {
     if (id.empty()) return;
     Video* v;
     for (int i = 0; i < list->size(); i++) {
@@ -154,16 +320,4 @@ void VideoList::removeVideo(std::string id) {
             break;
         }
     }
-}
-
-int VideoList::getLength() {
-    return list->size();
-}
-
-std::string VideoList::getName() {
-    return name;
-}
-//Determine if user can change the content of the list manually or not (for example, History cannot be directly manipulated)...
-bool VideoList::isChangeable() {
-    return canBeManiputaledByUser;
 }

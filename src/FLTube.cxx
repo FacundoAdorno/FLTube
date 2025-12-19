@@ -48,6 +48,8 @@ bool SEARCH_BY_CHANNEL_F = false;
 
 std::string USER_CONFIGFILE_PATH = std::string(getHomePathOr("")) + "/.config/fltube/fltube.conf";
 
+std::string USERDATA_FILE_PATH = std::string(getHomePathOr("")) + "/.local/share/fltube/userdata.txt";
+
 std::string SYSTEM_CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
 
 std::string CONFIGFILE_PATH = "";
@@ -84,6 +86,7 @@ void exitApp(unsigned short int exitStatusCode = FLT_OK) {
     if (helpWin != nullptr) delete helpWin;
     if (message_window != nullptr) delete message_window;
     delete mainWin;
+    delete userdata;
     //Exiting the app...
     logAtTerminal(_("Closing FLtube... Bye!\n"), LogLevel::INFO);
     exit(exitStatusCode);
@@ -353,7 +356,8 @@ void pre_init() {
         CONFIGFILE_PATH = (std::filesystem::exists(USER_CONFIGFILE_PATH)) ? USER_CONFIGFILE_PATH : SYSTEM_CONFIGFILE_PATH;
     logAtTerminal(_("Loading configurations from ") + CONFIGFILE_PATH, LogLevel::DEBUG);
     config = new ConfigurationManager(CONFIGFILE_PATH.c_str());
-    userdata = new UserDataManager("/home/facujosegrabacion/Documentos/Desarrollo/FLTube/src/datos2.txt", 202);
+    //TODO la ruta tiene que ser otra, ~/.local/share/fltube/userdata.txt
+    userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion());
     AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
 
     if ( !AVOID_INITIAL_CHECKS && !isInstalledYTDLP() ) {
@@ -653,6 +657,20 @@ void parseOptions(int argc, char **argv){
     if (existsCmdOption(argc, argv, "-d") || existsCmdOption(argc, argv, "--debug")) {
         printf(_("DEBUG MODE enabled.\n"));
         DEBUG_ENABLED = 0;
+    }
+}
+
+// Returns the current version of this software expressed as an Integer (for example: 2.1.4 is expressed as 214).
+int getIntVersion() {
+    std::string version(VERSION);
+    replace_all(version, ".", "");
+    try {
+        return std::stoi(version);
+    } catch (const std::invalid_argument& e) {
+        char message[256];
+        snprintf(message, sizeof(message), "Error on VERSION number format (%s). The version must be expressed as numbers separated by dots.\n", VERSION);
+        logAtTerminal(message, LogLevel::ERROR);
+        return -100000;
     }
 }
 
