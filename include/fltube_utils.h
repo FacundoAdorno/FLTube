@@ -54,6 +54,11 @@ const std::string DEFAULT_PLAYER_EXTRAPARAMS_LIVE = "-demuxer lavf -cache 2048";
 const std::string DOWNLOAD_VIDEO_PREFERRED_EXT = "mp4";
 
 const std::string YOUTUBE_EXTRACTOR_NAME = "youtube";
+
+const std::string HTTP_PREFIX = "http://";
+const std::string HTTPS_PREFIX = "https://";
+const std::string YOUTUBE_URL_PREFIX = HTTPS_PREFIX + "youtu.be/";
+
 /*Enum for the target video resolutions. */
 enum VCODEC_RESOLUTIONS {
     R240p = 240, R360p = 360, R480p = 480, R720p = 720, R1080p = 1080 };

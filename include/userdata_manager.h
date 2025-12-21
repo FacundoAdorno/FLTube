@@ -34,6 +34,14 @@ struct Video {
     std::string views;
     std::string duration;
     std::string thumbnail_url;
+
+    //Empty constructor
+    Video() {}
+
+    Video(std::string id, std::string title, std::string creator, std::string channel_id, std::string views,
+          std::string duration, std::string thumbnail_url):
+          id(id), title(title), creator(creator), channel_id(channel_id), views(views),
+          duration(duration), thumbnail_url(thumbnail_url) {}
 };
 
 // A VideoList is only a view of videos in a List, cannot be modified directly.
@@ -50,6 +58,9 @@ class VideoList {
         std::string getName();
 
         Video* getVideoAt(int position);
+
+        // Search a video by its id. If does not exists at this list, a nullptr is returned.
+        Video* findVideoById(std::string id);
 
         //Print on terminal all videos from begining of videolist.
         void printElementsOnTerminal() {
@@ -129,6 +140,10 @@ class UserDataManager {
          */
         int loadData(std::string filepath, int current_version);
 
+        /*
+         * Check if a video is dangling, it means, that is not added in any videolist.
+         */
+        bool isADanglingVideo(Video* v);
 
         /* Save at @filepath the videos and the differents lists created (History, Likes, etc.).
          * Returns 0 if all was OK.

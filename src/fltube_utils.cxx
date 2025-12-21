@@ -13,10 +13,6 @@
 
 #include "../include/fltube_utils.h"
 
-const std::string HTTP_PREFIX = "http://";
-const std::string HTTPS_PREFIX = "https://";
-const std::string YOUTUBE_URL_PREFIX = HTTPS_PREFIX + "youtu.be/";
-
 /** Mapping FS_PERMISSION_NAMES to corresponding std::filesystem::perms. */
 static const std::map<SIMPLE_FS_PERMISSION, std::map<std::string, std::filesystem::perms>> perms_map = {
     {CAN_READ,

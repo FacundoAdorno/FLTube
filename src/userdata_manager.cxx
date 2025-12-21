@@ -180,6 +180,9 @@ int UserDataManager::saveData(std::string filepath) {
     for (auto it = videos->begin(); it != videos->end() ;it++) {
         //id>title>creator>channel_id>views>duration>thumbnail_url
         v = it->second;
+        if (isADanglingVideo(v)) {
+            continue;   //Avoid to write any video that is dangling...
+        }
         outputfile << v->id << FIELD_SEPARATOR << v->title << FIELD_SEPARATOR << v->creator << FIELD_SEPARATOR
                     << v->channel_id << FIELD_SEPARATOR << v->views << FIELD_SEPARATOR << v->duration << FIELD_SEPARATOR
                     << v->thumbnail_url << "\n";
@@ -198,6 +201,20 @@ int UserDataManager::saveData(std::string filepath) {
     }
     outputfile.close();
     return 0;
+}
+
+bool UserDataManager::isADanglingVideo(Video* v) {
+    bool videoFound = false;
+    if ( v != nullptr && existsVideo(v)) {
+        for (auto it = custom_lists->begin(); it != custom_lists->end() ; it++) {
+            //auto it = videos->find(v->id);
+            if (it->second->findVideoById(v->id) != nullptr ) {
+                videoFound = true;
+                break;
+            }
+        }
+    }
+    return !videoFound;
 }
 
 bool UserDataManager::existsVideoList(std::string name) {
@@ -287,6 +304,15 @@ std::string VideoList::getName() {
     return name;
 }
 
+Video* VideoList::findVideoById(std::string id) {
+    if (!id.empty()) {
+        for (int i = 0; i < list->size(); ++i) {
+            if (list->at(i)->id == id) return list->at(i);
+        }
+    }
+    return nullptr;
+}
+
 Video* VideoList::getVideoAt(int position) {
     if (position >= this->getLength()) return nullptr;
     else return this->list->at(position);
@@ -303,9 +329,8 @@ void InternalVideoList::addVideo(Video* v) {
         std::cout << "Error: Cannot add a null video.\n";
         return;
     }
-    for (int i = 0; i < list->size(); ++i) {
-        if (list->at(i)->id == v->id)
-            return; // Avoid adding a video if already exists at list...
+    if (findVideoById(v->id) != nullptr) {
+        return; // Avoid adding a video if already exists at list...
     }
     list->push_back(v);
 }

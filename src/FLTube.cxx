@@ -74,6 +74,8 @@ UserDataManager* userdata = nullptr;
 
 Fl_PNG_Image* live_image = nullptr;
 
+Fl_PNG_Image* already_viewed_image = nullptr;
+
 /**
  * Callback for main window close action. By default, exit app with success status code (0).
  */
@@ -85,8 +87,8 @@ void exitApp(unsigned short int exitStatusCode = FLT_OK) {
     std::filesystem::remove_all(FLTUBE_TEMPORAL_DIR);
     if (helpWin != nullptr) delete helpWin;
     if (message_window != nullptr) delete message_window;
-    delete mainWin;
     delete userdata;
+    delete mainWin;
     //Exiting the app...
     logAtTerminal(_("Closing FLtube... Bye!\n"), LogLevel::INFO);
     exit(exitStatusCode);
@@ -273,6 +275,17 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
     std::string* url = static_cast<std::string*>(video_url);
     if (url){
         VideoInfo *vi = static_cast<VideoInfo *>(widget->parent());
+        //Registering view of current video at History List...
+        std::string id = *url;
+        replace_all(id, std::string(YOUTUBE_URL_PREFIX), "");
+        for (YTDLP_Video_Metadata* ytv : video_metadata) {
+            if (ytv->id == id) {
+                Video* v = new Video(id, ytv->title, ytv->creators, ytv->channel_id, ytv->viewers_count, ytv->duration, ytv->thumbnail_url);
+                userdata->addVideo(v, UserDataManager::HISTORY_LIST_NAME);
+                break;
+            }
+        }
+        //Stream video section...
         char message[256];
         snprintf(message, sizeof(message), _("Starting streaming preview of video '%s' - (%s)..."), vi->title->label(), url->c_str());
         logAtTerminal(message,LogLevel::INFO);
@@ -305,6 +318,11 @@ void update_video_info() {
                 video_info_arr[j]->is_live_image->show();
             } else {
                 video_info_arr[j]->is_live_image->hide();
+            }
+            if (userdata->getHistoryList()->findVideoById(video_metadata[j]->id) != nullptr) {
+                video_info_arr[j]->already_viewed_icon->show();
+            } else {
+                video_info_arr[j]->already_viewed_icon->hide();
             }
             try {
                 snprintf(text_buffer, sizeof(text_buffer), "%s %s", get_metric_abbreviation(std::stoi(video_metadata[j]->viewers_count))->c_str(), (is_livestream) ? _("viewers") : _("views"));
@@ -356,7 +374,6 @@ void pre_init() {
         CONFIGFILE_PATH = (std::filesystem::exists(USER_CONFIGFILE_PATH)) ? USER_CONFIGFILE_PATH : SYSTEM_CONFIGFILE_PATH;
     logAtTerminal(_("Loading configurations from ") + CONFIGFILE_PATH, LogLevel::DEBUG);
     config = new ConfigurationManager(CONFIGFILE_PATH.c_str());
-    //TODO la ruta tiene que ser otra, ~/.local/share/fltube/userdata.txt
     userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion());
     AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
 
@@ -394,6 +411,7 @@ void pre_init() {
             logAtTerminal(_("Default streaming resolution (360p) changed at configuration to this new resolution: ") + std::to_string(STREAM_VIDEO_RESOLUTION), LogLevel::DEBUG);
     }
     live_image = load_resource_image("livebutton_18p.png");
+    already_viewed_image = load_resource_image("clock_18p.png");
 
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
@@ -457,6 +475,7 @@ VideoInfo* create_video_group(int posx, int posy) {
     video_info->thumbnail->callback((Fl_Callback*)preview_video_cb);
     video_info->userUploader->callback((Fl_Callback*)getYTChannelVideo_cb);
     if (live_image != nullptr) video_info->is_live_image->image(live_image);
+    if (already_viewed_image != nullptr) video_info->already_viewed_icon->image(already_viewed_image);
     return video_info;
 }
 

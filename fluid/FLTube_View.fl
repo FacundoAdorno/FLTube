@@ -33,7 +33,7 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 
 widget_class FLTubeMainWindow {
   label FLTube open
-  xywh {568 142 593 540}
+  xywh {0 0 593 540}
   class Fl_Double_Window visible
 } {
   Fl_Group {} {
@@ -71,17 +71,20 @@ widget_class FLTubeMainWindow {
   }
 }
 
-widget_class VideoInfo {
-  xywh {690 282 577 91} hide position_relative
+widget_class VideoInfo {open selected
+  xywh {0 0 577 91} visible position_relative
 } {
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
   }
   Fl_Box views_spectators {
-    tooltip {Total video views, or if live current count of concurrent spectators.} bind_image 1 xywh {105 45 110 20} align 372
+    tooltip {Total video views, or if live current count of concurrent spectators.} bind_image 1 xywh {105 43 110 20} align 372
   }
   Fl_Box is_live_image {
-    tooltip {The video is live.} bind_image 1 xywh {220 45 40 20} align 288 hide
+    tooltip {The video is live.} bind_image 1 xywh {220 43 40 20} align 288 hide
+  }
+  Fl_Box already_viewed_icon {
+    tooltip {You have view this video in the past.} xywh {265 43 20 20} align 288 hide
   }
   Fl_Box title {
     xywh {105 6 450 37} labelfont 1 align 213
@@ -135,8 +138,8 @@ widget_class TinyChoiceWindow {
 
 widget_class HelpFLTubeWindow {
   label {FLTube Help} open
-  xywh {620 195 480 352}
-  class Fl_Double_Window modal visible
+  xywh {0 0 480 352} hide
+  class Fl_Double_Window modal
 } {
   Fl_Group {} {
     xywh {15 14 448 144}
@@ -189,7 +192,7 @@ widget_class HelpFLTubeWindow {
     xywh {15 158 450 183}
   } {
     Fl_Group howtouse_tab {
-      label {How to use} open selected
+      label {How to use} open
       xywh {15 183 450 158} selection_color 47 labelfont 1
     } {
       Fl_Text_Display howtouse_txt {

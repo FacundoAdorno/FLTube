@@ -47,6 +47,7 @@ public:
   Fl_Button *thumbnail;
   Fl_Box *views_spectators;
   Fl_Box *is_live_image;
+  Fl_Box *already_viewed_icon;
   Fl_Box *title;
   Fl_Box *duration;
   Fl_Box *uploadDate;
