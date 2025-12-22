@@ -77,21 +77,27 @@ class VideoList {
         std::vector<YTDLP_Video_Metadata*> getYTDLPVideoList() {
             std::vector<YTDLP_Video_Metadata*> result = {};
             for (int i = 0; i < list->size() ; ++i) {
-                YTDLP_Video_Metadata* ytdlp_v = new YTDLP_Video_Metadata();
+
                 Video* v = list->at(i);
-                ytdlp_v->id = v->id;
-                ytdlp_v->title = v->title;
-                ytdlp_v->creators = v->creator;
-                ytdlp_v->channel_id = v->channel_id;
-                ytdlp_v->viewers_count = v->views;
-                ytdlp_v->duration = v->duration;
-                ytdlp_v->thumbnail_url = v->thumbnail_url;
-                ytdlp_v->upload_date = "-";
-                ytdlp_v->live_status = "-";
-                result.push_back(ytdlp_v);
+                result.push_back(toYTDLPVideo(v));
             }
             return result;
         };
+
+        YTDLP_Video_Metadata* toYTDLPVideo(Video* v) {
+            YTDLP_Video_Metadata* ytdlp_v = new YTDLP_Video_Metadata();
+            ytdlp_v->id = v->id;
+            ytdlp_v->title = v->title;
+            ytdlp_v->creators = v->creator;
+            ytdlp_v->channel_id = v->channel_id;
+            ytdlp_v->viewers_count = v->views;
+            ytdlp_v->duration = v->duration;
+            ytdlp_v->thumbnail_url = v->thumbnail_url;
+            ytdlp_v->url = YOUTUBE_URL_PREFIX + v->id;
+            ytdlp_v->upload_date = "-";
+            ytdlp_v->live_status = "-";
+            return ytdlp_v;
+        }
 };
 
 // A InternalVideoList can be modified directly (add, remove), only must be used by UserDataManager.class.
@@ -189,8 +195,14 @@ class UserDataManager {
         // If list doesnt exists, return nullptr.
         VideoList* getVideoList(std::string name);
 
+        // Return the name of every existing video list (the defaults and created by user).
+        std::vector<std::string> getVideoListNames();
+
         // If video list already exists, return false.
         bool createVideoList(std::string name);
+
+        // Delete a video list if exists (except for @HISTORY_LIST_NAME and @LIKED_LIST_NAME). Return true if all was OK.
+        bool deleteVideoList(std::string name);
 
         VideoList* getHistoryList();
 

@@ -17,6 +17,7 @@
 #include "../include/fltube_utils.h"
 #include "../include/configuration_manager.h"
 #include "../include/userdata_manager.h"
+#include <cstdio>
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -65,6 +66,9 @@ bool AVOID_INITIAL_CHECKS = 1;
 
 // This variable holds the configured video codec used when download a video.
 std::string DOWNLOAD_VIDEO_CODEC;
+
+const std::string TAB_SEARCH_NAME = "SEARCHVIDEOS_TAB";
+const std::string TAB_VIDEOLIST_NAME = "VIDEOLISTS_TABS";
 
 MediaPlayerInfo* media_player;
 
@@ -298,6 +302,15 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
 }
 
 /**
+ * Hide VideoInfo widgets.
+ */
+void clear_video_info() {
+    for (int j=0; j < video_info_arr.size(); j++) {
+        video_info_arr[j]->hide();
+    }
+}
+
+/**
  * Update the VideoInfo widgets data, based on the data on the video_metadata array.
  */
 void update_video_info() {
@@ -362,6 +375,66 @@ void update_video_info() {
             video_info_arr[j]->hide();
         }
     }
+}
+
+/**
+ * Update the elements in the video_metadata array using as input the videos in the selected list at @TAB_VIDEOLIST_NAME section.
+ * This must be called for show the videos in a saved list (History, Liked, etc...).
+ * Returns @true if there is more results to process at video list. Returns @false in otherwise.
+ */
+bool updateVideoMetadataFromVideoList() {
+    Fl::check();
+    std::string selected_list = mainWin->videolist_selector->mvalue()->label();
+    VideoList* vlist = userdata->getVideoList(selected_list);
+    int next_video_position = (SEARCH_PAGE_INDEX * SEARCH_PAGE_SIZE);
+    for (int i=0; i < SEARCH_PAGE_SIZE; i++) {
+        if (next_video_position < vlist->getLength()) {
+            video_metadata[i] = vlist->toYTDLPVideo(vlist->getVideoAt(next_video_position));
+        } else {
+            video_metadata[i] = nullptr;
+        }
+        next_video_position++;
+    }
+
+    update_video_info();
+
+    if (next_video_position < vlist->getLength())
+        mainWin->next_results_bttn->activate();
+    if (vlist->getLength() < next_video_position + 1){
+        mainWin->next_results_bttn->deactivate();     // If the list doesn't have more elements to show, deactivate next button...'
+        return false;
+    }
+
+    return true;
+}
+
+void getVideosAtList_cb(Fl_Choice* w, void* a){
+    SEARCH_PAGE_INDEX = 0;
+    mainWin->previous_results_bttn->deactivate();
+    updateVideoMetadataFromVideoList();
+};
+
+void selectCentralTab_cb(Fl_Choice* w, void* a){
+    char* tabname = static_cast<char*>(mainWin->central_tabs->value()->user_data());
+    if (tabname == TAB_VIDEOLIST_NAME) {
+        mainWin->videolist_selector->value(mainWin->videolist_selector->find_index(UserDataManager::HISTORY_LIST_NAME.c_str()));
+        mainWin->videolist_selector->set_changed();
+        mainWin->videolist_selector->do_callback();
+    }
+    if (tabname == TAB_SEARCH_NAME) {
+        mainWin->search_term_or_url->value("");
+        mainWin->previous_results_bttn->deactivate();
+        mainWin->next_results_bttn->deactivate();
+        clear_video_info();
+    }
+}
+
+/*
+ * Return the name of the current active tab at @central_tabs widget.
+ */
+std::string getActiveTabName() {
+    char* tabname = static_cast<char*>(mainWin->central_tabs->value()->user_data());
+    return std::string(tabname);
 }
 
 /**
@@ -438,6 +511,19 @@ void post_init() {
 
     mainWin->about_bttn->callback((Fl_Callback*)showFLTubeHelpWindow);
     mainWin->about_bttn->shortcut(config->getShortcutFor(SHORTCUTS::SHOW_HELP));
+
+    std::vector<std::string> videoLists = userdata->getVideoListNames();
+    std::sort(videoLists.begin(),videoLists.end()); //Sort lists alphabetically
+    for (int i=0; i < videoLists.size() ; i++) {
+        mainWin->videolist_selector->add(videoLists.at(i).c_str());
+    }
+
+    mainWin->videolist_selector->value(mainWin->videolist_selector->find_index(UserDataManager::HISTORY_LIST_NAME.c_str()));
+    mainWin->videolist_selector->when(FL_WHEN_CHANGED);
+    mainWin->videolist_selector->callback((Fl_Callback*)getVideosAtList_cb);
+
+    mainWin->central_tabs->when(FL_WHEN_RELEASE_ALWAYS);
+    mainWin->central_tabs->callback((Fl_Callback*)selectCentralTab_cb);
 
     // Redraw the window to show the new button
     mainWin->redraw();
@@ -549,6 +635,10 @@ void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
         logAtTerminal(_("Channel ID is empty. Please verify the video metadata initilization!!!\n"), LogLevel::ERROR);
         return;
     }
+    if (getActiveTabName() == TAB_VIDEOLIST_NAME) {
+        // If "My Lists" tab is open, then change to the main searchbox tab...
+        mainWin->central_tabs->value(mainWin->searchbox_tab);
+    }
     SEARCH_PAGE_INDEX = 0;
     SEARCH_BY_CHANNEL_F = true;
     char channel_videos_URL[256];
@@ -599,10 +689,17 @@ void getPreviousSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     if (SEARCH_PAGE_INDEX>0) {
         SEARCH_PAGE_INDEX--;
     }
-    const char* input_text = getSearchValue(input);
-    if (input_text != nullptr)  {
+    if ( getActiveTabName() == TAB_SEARCH_NAME ) {
+        const char* input_text = getSearchValue(input);
+        if (input_text != nullptr)  {
+            lock_buttons(true);
+            doSearch(input_text);
+            lock_buttons(false);
+        }
+    }
+    if (getActiveTabName() == TAB_VIDEOLIST_NAME) {
         lock_buttons(true);
-        doSearch(input_text);
+        updateVideoMetadataFromVideoList();
         lock_buttons(false);
     }
     if (SEARCH_PAGE_INDEX == 0) {
@@ -613,11 +710,19 @@ void getPreviousSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
 void getNextSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     //TODO: what to do if there is no more results? It must be controlled in some way...
     SEARCH_PAGE_INDEX++;
-    const char* input_text = getSearchValue(input);
-    if (input_text != nullptr) {
+    if (getActiveTabName() == TAB_SEARCH_NAME) {
+        const char* input_text = getSearchValue(input);
+        if (input_text != nullptr) {
+            lock_buttons(true);
+            doSearch(input_text);
+            lock_buttons(false);
+        }
+    }
+    if (getActiveTabName() == TAB_VIDEOLIST_NAME) {
         lock_buttons(true);
-        doSearch(input_text);
+        bool areMoreVideos = updateVideoMetadataFromVideoList();
         lock_buttons(false);
+        if (!areMoreVideos) mainWin->next_results_bttn->deactivate();
     }
     mainWin->previous_results_bttn->activate();
 }
@@ -707,8 +812,8 @@ int main(int argc, char **argv) {
     char win_title[30] = "FLTube ";
     mainWin = new FLTubeMainWindow(593, 540, strcat(win_title, VERSION));
     mainWin->callback((Fl_Callback*)exitApp);
-    mainWin->search_term_or_url->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->search_term_or_url->when(FL_WHEN_ENTER_KEY);
+    mainWin->search_term_or_url->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->search_term_or_url->shortcut(config->getShortcutFor(SHORTCUTS::FOCUS_SEARCH));
     mainWin->do_search_bttn->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->callback((Fl_Callback*)getPreviousSearchResults_cb, (void*)(mainWin->search_term_or_url));

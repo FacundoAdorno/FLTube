@@ -217,6 +217,16 @@ bool UserDataManager::isADanglingVideo(Video* v) {
     return !videoFound;
 }
 
+bool UserDataManager::createVideoList(std::string name) {
+    //TODO finish...
+    return false;
+}
+
+bool UserDataManager::deleteVideoList(std::string name) {
+    //TODO finish...
+    return false;
+}
+
 bool UserDataManager::existsVideoList(std::string name) {
     auto it = custom_lists->find(name);
     return (it != custom_lists->end());
@@ -240,6 +250,14 @@ InternalVideoList* UserDataManager::getInternalVideoList(std::string name) {
 
 VideoList* UserDataManager::getVideoList(std::string name) {
     return getInternalVideoList(name);
+}
+
+std::vector<std::string> UserDataManager::getVideoListNames() {
+    std::vector<std::string> names = {};
+    for (auto it = custom_lists->begin(); it != custom_lists->end() ; it++) {
+        names.push_back(it->second->getName());
+    }
+    return names;
 }
 
 VideoList* UserDataManager::getHistoryList() {

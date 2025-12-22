@@ -26,6 +26,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <algorithm>
 
 /* The @VERSION MUST be expressed as numbers separated by dots (<number>.<number>.<number>), in example: 2.10.3.
  * MUST NOT BE something like "2.10.3.rc1"...
@@ -48,7 +49,11 @@ static void preview_video_cb(Fl_Button* widget, void* video_url);
 static void logAtTerminal(std::string log_message, LogLevel log_lvl);
 static void add_video_group(int posx, int posy);
 static VideoInfo* create_video_group(int posx, int posy);
+static void clear_video_info();
 static void update_video_info();
+static bool updateVideoMetadataFromVideoList();
+static void getVideosAtList_cb(Fl_Choice* w, void* a);
+static void selectCentralTab_cb(Fl_Choice* w, void* a);
 static void pre_init();
 static void post_init();
 static void doSearch(const char* input_text, bool is_a_channel = false);

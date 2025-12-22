@@ -21,9 +21,11 @@
 #define ng_(SINGULAR, PLURAL, COUNT) ngettext(SINGULAR, PLURAL, COUNT)
 #endif
 #include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Tabs.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Input.H>
-#include <FL/Fl_Button.H>
+#include <FL/Fl_Choice.H>
 
 class FLTubeMainWindow : public Fl_Double_Window {
   void _FLTubeMainWindow();
@@ -31,13 +33,17 @@ public:
   FLTubeMainWindow(int X, int Y, int W, int H, const char *L = 0);
   FLTubeMainWindow(int W, int H, const char *L = 0);
   FLTubeMainWindow();
+  Fl_Button *about_bttn;
+  Fl_Tabs *central_tabs;
+  Fl_Group *searchbox_tab;
   Fl_Input *search_term_or_url;
   Fl_Button *do_search_bttn;
+  Fl_Group *videolists_tab;
+  Fl_Choice *videolist_selector;
   Fl_Group *search_result_selectors;
   Fl_Group *pagination_controls;
   Fl_Button *previous_results_bttn;
   Fl_Button *next_results_bttn;
-  Fl_Button *about_bttn;
 };
 #include <FL/Fl_Box.H>
 
@@ -76,7 +82,6 @@ public:
   Fl_Button *cancel_bttn;
   Fl_Check_Button *warnme_again_check;
 };
-#include <FL/Fl_Tabs.H>
 #include <FL/Fl_Text_Display.H>
 
 class HelpFLTubeWindow : public Fl_Double_Window {

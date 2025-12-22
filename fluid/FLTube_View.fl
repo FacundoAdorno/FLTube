@@ -36,24 +36,43 @@ widget_class FLTubeMainWindow {
   xywh {0 0 593 540}
   class Fl_Double_Window visible
 } {
-  Fl_Group {} {
-    label {Search box:}
-    xywh {10 35 575 85} box UP_FRAME labelfont 1 align 5
+  Fl_Button about_bttn {
+    label Help
+    tooltip {Show info about this application and some help of how to use it.} xywh {521 6 64 22}
+  }
+  Fl_Tabs central_tabs {open
+    xywh {9 28 576 92}
   } {
-    Fl_Input search_term_or_url {
-      label {Term or URL}
-      tooltip {Enter a search term for search or a valid Youtube URL.} xywh {46 59 512 24} align 1
+    Fl_Group searchbox_tab {
+      label {Search box}
+      user_data {"SEARCHVIDEOS_TAB"} open selected
+      tooltip {Search videos at this section.} xywh {9 56 576 64} box UP_FRAME selection_color 47 labelfont 1 align 5
+    } {
+      Fl_Input search_term_or_url {
+        label {Term/URL  }
+        tooltip {Enter a search term for search or a valid Youtube URL.} xywh {110 63 460 24} align 132
+      }
+      Fl_Button do_search_bttn {
+        label {Go &search!}
+        user_data search_term_or_url
+        tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 90 150 22}
+      }
     }
-    Fl_Button do_search_bttn {
-      label {Go &search!}
-      user_data search_term_or_url
-      tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 88 150 22}
+    Fl_Group videolists_tab {
+      label {My Lists}
+      user_data {"VIDEOLISTS_TABS"} open
+      tooltip {Lookup your lists of videos at this section (History, Liked, etc...).} xywh {9 56 576 64} box UP_FRAME selection_color 47 labelfont 1 hide
+    } {
+      Fl_Choice videolist_selector {
+        label {Lists  } open
+        xywh {89 63 480 24} down_box BORDER_BOX
+      } {}
     }
   }
   Fl_Group search_result_selectors {
     xywh {10 126 575 380} box THIN_UP_BOX
   } {}
-  Fl_Group pagination_controls {
+  Fl_Group pagination_controls {open
     xywh {9 508 577 30}
   } {
     Fl_Button previous_results_bttn {
@@ -65,14 +84,10 @@ widget_class FLTubeMainWindow {
       tooltip {Get following results of current search results set.} xywh {450 510 135 23}
     }
   }
-  Fl_Button about_bttn {
-    label Help
-    tooltip {Show info about this application and some help of how to use it.} xywh {521 9 64 22}
-  }
 }
 
-widget_class VideoInfo {open selected
-  xywh {0 0 577 91} visible position_relative
+widget_class VideoInfo {open
+  xywh {0 0 577 91} hide position_relative
 } {
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}

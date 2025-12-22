@@ -50,20 +50,41 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
   this->labelcolor(FL_FOREGROUND_COLOR);
   this->align(Fl_Align(FL_ALIGN_TOP));
   this->when(FL_WHEN_RELEASE);
-  { Fl_Group* o = new Fl_Group(10, 35, 575, 85, _("Search box:"));
-    o->box(FL_UP_FRAME);
-    o->labelfont(1);
-    o->align(Fl_Align(FL_ALIGN_TOP_LEFT));
-    { search_term_or_url = new Fl_Input(46, 59, 512, 24, _("Term or URL"));
-      search_term_or_url->tooltip(_("Enter a search term for search or a valid Youtube URL."));
-      search_term_or_url->align(Fl_Align(FL_ALIGN_TOP));
-    } // Fl_Input* search_term_or_url
-    { do_search_bttn = new Fl_Button(227, 88, 150, 22, _("Go &search!"));
-      do_search_bttn->tooltip(_("If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."));
-      do_search_bttn->user_data((void*)(search_term_or_url));
-    } // Fl_Button* do_search_bttn
-    o->end();
-  } // Fl_Group* o
+  { about_bttn = new Fl_Button(521, 6, 64, 22, _("Help"));
+    about_bttn->tooltip(_("Show info about this application and some help of how to use it."));
+  } // Fl_Button* about_bttn
+  { central_tabs = new Fl_Tabs(9, 28, 576, 92);
+    { searchbox_tab = new Fl_Group(9, 56, 576, 64, _("Search box"));
+      searchbox_tab->tooltip(_("Search videos at this section."));
+      searchbox_tab->box(FL_UP_FRAME);
+      searchbox_tab->selection_color(FL_DARK1);
+      searchbox_tab->labelfont(1);
+      searchbox_tab->user_data((void*)("SEARCHVIDEOS_TAB"));
+      searchbox_tab->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+      { search_term_or_url = new Fl_Input(110, 63, 460, 24, _("Term/URL  "));
+        search_term_or_url->tooltip(_("Enter a search term for search or a valid Youtube URL."));
+        search_term_or_url->align(Fl_Align(132));
+      } // Fl_Input* search_term_or_url
+      { do_search_bttn = new Fl_Button(227, 90, 150, 22, _("Go &search!"));
+        do_search_bttn->tooltip(_("If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."));
+        do_search_bttn->user_data((void*)(search_term_or_url));
+      } // Fl_Button* do_search_bttn
+      searchbox_tab->end();
+    } // Fl_Group* searchbox_tab
+    { videolists_tab = new Fl_Group(9, 56, 576, 64, _("My Lists"));
+      videolists_tab->tooltip(_("Lookup your lists of videos at this section (History, Liked, etc...)."));
+      videolists_tab->box(FL_UP_FRAME);
+      videolists_tab->selection_color(FL_DARK1);
+      videolists_tab->labelfont(1);
+      videolists_tab->user_data((void*)("VIDEOLISTS_TABS"));
+      videolists_tab->hide();
+      { videolist_selector = new Fl_Choice(89, 63, 480, 24, _("Lists  "));
+        videolist_selector->down_box(FL_BORDER_BOX);
+      } // Fl_Choice* videolist_selector
+      videolists_tab->end();
+    } // Fl_Group* videolists_tab
+    central_tabs->end();
+  } // Fl_Tabs* central_tabs
   { search_result_selectors = new Fl_Group(10, 126, 575, 380);
     search_result_selectors->box(FL_THIN_UP_BOX);
     search_result_selectors->end();
@@ -77,9 +98,6 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     } // Fl_Button* next_results_bttn
     pagination_controls->end();
   } // Fl_Group* pagination_controls
-  { about_bttn = new Fl_Button(521, 9, 64, 22, _("Help"));
-    about_bttn->tooltip(_("Show info about this application and some help of how to use it."));
-  } // Fl_Button* about_bttn
   end();
 }
 
