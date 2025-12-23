@@ -33,8 +33,6 @@
  */
 static const char* VERSION = "2.0.3";
 
-enum LogLevel { INFO, WARN, ERROR, DEBUG };
-
 /**  Save this object as user_data in buttons callbacks for Video Info. */
 struct DownloadVideoCBData {
     int video_resolution;
@@ -46,7 +44,6 @@ static void closeWindow_cb(Fl_Widget*, Fl_Window *targetWindow);
 static void showMessageWindow(const char* message);
 static void lock_buttons(bool lock);
 static void preview_video_cb(Fl_Button* widget, void* video_url);
-static void logAtTerminal(std::string log_message, LogLevel log_lvl);
 static void add_video_group(int posx, int posy);
 static VideoInfo* create_video_group(int posx, int posy);
 static void clear_video_info();

@@ -58,8 +58,8 @@ std::string CONFIGFILE_PATH = "";
 // Path to fltube resources, like images, sounds, etc. Can be modified at fltube.conf file.
 std::string RESOURCES_PATH = "/usr/local/share/fltube/resources";
 
-//If value is 0, enable the debug mode. Defaults to false (or 1).
-int DEBUG_ENABLED = 1;
+//If value is true, enable the debug mode. Defaults to false.
+bool DEBUG_ENABLED = false;
 
 //If value is 0, enable the initial verifications. Defaults to false (or 1).
 bool AVOID_INITIAL_CHECKS = 1;
@@ -80,6 +80,8 @@ Fl_PNG_Image* live_image = nullptr;
 
 Fl_PNG_Image* already_viewed_image = nullptr;
 
+std::shared_ptr<TerminalLogger> logger;
+
 /**
  * Callback for main window close action. By default, exit app with success status code (0).
  */
@@ -87,14 +89,14 @@ void exitApp(unsigned short int exitStatusCode = FLT_OK) {
     //Do some cleaning...
     char message[1024];
     snprintf(message, sizeof(message), _("Cleaning temporal files at %s."), FLTUBE_TEMPORAL_DIR.c_str());
-    logAtTerminal(std::string(message), LogLevel::INFO);
+    logger->info(std::string(message));
     std::filesystem::remove_all(FLTUBE_TEMPORAL_DIR);
     if (helpWin != nullptr) delete helpWin;
     if (message_window != nullptr) delete message_window;
     delete userdata;
     delete mainWin;
     //Exiting the app...
-    logAtTerminal(_("Closing FLtube... Bye!\n"), LogLevel::INFO);
+    logger->info(_("Closing FLtube... Bye!\n"));
     exit(exitStatusCode);
 }
 
@@ -164,7 +166,7 @@ Fl_PNG_Image* load_image(std::string path) {
     } else {
         char message[1024];
         snprintf(message, sizeof(message), _("Resource image at '%s' cannot be loaded..."), path.c_str());
-        logAtTerminal(std::string(message), LogLevel::WARN);
+        logger->warn(std::string(message));
     }
     return nullptr;
 }
@@ -271,7 +273,7 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
     mainWin->cursor(FL_CURSOR_WAIT);
     Fl::check();
     if (! verify_network_connection()) {
-        logAtTerminal(_("Your device is offline. Check your internet connection."), LogLevel::WARN);
+        logger->warn(_("Your device is offline. Check your internet connection."));
         showMessageWindow( _("There seems that you don't have access to the Internet. "
         "Please, verify you network connection before proceed..."));
         return;
@@ -292,10 +294,10 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
         //Stream video section...
         char message[256];
         snprintf(message, sizeof(message), _("Starting streaming preview of video '%s' - (%s)..."), vi->title->label(), url->c_str());
-        logAtTerminal(message,LogLevel::INFO);
+        logger->info(message);
         stream_video(url->c_str(), vi->is_live_image->visible(), STREAM_VIDEO_RESOLUTION, media_player);
     } else {
-        logAtTerminal(_("Cannot get video URL. Review the video metadata enabling app debugging..."), LogLevel::ERROR);
+        logger->error(_("Cannot get video URL. Review the video metadata enabling app debugging..."));
     }
     mainWin->cursor(FL_CURSOR_DEFAULT);
     Fl::check();
@@ -342,8 +344,8 @@ void update_video_info() {
             } catch (const std::invalid_argument& ex) {
                 char err_msg[256];
                 snprintf(err_msg, sizeof(err_msg), _("Error when getting count of viewers of video: (title: \"%s\", ID: \"%s\")"), video_metadata[j]->title.c_str(), video_metadata[j]->id.c_str());
-                logAtTerminal(err_msg, LogLevel::WARN);
-                logAtTerminal(ex.what(), LogLevel::DEBUG);
+                logger->warn(err_msg);
+                logger->debug(ex.what());
                 strcpy(text_buffer, _("Unknown"));
             }
             video_info_arr[j]->views_spectators->copy_label(text_buffer);
@@ -357,7 +359,7 @@ void update_video_info() {
                 int targetWidth = video_info_arr[j]->thumbnail->w();
                 Fl_Image* resized_thumbnail = create_resized_image_from_jpg(FLTUBE_TEMPORAL_DIR + thumbn_name, targetWidth);
                 if (resized_thumbnail == nullptr) {
-                    logAtTerminal(_("Something went wrong when generating a resize thumbnail for video with ID=") + video_metadata[j]->id, LogLevel::ERROR);
+                    logger->error(_("Something went wrong when generating a resize thumbnail for video with ID=") + video_metadata[j]->id);
                 } else {
                     delete video_info_arr[j]->thumbnail->image();
                     video_info_arr[j]->thumbnail->image(resized_thumbnail);
@@ -441,18 +443,19 @@ std::string getActiveTabName() {
  * Hook: Actions to execute before main window is drawn...
  */
 void pre_init() {
+    logger = std::make_shared<TerminalLogger>(DEBUG_ENABLED);
     ///// LOAD CONFIGURATIONS  //////
     // If not specified custom configuration file through parameter "--config"...
     if (CONFIGFILE_PATH.empty())
         CONFIGFILE_PATH = (std::filesystem::exists(USER_CONFIGFILE_PATH)) ? USER_CONFIGFILE_PATH : SYSTEM_CONFIGFILE_PATH;
-    logAtTerminal(_("Loading configurations from ") + CONFIGFILE_PATH, LogLevel::DEBUG);
-    config = new ConfigurationManager(CONFIGFILE_PATH.c_str());
-    userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion());
+    logger->debug(_("Loading configurations from ") + CONFIGFILE_PATH);
+    config = new ConfigurationManager(CONFIGFILE_PATH.c_str(), logger);
+    userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion(), logger);
     AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
 
     if ( !AVOID_INITIAL_CHECKS && !isInstalledYTDLP() ) {
         showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run in a terminal the 'install_yt-dlp' script."));
-        logAtTerminal(_("yt-dlp is not installed. Closing app...\n"), LogLevel::ERROR);
+        logger->error(_("yt-dlp is not installed. Closing app...\n"));
         exitApp(FLT_GENERAL_FAILED);
     }
     //Init Localization. Use locale path specified at config, or custom config default_locale_path().
@@ -481,7 +484,7 @@ void pre_init() {
             }
         }
         if (STREAM_VIDEO_RESOLUTION != DEFAULT_STREAM_VIDEO_RESOLUTION)
-            logAtTerminal(_("Default streaming resolution (360p) changed at configuration to this new resolution: ") + std::to_string(STREAM_VIDEO_RESOLUTION), LogLevel::DEBUG);
+            logger->debug(_("Default streaming resolution (360p) changed at configuration to this new resolution: ") + std::to_string(STREAM_VIDEO_RESOLUTION));
     }
     live_image = load_resource_image("livebutton_18p.png");
     already_viewed_image = load_resource_image("clock_18p.png");
@@ -529,30 +532,6 @@ void post_init() {
     mainWin->redraw();
 }
 
-/** Write a log message at the terminal where the application was launched. */
-void logAtTerminal(std::string log_message, LogLevel log_lvl) {
-    if (log_lvl == LogLevel::DEBUG && DEBUG_ENABLED == 1) { return; }//if debug mode disabled, cancel debug message...
-
-    std::string logleveltext;
-    switch (log_lvl) {
-        case LogLevel::INFO:
-            logleveltext = "\033[32m\033[1m[INFO]\033[0m ";
-            break;
-        case LogLevel::WARN:
-            logleveltext = "\033[34m\033[1m[WARN]\033[0m ";
-            break;
-        case LogLevel::ERROR:
-            logleveltext = "\033[31m\033[1m[ERROR]\033[0m ";
-            break;
-        case LogLevel::DEBUG:
-            logleveltext = "\033[33m\033[1m[DEBUG]\033[0m ";
-            break;
-        default:
-            logleveltext = "\033[1m[UNKNOWN]\033[0m ";
-    }
-    printf("\n%s [%s] - - -  %s\n", logleveltext.c_str(), currentDateTime().c_str(), log_message.c_str());
-}
-
 /**
  * Create a new group to view video info.
  */
@@ -574,7 +553,7 @@ void doSearch(const char* input_text, bool is_a_channel) {
     Fl::check();
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
-        logAtTerminal(_("Your device is offline. Check your internet connection."), LogLevel::WARN);
+        logger->warn(_("Your device is offline. Check your internet connection."));
         showMessageWindow( _("There seems that you don't have access to the Internet. "
                             "Please, verify you network connection before proceed..."));
         return;
@@ -582,13 +561,13 @@ void doSearch(const char* input_text, bool is_a_channel) {
 
     char message[1024];
     snprintf(message, sizeof(message), _("Searching for results for '%s' user input..."), input_text);
-    logAtTerminal(std::string(message), LogLevel::DEBUG);
+    logger->debug(std::string(message));
     std::string result;
     if (isUrl(input_text) && !SEARCH_BY_CHANNEL_F) {
         if(!isYoutubeURL(input_text)){
             std::string warn_message = _("For now, only Youtube URL's are valid for download. Please, edit your input text or search using a generic term.");
             showMessageWindow(warn_message.c_str());
-            logAtTerminal(warn_message, LogLevel::WARN);
+            logger->warn(warn_message);
             return;
         }
         result = get_videoURL_metadata(input_text);
@@ -600,7 +579,7 @@ void doSearch(const char* input_text, bool is_a_channel) {
         }
         result = do_ytdlp_search(input_text, YOUTUBE_EXTRACTOR_NAME.c_str(), page_i, SEARCH_BY_CHANNEL_F);
     }
-    logAtTerminal(result, LogLevel::DEBUG);
+    logger->debug(result);
     // Read input lines until an empty line is encountered
     std::istringstream result_sstream(result);
     std::string line;
@@ -626,13 +605,13 @@ void doSearch(const char* input_text, bool is_a_channel) {
  */
 void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
     if (bttn == nullptr) {
-        logAtTerminal(_("The Fl_Button is inexistent when search videos for a channel!!!\n"), LogLevel::ERROR);
+        logger->error(_("The Fl_Button is inexistent when search videos for a channel!!!\n"));
         return;
     }
     std::string* channel_id =  static_cast<std::string*>(channel_id_str);
     printf("CHANNEL ID: %s", channel_id->c_str());
     if (channel_id == nullptr || channel_id->empty()) {
-        logAtTerminal(_("Channel ID is empty. Please verify the video metadata initilization!!!\n"), LogLevel::ERROR);
+        logger->error(_("Channel ID is empty. Please verify the video metadata initilization!!!\n"));
         return;
     }
     if (getActiveTabName() == TAB_VIDEOLIST_NAME) {
@@ -656,7 +635,7 @@ void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
  */
 const char* getSearchValue(Fl_Input *input){
     if (input == nullptr) {
-        logAtTerminal(_("The Fl_Input search widget inexistent!!!\n"), LogLevel::ERROR);
+        logger->error(_("The Fl_Input search widget inexistent!!!\n"));
         return nullptr;
     }
 
@@ -780,7 +759,7 @@ void parseOptions(int argc, char **argv){
     }
     if (existsCmdOption(argc, argv, "-d") || existsCmdOption(argc, argv, "--debug")) {
         printf(_("DEBUG MODE enabled.\n"));
-        DEBUG_ENABLED = 0;
+        DEBUG_ENABLED = true;
     }
 }
 
@@ -793,7 +772,7 @@ int getIntVersion() {
     } catch (const std::invalid_argument& e) {
         char message[256];
         snprintf(message, sizeof(message), "Error on VERSION number format (%s). The version must be expressed as numbers separated by dots.\n", VERSION);
-        logAtTerminal(message, LogLevel::ERROR);
+        logger->error(message);
         return -100000;
     }
 }
@@ -807,7 +786,7 @@ int main(int argc, char **argv) {
     pre_init();
     char message[64];
     snprintf(message, sizeof(message), _("Starting FLTube v.%s\n"), VERSION);
-    logAtTerminal(message, LogLevel::INFO);
+    logger->info(message);
 
     char win_title[30] = "FLTube ";
     mainWin = new FLTubeMainWindow(593, 540, strcat(win_title, VERSION));
@@ -825,7 +804,7 @@ int main(int argc, char **argv) {
     //mainWin->show(argc, argv);    //TODO Avoid passing parameters to the mainWin function to prevent undesirable logs.
     mainWin->icon(load_image("/usr/local/share/icons/fltube/64x64.png"));
     mainWin->show();
-    logAtTerminal(_("The FLTube main window has loaded."), LogLevel::DEBUG);
+    logger->debug(_("The FLTube main window has loaded."));
     return Fl::run();
 
 }

@@ -83,6 +83,27 @@ enum SIMPLE_FS_PERMISSION {
         CAN_EXECUTE,
 };
 
+enum LogLevel { INFO, WARN, ERROR, DEBUG };
+
+/**
+ * Class for write logs at terminal, for differents @LogLevel's.
+ * If @debug_enable is true, messages of every log level will be printed.
+ */
+class TerminalLogger {
+    private:
+        const std::string PRINT_FORMAT = "\n%s [%s] - - -  %s\n";
+        bool debug_enabled;
+    public:
+        TerminalLogger(bool enable_debug)
+            : debug_enabled(enable_debug) {};
+
+        void log(std::string log_message, LogLevel log_lvl);
+        void info(std::string log_message);
+        void warn(std::string log_message);
+        void error(std::string log_message);
+        void debug(std::string log_message);
+};
+
 /** Info for page search results. Initial page has index 0. See parameter -I at yt-dlp documentation. */
 struct Pagination_Info {
     int size;

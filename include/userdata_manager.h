@@ -139,6 +139,8 @@ class UserDataManager {
         // Custom lists have an unique name and a vector of Video:id's.
         std::unique_ptr<std::map<std::string, InternalVideoList*>> custom_lists;
 
+        std::shared_ptr<TerminalLogger> logger;
+
 
         /** Loads from @filepath the videos saved and the differents lists of videos (History, Likes, etc.).
          * Returns 0 if all was OK.
@@ -180,7 +182,7 @@ class UserDataManager {
          * - (1) @filepath: system path where userdata file will be created/loaded/saved.
          * - (2) @current_version: version of FLTube used to save the userdata file.
          */
-        UserDataManager(std::string userdata_filepath, int current_version);
+        UserDataManager(std::string userdata_filepath, int current_version, std::shared_ptr<TerminalLogger> const& logger);
         ~UserDataManager();
 
 

@@ -13,6 +13,7 @@
 #ifndef CONFIGURATION_MANAGER_H
 #define CONFIGURATION_MANAGER_H
 
+#include "fltube_utils.h"
 #include <FL/Enumerations.H>
 #include <cstring>
 #include <memory>
@@ -39,9 +40,10 @@ protected:
     std::string filepath;
     std::unique_ptr<std::map<std::string, std::string>> configurations;
     KeyboardShortcuts* shortcuts;
+    std::shared_ptr<TerminalLogger> logger;
 
 public:
-    ConfigurationManager(std::string path_to_conf);
+    ConfigurationManager(std::string path_to_conf, std::shared_ptr<TerminalLogger> const& logger);
     ~ConfigurationManager();
     /*
      *   Returns true if the configuration is set in the configuration file.

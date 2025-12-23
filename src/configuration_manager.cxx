@@ -14,9 +14,11 @@
 #include "../include/fltube_utils.h"
 
 
-ConfigurationManager::ConfigurationManager(std::string path_to_conf) {
+ConfigurationManager::ConfigurationManager(std::string path_to_conf, std::shared_ptr<TerminalLogger> const& logger_) : logger(logger_)
+{
   configurations = std::make_unique<std::map<std::string, std::string>>();
   shortcuts = new KeyboardShortcuts();
+  if (logger_ == nullptr) this->logger = std::make_shared<TerminalLogger>(false);
     std::ifstream infile(path_to_conf);
     std::string line, config_key, config_value;
     while (std::getline(infile, line)) {
@@ -65,9 +67,9 @@ int ConfigurationManager::getIntProperty(const char *config_name, int default_va
     try {
         return std::stoi(prop);
     } catch (const std::invalid_argument& e) {
-        fprintf(stderr, _("Invalid configuration at property '%s' (CURRENT VALUE: %s). Please, modify it to a valid integer value.\n"), config_name, prop.c_str());
+        logger->error("Invalid configuration at property '" + std::string(config_name) + "' (CURRENT VALUE: " + prop + "). Please, modify it to a valid integer value.\n");
     } catch (const std::out_of_range& e) {
-        fprintf(stderr, _("Invalid configuration at property '%s' (CURRENT VALUE: %s). Value out of range: %s.\n"), config_name, prop.c_str(), e.what());
+        logger->error("Invalid configuration at property '" + std::string(config_name) + "' (CURRENT VALUE: " + prop + "). Value out of range: " + std::string(e.what()) + ".\n");
     }
 
     return default_value;

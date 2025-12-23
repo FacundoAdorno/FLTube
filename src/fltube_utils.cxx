@@ -485,3 +485,27 @@ void replace_all(std::string &original_text, const std::string &toReplace, const
 bool isNumber(const std::string& str) {
     return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
 }
+
+
+void TerminalLogger::log(std::string log_message, LogLevel log_lvl) {
+    printf(PRINT_FORMAT.c_str(), "\033[1m[UNKNOWN]\033[0m ", currentDateTime().c_str(), log_message.c_str());
+
+}
+
+void TerminalLogger::info(std::string log_message) {
+    printf(PRINT_FORMAT.c_str(), "\033[32m\033[1m[INFO]\033[0m ", currentDateTime().c_str(), log_message.c_str());
+}
+
+void TerminalLogger::warn(std::string log_message) {
+    printf(PRINT_FORMAT.c_str(), "\033[34m\033[1m[WARN]\033[0m ", currentDateTime().c_str(), log_message.c_str());
+}
+
+void TerminalLogger::error(std::string log_message) {
+    fprintf(stderr, PRINT_FORMAT.c_str(), "\033[31m\033[1m[ERROR]\033[0m ", currentDateTime().c_str(), log_message.c_str());
+}
+
+void TerminalLogger::debug(std::string log_message) {
+    if (debug_enabled) {
+        printf(PRINT_FORMAT.c_str(), "\033[33m\033[1m[DEBUG]\033[0m ", currentDateTime().c_str(), log_message.c_str());
+    }
+}
