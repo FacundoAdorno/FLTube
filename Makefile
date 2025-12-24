@@ -29,7 +29,7 @@ TARGET = $(BUILD_DIR)/fltube
 SOURCES_LIST = fltube_utils.cxx gnugettext_utils.cxx FLTube_View.cxx FLTube.cxx configuration_manager.cxx userdata_manager.cxx
 SOURCES = $(addprefix $(SRC_DIR)/, $(SOURCES_LIST))
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cxx=$(BUILD_DIR)/%.o)
-FLTUBE_VERSION=2.0.3
+FLTUBE_VERSION=2.1.0
 DEB_PACKAGE_NAME=fltube_$(FLTUBE_VERSION)-$(ARCH_CPU).deb
 TCZ_PACKAGE_NAME=fltube_$(FLTUBE_VERSION)_tcz.tar.gz
 

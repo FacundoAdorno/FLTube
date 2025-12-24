@@ -31,7 +31,7 @@
 /* The @VERSION MUST be expressed as numbers separated by dots (<number>.<number>.<number>), in example: 2.10.3.
  * MUST NOT BE something like "2.10.3.rc1"...
  */
-static const char* VERSION = "2.0.3";
+static const char* VERSION = "2.1.0";
 
 /**  Save this object as user_data in buttons callbacks for Video Info. */
 struct DownloadVideoCBData {
