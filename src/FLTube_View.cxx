@@ -116,11 +116,15 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
     is_live_image->align(Fl_Align(288));
     is_live_image->hide();
   } // Fl_Box* is_live_image
-  { already_viewed_icon = new Fl_Box(265, 43, 20, 20);
+  { already_viewed_icon = new Fl_Box(268, 43, 20, 20);
     already_viewed_icon->tooltip(_("You have view this video in the past."));
     already_viewed_icon->align(Fl_Align(288));
-    already_viewed_icon->hide();
   } // Fl_Box* already_viewed_icon
+  { like_icon_bttn = new Fl_Button(295, 43, 20, 20);
+    like_icon_bttn->tooltip(_("Press to mark the video as \"Liked\"."));
+    like_icon_bttn->box(FL_NO_BOX);
+    like_icon_bttn->down_box(FL_THIN_UP_FRAME);
+  } // Fl_Button* like_icon_bttn
   { title = new Fl_Box(105, 6, 450, 37);
     title->labelfont(1);
     title->align(Fl_Align(197|FL_ALIGN_INSIDE));

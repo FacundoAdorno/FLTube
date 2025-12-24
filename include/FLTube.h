@@ -51,6 +51,8 @@ static void update_video_info();
 static bool updateVideoMetadataFromVideoList();
 static void getVideosAtList_cb(Fl_Choice* w, void* a);
 static void selectCentralTab_cb(Fl_Choice* w, void* a);
+static std::string getActiveTabName();
+static void markLikedVideo_cb(Fl_Widget *wdg);
 static void pre_init();
 static void post_init();
 static void doSearch(const char* input_text, bool is_a_channel = false);

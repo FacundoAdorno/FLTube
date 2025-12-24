@@ -45,7 +45,7 @@ widget_class FLTubeMainWindow {
   } {
     Fl_Group searchbox_tab {
       label {Search box}
-      user_data {"SEARCHVIDEOS_TAB"} open selected
+      user_data {"SEARCHVIDEOS_TAB"} open
       tooltip {Search videos at this section.} xywh {9 56 576 64} box UP_FRAME selection_color 47 labelfont 1 align 5
     } {
       Fl_Input search_term_or_url {
@@ -86,8 +86,8 @@ widget_class FLTubeMainWindow {
   }
 }
 
-widget_class VideoInfo {open
-  xywh {0 0 577 91} hide position_relative
+widget_class VideoInfo {open selected
+  xywh {0 0 577 91} visible position_relative
 } {
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
@@ -99,7 +99,10 @@ widget_class VideoInfo {open
     tooltip {The video is live.} bind_image 1 xywh {220 43 40 20} align 288 hide
   }
   Fl_Box already_viewed_icon {
-    tooltip {You have view this video in the past.} xywh {265 43 20 20} align 288 hide
+    tooltip {You have view this video in the past.} xywh {268 43 20 20} align 288
+  }
+  Fl_Button like_icon_bttn {
+    tooltip {Press to mark the video as "Liked".} xywh {295 43 20 20} box NO_BOX down_box THIN_UP_FRAME
   }
   Fl_Box title {
     xywh {105 6 450 37} labelfont 1 align 213

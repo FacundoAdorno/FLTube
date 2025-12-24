@@ -296,18 +296,36 @@ bool UserDataManager::addVideoInternal(Video* v) {
 
 bool UserDataManager::addVideo(Video* v, std::string listName) {
     if (v == nullptr || listName.empty()) {
-        logger->error(_("Cannot add video because one of the parameters, list or name, is empty...\n"));
+        logger->error(_("Cannot add video because one of the parameters, video or listName, is empty...\n"));
         return false;
     }
     if ( !this->existsVideoList(listName) ) {
         char message_bffr[512];
-        snprintf(message_bffr, sizeof(message_bffr), _("Cannot add video to an inexisting list '%s'.\n"), listName.c_str());
+        snprintf(message_bffr, sizeof(message_bffr), _("Cannot add video to a non-existent list '%s'.\n"), listName.c_str());
         logger->error(message_bffr);
         return false;
     }
 
     if ( !existsVideo(v) ) this->addVideoInternal(v);
     getInternalVideoList(listName)->addVideo(v);
+    return true;
+}
+
+bool UserDataManager::removeVideoFromList(std::string id, std::string listName) {
+    if (id.empty() || listName.empty()) {
+        logger->error(_("Cannot remove video because one of the parameters, listName or id, is empty...\n"));
+        return false;
+    }
+    if ( !this->existsVideoList(listName) ) {
+        char message_bffr[512];
+        snprintf(message_bffr, sizeof(message_bffr), _("Cannot add remove from a non-existent list '%s'.\n"), listName.c_str());
+        logger->error(message_bffr);
+        return false;
+    }
+
+    InternalVideoList* vl = getInternalVideoList(listName);
+    if ( vl->existAtList(id) ) vl->removeVideo(id);
+    // If video became dangling, it will not be written to disk when userdata file be saved...
     return true;
 }
 
@@ -345,6 +363,15 @@ Video* VideoList::findVideoById(std::string id) {
         }
     }
     return nullptr;
+}
+
+bool VideoList::existAtList(std::string id) {
+    if (!id.empty()) {
+        for (int i = 0; i < list->size(); ++i) {
+            if (list->at(i)->id == id) return true;
+        }
+    }
+    return false;
 }
 
 Video* VideoList::getVideoAt(int position) {

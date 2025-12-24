@@ -17,7 +17,6 @@
 #include "../include/fltube_utils.h"
 #include "../include/configuration_manager.h"
 #include "../include/userdata_manager.h"
-#include <cstdio>
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -79,6 +78,9 @@ UserDataManager* userdata = nullptr;
 Fl_PNG_Image* live_image = nullptr;
 
 Fl_PNG_Image* already_viewed_image = nullptr;
+
+Fl_PNG_Image* like_icon_image = nullptr;
+Fl_PNG_Image* like_red_icon_image = nullptr;
 
 std::shared_ptr<TerminalLogger> logger;
 
@@ -334,11 +336,19 @@ void update_video_info() {
             } else {
                 video_info_arr[j]->is_live_image->hide();
             }
+            // Update History icon...
             if (userdata->getHistoryList()->findVideoById(video_metadata[j]->id) != nullptr) {
                 video_info_arr[j]->already_viewed_icon->show();
             } else {
                 video_info_arr[j]->already_viewed_icon->hide();
             }
+            // Update Liked icon...
+            if (userdata->getLikedVideosList()->existAtList(video_metadata[j]->id)) {
+                video_info_arr[j]->like_icon_bttn->image(like_red_icon_image);
+            } else {
+                video_info_arr[j]->like_icon_bttn->image(like_icon_image);
+            }
+            video_info_arr[j]->like_icon_bttn->redraw();
             try {
                 snprintf(text_buffer, sizeof(text_buffer), "%s %s", get_metric_abbreviation(std::stoi(video_metadata[j]->viewers_count))->c_str(), (is_livestream) ? _("viewers") : _("views"));
             } catch (const std::invalid_argument& ex) {
@@ -439,6 +449,26 @@ std::string getActiveTabName() {
     return std::string(tabname);
 }
 
+void markLikedVideo_cb(Fl_Widget *wdg) {
+    VideoInfo* vi = static_cast<VideoInfo*>(wdg->parent());
+    //Registering view of current video at History List...
+    std::string id = *static_cast<std::string*>(vi->thumbnail->user_data());
+    replace_all(id, std::string(YOUTUBE_URL_PREFIX), "");
+    for (YTDLP_Video_Metadata* ytv : video_metadata) {
+        if (ytv->id == id) {
+            if ( userdata->getLikedVideosList()->existAtList(ytv->id)) {
+                userdata->removeVideoFromList(ytv->id, UserDataManager::LIKED_LIST_NAME);
+                vi->like_icon_bttn->image(like_icon_image);
+            } else {
+                Video* v = new Video(id, ytv->title, ytv->creators, ytv->channel_id, ytv->viewers_count, ytv->duration, ytv->thumbnail_url);
+                userdata->addVideo(v, UserDataManager::LIKED_LIST_NAME);
+                vi->like_icon_bttn->image(like_red_icon_image);
+            }
+            break;
+        }
+    }
+}
+
 /**
  * Hook: Actions to execute before main window is drawn...
  */
@@ -488,6 +518,8 @@ void pre_init() {
     }
     live_image = load_resource_image("livebutton_18p.png");
     already_viewed_image = load_resource_image("clock_18p.png");
+    like_icon_image = load_resource_image("heart_18p.png");
+    like_red_icon_image = load_resource_image("heart_18p_red.png");
 
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
@@ -541,6 +573,8 @@ VideoInfo* create_video_group(int posx, int posy) {
     video_info->userUploader->callback((Fl_Callback*)getYTChannelVideo_cb);
     if (live_image != nullptr) video_info->is_live_image->image(live_image);
     if (already_viewed_image != nullptr) video_info->already_viewed_icon->image(already_viewed_image);
+    if (like_icon_image != nullptr) video_info->like_icon_bttn->image(like_icon_image);
+    video_info->like_icon_bttn->callback((Fl_Callback*)markLikedVideo_cb);
     return video_info;
 }
 

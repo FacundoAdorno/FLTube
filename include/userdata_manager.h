@@ -62,6 +62,9 @@ class VideoList {
         // Search a video by its id. If does not exists at this list, a nullptr is returned.
         Video* findVideoById(std::string id);
 
+        // Returns true if the video ID exists in the list, false otherwise.
+        bool existAtList(std::string id);
+
         //Print on terminal all videos from begining of videolist.
         void printElementsOnTerminal() {
             for (auto it=list->begin(); it != list->end() ; it++ ) {
@@ -210,11 +213,17 @@ class UserDataManager {
 
         VideoList* getLikedVideosList();
 
-        // Return true if Video was saved previously saved in any VideoList.
+        // Return true if Video was saved previously saved in ANY existing VideoList.
         bool existsVideo(Video* v);
 
-        // Add/remove videos from an existing list.
+        // Add a video from an existing list.
         bool addVideo(Video* v, std::string listName);
+
+        /** Remove a video from an existing list, searching by its ID.
+         * If neither other list holds that video, it is completely deleted
+         * of this instance internal data structures.
+         */
+        bool removeVideoFromList(std::string id, std::string listName);
 
         // Returns the FLTube version used to save a specific file
         int getVersion();
