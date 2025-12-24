@@ -16,7 +16,8 @@
 yt_dlp_DOWNLOAD_URL="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
 yt_dlp_INSTALL_DIR="$HOME/.local/bin"
 quickjs_LATEST_VERSION="2025-09-13"
-quickjs_DOWNLOAD_FILENAME="quickjs-linux-i686-$quickjs_LATEST_VERSION.zip"
+quickjs_ARCH=`uname -m | grep -q "x86_64" && echo "x86_64" || echo "i386"`
+quickjs_DOWNLOAD_FILENAME="quickjs-linux-$quickjs_ARCH-$quickjs_LATEST_VERSION.zip"
 quickjs_DOWNLOAD_URL="https://bellard.org/quickjs/binary_releases/$quickjs_DOWNLOAD_FILENAME"
 quickjs_BINARY_NAME="qjs"
 ## Global booleans flags. Keep in mind this bash convention: 0 is true, and 1 is false.
