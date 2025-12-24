@@ -206,7 +206,8 @@ void showFLTubeHelpWindow(Fl_Widget* w) {
         helpWin->howtouse_txt->buffer(new Fl_Text_Buffer());
         helpWin->howtouse_txt->wrap_mode(Fl_Text_Display::WRAP_AT_COLUMN, 50);
         helpWin->howtouse_txt->buffer()->text(_("FLTube is an application for search & stream Youtube videos. You can search by a search term or by entering the URL of a specific YouTube video.\n\nOnce the results are returned, you can watch any of these videos by clicking on their thumbnail. The stream resolution is 360p by default, but can be changed at fltube.conf configuration file.\n\n"
-        "You can also view the latest videos by the creator of a specific video by clicking on their name (a button at the bottom right of each result).\n\nIf a search returns multiple results, they will be paginated, and you can navigate through them using the \"<Previous\" and \"Next>\" buttons at the bottom of the window.\n"));
+        "You can also view the latest videos by the creator of a specific video by clicking on their name (a button at the bottom right of each result).\n\nIf a search returns multiple results, they will be paginated, and you can navigate through them using the \"<Previous\" and \"Next>\" buttons at the bottom of the window.\n\n"
+        "Every time you watch a video, it is added to an existing list called \"Navigation History\". This list can be consulted using the user interface at the \"My Lists\" tab.\n\nBesides, you can mark a video as \"Liked\" pressing a button with heart shape. A video list called \"Liked\" will be generated to in order to consult it in the future.\n"));
         helpWin->shortcuts_txt->buffer(new Fl_Text_Buffer());
         helpWin->shortcuts_txt->wrap_mode(Fl_Text_Display::WRAP_AT_COLUMN, 50);
         char help_text_bffr[1024];
@@ -257,6 +258,7 @@ void lock_buttons(bool lock){
         for (int j=0; j < video_info_arr.size(); j++) {
             video_info_arr[j]->thumbnail->deactivate();
             video_info_arr[j]->userUploader->deactivate();
+            video_info_arr[j]->like_icon_bttn->deactivate();
         }
     } else {
         //unlock
@@ -266,6 +268,7 @@ void lock_buttons(bool lock){
         for (int j=0; j < video_info_arr.size(); j++) {
             video_info_arr[j]->thumbnail->activate();
             video_info_arr[j]->userUploader->activate();
+            video_info_arr[j]->like_icon_bttn->activate();
         }
     }
 }
