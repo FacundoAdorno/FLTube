@@ -211,7 +211,7 @@ std::string get_videoURL_metadata(const char* video_url){
  * Stream a video from a its URL using the configured multimedia player at @DEFAULT_STREAM_PLAYER. The stream resolution is 360p.
  * Also, you can specify if the video to stream is a "live video".
  */
-void stream_video(const char* video_url, const bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp) {
+void stream_video(const char* video_url, const bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp, bool use_alternative_method) {
     char stream_videoplayer_cmd[2048];
     char stream_format[100];
     snprintf(stream_format, sizeof(stream_format), "res:%d,+codec:avc1:m4a", v_resolution);
@@ -219,8 +219,14 @@ void stream_video(const char* video_url, const bool is_a_live, VCODEC_RESOLUTION
         snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
                  "yt-dlp -S \"%s\" -o - \"%s\" | %s %s %s -", stream_format, video_url, mp->binary_path.c_str(), mp->parameters.c_str(), mp->extra_live_parameters.c_str());
     } else {
-        snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                "%s %s \"$(yt-dlp -S \"%s\" -g \"%s\")\"", mp->binary_path.c_str(), mp->parameters.c_str(), stream_format, video_url);
+        if (use_alternative_method) {
+            snprintf(stream_format, sizeof(stream_format), "bv*[height<=%d][vcodec^=avc]+ba[acodec^=mp4a]", v_resolution);
+            snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
+                    "yt-dlp -f \"%s\" -o - --merge-output-format mkv \"%s\" | %s %s -", stream_format, video_url, mp->binary_path.c_str(), mp->parameters.c_str());
+        } else {
+            snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
+                    "%s %s \"$(yt-dlp -S \"%s\" -g \"%s\")\"", mp->binary_path.c_str(), mp->parameters.c_str(), stream_format, video_url);
+        }
     }
     printf("%s\n", stream_videoplayer_cmd);
     system(stream_videoplayer_cmd);

@@ -168,7 +168,7 @@ static std::string do_youtube_search(const char* byTerm);
 
 std::string get_videoURL_metadata(const char* video_url);
 
-void stream_video(const char* video_url, const bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp);
+void stream_video(const char* video_url, const bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp, bool use_alternative_method = false);
 
 void download_video(const char* video_url, const char* download_path, VCODEC_RESOLUTIONS v_resolution, const char* vcodec);
 

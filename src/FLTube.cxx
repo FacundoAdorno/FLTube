@@ -271,6 +271,7 @@ void lock_buttons(bool lock){
             video_info_arr[j]->like_icon_bttn->activate();
         }
     }
+    Fl::check();
 }
 
 /** Callback to preview a video... */
@@ -300,7 +301,9 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
         char message[256];
         snprintf(message, sizeof(message), _("Starting streaming preview of video '%s' - (%s)..."), vi->title->label(), url->c_str());
         logger->info(message);
-        stream_video(url->c_str(), vi->is_live_image->visible(), STREAM_VIDEO_RESOLUTION, media_player);
+        lock_buttons(true);
+        stream_video(url->c_str(), vi->is_live_image->visible(), STREAM_VIDEO_RESOLUTION, media_player, (STREAM_VIDEO_RESOLUTION != VCODEC_RESOLUTIONS::R360p));
+        lock_buttons(false);
     } else {
         logger->error(_("Cannot get video URL. Review the video metadata enabling app debugging..."));
     }
