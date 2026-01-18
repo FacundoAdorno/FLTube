@@ -8,30 +8,48 @@ Although initially developed for [Spirit-OS](https://spirit-os.sourceforge.io/) 
 - A very lighweight app thanks to **C++** and **FLTK** toolkit *(support for FLTK 1.3.x or above)*.
 - Powered by **yt-dlp**, a feature-rich command-line audio/video downloader developed in Python.
 - With capabilities to search for videos on YouTube using search terms or a specific YouTube URL.
+- Ability to remember the watched and liked videos, as well as features to explore those videos through a "Navigation History" and a "Liked" video list.
+- Configurations available for change stream video resolution: 240p, 360p (default), 480p, 720p and 1080p.
 - Localized in English and Spanish, with the potential for future translation into other languages. Localization is done using [GNU gettext](https://www.gnu.org/software/gettext/).
 - Designed for low screen resolutions on small screens.
 - For now, the app only was tested on GNU/Linux.
 
 ![FLtube on Spirit OS!](https://i.postimg.cc/44QyBXH8/fltube-screenshot-5.png    "Fltube on Spirit OS")
 
-![FLtube on Debian 13 Trixie!](https://i.postimg.cc/yYfdCnPc/fltube-screenshot-6.png "Fltube on Debian 13 Trixie")
+![FLtube on Debian 13 Trixie!](https://fltube.sourceforge.io/img/screenshot_2.png "Fltube on Debian 13 Trixie")
+
+![FLtube showing Navigation History list!](https://fltube.sourceforge.io/img/screenshot_6.png "FLtube showing "Navigation History"" list")
 
 ------------
 
-## Installation
+## Installing from a Package
+
+32-bit and 64-bit .deb packages can be downloaded and installed, as well as an installation package for TinyCore-based distributions (.tcz).
+
+- Download from the [official FLTube website](https://fltube.sourceforge.io/).
+
+- Download from the [releases on GitLab](https://gitlab.com/facuA/fltube/-/releases).
+
+## Compile and install from source.
 
 Once downloaded the source code, you can compile it using [Make](https://www.gnu.org/software/make/). 
 > NOTE: By default, the installation directories are under `/usr/local`, so to find the binaries correctly after installation, you must ensure that `/usr/local/bin` is on your `$PATH` environment variable.
 
-### On SpiritOS (or any TinyCore-based distro)
+### On FLinux, SpiritOS, or any TinyCore-based distro
 
 Install app dependencies and compile using *make*.
 
 ```bash
 $ tce-load -wi make.tcz fluid.tcz pkg-config.tcz gettext.tcz \ 
-    curl-dev.tcz gcc.tcz glibc_base-dev.tcz tcc.tcz python3.9.tcz mplayer-cli.tcz 
+    curl-dev.tcz gcc.tcz glibc_base-dev.tcz tcc.tcz mplayer-cli.tcz 
+
+# Download and install Python 3.11.
+$ wget -q -O /tmp/python3.11.tcz  https://gitlab.com/-/project/74160365/uploads/f286ad3d76aabc21492b31853c76bd0c/python3.11.tcz
+$ tce-load -i python3.11.tcz
 
 $ sudo make install
+
+$ fltube        ## To open app.
 ```
 
 On some distribution more minimalist, like [FLinux](https://flinux-distro.sourceforge.io/), you must install some extra packages: 

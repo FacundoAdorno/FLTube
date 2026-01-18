@@ -8,28 +8,42 @@ Aunque inicialmente fue desarrollado para la distribución [Spirit-OS](https://s
 - Aplicación ligera gracias a **C++** y la librería **FLTK** *(soporta FLTK 1.3.x o superior)*.
 - Potenciado por **yt-dlp**, una herramienta para descargar videos/audios por línea de comandos, muy rica en características, y desarrollada en Python.
 - Con capacidad de búsqueda de video en YouTube usando términos de búsqueda o una URL de YouTube específica.
+- Capacidad para recordar los videos vistos y que gustaron, así como funciones para explorar esos videos a través de un "Historial de navegación" y una lista de videos "Me gusta".
+- Configuraciones disponibles para cambiar la resolución de transmisión de video: **240p**, **360p** (predeterminado), **480p**, **720p** y **1080p**.
 - Localizado al Inglés y Español, pero con potencial futuro a traducirse en otros idiomas. La localización se realiza mediante el uso de [GNU gettext](https://www.gnu.org/software/gettext/).
 - Diseñado para bajas resoluciones de pantalla en pantallas pequeñas.
 - Por ahora, la aplicación sólo fue probado en GNU/Linux.
 
 ![FLtube en Spirit OS!](https://i.postimg.cc/44QyBXH8/fltube-screenshot-5.png "Fltube en Spirit OS")
 
-![FLtube en Debian 13 Trixie!](https://i.postimg.cc/yYfdCnPc/fltube-screenshot-6.png "Fltube en Debian 13 Trixie")
+![FLtube en Debian 13 Trixie!](https://fltube.sourceforge.io/img/screenshot_2.png "Fltube en Debian 13 Trixie")
+
+![FLtube showing Navigation History list!](https://fltube.sourceforge.io/img/screenshot_6.png "FLtube showing "Navigation History"" list")
 
 
 ------------
 
-## Instalación
+## Instalar desde un paquete
+
+Se pueden descargar e instalar paquetes para 32 y 64 bits de .deb, así como un paquete de instalación para distribuciones basados en TinyCore (.tcz).
+- Descargar desde el [sitio oficial de FLTube](https://fltube.sourceforge.io/).
+- Descargar desde los [releases en Gitlab](https://gitlab.com/facuA/fltube/-/releases).
+
+## Compilar e instar desde el código fuente.
 
 Una vez descargado el código fuente (y siempre recomendable mantenerlo versionado con Git), puedes compilarlo utilizando [Make](https://www.gnu.org/software/make/).
 > NOTA: Por defecto, los directorios de instalación están bajo `/usr/local`, así que para encontrar los binarios del programa correctamente luego de la instalación, debes asegurarte que `/usr/local/bin` esté en la variable `$PATH` del sistema.
 
-### En SpiritOS (o cualquier otra distribución basada en TinyCore)
+### En FLinux, SpiritOS, o cualquier otra distribución basada en TinyCore
 
 Instalar las dependencias y compilar usando *make*.
 ```bash
 $ tce-load -wi make.tcz fluid.tcz pkg-config.tcz gettext.tcz \ 
-    curl-dev.tcz gcc.tcz glibc_base-dev.tcz tcc.tcz python3.9.tcz mplayer-cli.tcz 
+    curl-dev.tcz gcc.tcz glibc_base-dev.tcz tcc.tcz mplayer-cli.tcz 
+    
+# Descarga e instala Python 3.11.
+$ wget -q -O /tmp/python3.11.tcz  https://gitlab.com/-/project/74160365/uploads/f286ad3d76aabc21492b31853c76bd0c/python3.11.tcz
+$ tce-load -i python3.11.tcz
 
 $ sudo make install
 
