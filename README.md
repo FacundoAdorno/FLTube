@@ -18,7 +18,7 @@ Although initially developed for [Spirit-OS](https://spirit-os.sourceforge.io/) 
 
 ![FLtube on Debian 13 Trixie!](https://fltube.sourceforge.io/img/screenshot_2.png "Fltube on Debian 13 Trixie")
 
-![FLtube showing Navigation History list!](https://fltube.sourceforge.io/img/screenshot_6.png "FLtube showing "Navigation History"" list")
+![FLtube showing Navigation History list!](https://fltube.sourceforge.io/img/screenshot_6.png "FLtube showing 'Navigation History' list")
 
 ------------
 
