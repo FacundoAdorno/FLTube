@@ -210,6 +210,8 @@ std::string get_videoURL_metadata(const char* video_url){
 /**
  * Stream a video from a its URL using the configured multimedia player at @DEFAULT_STREAM_PLAYER. The stream resolution is 360p.
  * Also, you can specify if the video to stream is a "live video".
+ * If @use_alternative_method is true, then the video stream will be considered as a VBR stream, instead a CBR (like as 360p resolution).
+ *  More info about this at: https://getstream.io/glossary/cbr-vs-vbr/.
  */
 void stream_video(const char* video_url, const bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp, bool use_alternative_method) {
     char stream_videoplayer_cmd[2048];
