@@ -84,6 +84,8 @@ Fl_PNG_Image* like_red_icon_image = nullptr;
 
 std::shared_ptr<TerminalLogger> logger;
 
+std::atomic<bool> streaming_in_progress(false);
+
 /**
  * Callback for main window close action. By default, exit app with success status code (0).
  */
@@ -276,8 +278,8 @@ void lock_buttons(bool lock){
 
 /** Callback to preview a video... */
 void preview_video_cb(Fl_Button* widget, void* video_url){
-    mainWin->cursor(FL_CURSOR_WAIT);
-    Fl::check();
+    if (streaming_in_progress)
+        return;
     if (! verify_network_connection()) {
         logger->warn(_("Your device is offline. Check your internet connection."));
         showMessageWindow( _("There seems that you don't have access to the Internet. "
@@ -302,13 +304,19 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
         snprintf(message, sizeof(message), _("Starting streaming preview of video '%s' - (%s)..."), vi->title->label(), url->c_str());
         logger->info(message);
         lock_buttons(true);
-        stream_video(url->c_str(), vi->is_live_image->visible(), STREAM_VIDEO_RESOLUTION, media_player, (STREAM_VIDEO_RESOLUTION != VCODEC_RESOLUTIONS::R360p));
+        auto stream_lambda = [&](std::string* url, bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp, bool use_alternative_method) {
+            streaming_in_progress = true;
+            stream_video(url->c_str(), is_a_live, v_resolution, mp, use_alternative_method);
+            streaming_in_progress = false;
+
+        };
+        std::thread worker(stream_lambda, url, vi->is_live_image->visible(), STREAM_VIDEO_RESOLUTION, media_player, (STREAM_VIDEO_RESOLUTION != VCODEC_RESOLUTIONS::R360p));
+
+        worker.detach();
         lock_buttons(false);
     } else {
         logger->error(_("Cannot get video URL. Review the video metadata enabling app debugging..."));
     }
-    mainWin->cursor(FL_CURSOR_DEFAULT);
-    Fl::check();
 }
 
 /**
@@ -530,6 +538,25 @@ void pre_init() {
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
     std::filesystem::current_path(FLTUBE_TEMPORAL_DIR);
+
+    // Add a custom FLTK event dispatcher
+    Fl::event_dispatch([](int event, Fl_Window* w) -> int{
+        if (streaming_in_progress) {
+            // If streaming is in progress, then turncursor to default if changed...
+            mainWin->cursor(FL_CURSOR_WAIT);
+            Fl::check();
+            switch (event) {
+                case FL_PUSH:
+                case FL_RELEASE:
+                case FL_DRAG:
+                case FL_KEYDOWN:
+                case FL_KEYUP:
+                case FL_MOUSEWHEEL:
+                    return 1;       // Ignore this events when streaming in course...
+            }
+        }
+        return Fl::handle_(event, w);      // Otherwise, let default FLTK Handler handle the event...
+    });
 
 }
 
@@ -824,6 +851,7 @@ int getIntVersion() {
 int main(int argc, char **argv) {
     parseOptions(argc, argv);
     pre_init();
+
     char message[64];
     snprintf(message, sizeof(message), _("Starting FLTube v.%s\n"), VERSION);
     logger->info(message);
