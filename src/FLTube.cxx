@@ -247,8 +247,6 @@ void showFLTubeHelpWindow(Fl_Widget* w) {
 }
 
 
-//TODO: instead of locking buttons, try to lock main window or open a modal window
-//      making notice that you must wait some action to finish..
 /**
  * Lock/unlock the following buttons: main search, pagination, preview and search channel's video.
  */
@@ -310,6 +308,7 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
             streaming_in_progress = false;
 
         };
+        // TODO: in the future, a ThreadPool of one or more threads could be implemented for optimization. More info at https://www.geeksforgeeks.org/cpp/thread-pool-in-cpp/.
         std::thread worker(stream_lambda, url, vi->is_live_image->visible(), STREAM_VIDEO_RESOLUTION, media_player, (STREAM_VIDEO_RESOLUTION != VCODEC_RESOLUTIONS::R360p));
 
         worker.detach();
@@ -554,6 +553,9 @@ void pre_init() {
                 case FL_MOUSEWHEEL:
                     return 1;       // Ignore this events when streaming in course...
             }
+        } else {
+            mainWin->cursor(FL_CURSOR_DEFAULT);
+            Fl::check();
         }
         return Fl::handle_(event, w);      // Otherwise, let default FLTK Handler handle the event...
     });
