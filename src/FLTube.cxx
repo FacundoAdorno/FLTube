@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 - FLtube
+ * Copyright (C) 2025-2026 - FLtube
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, version 3, as published
@@ -236,7 +236,7 @@ void showFLTubeHelpWindow(Fl_Widget* w) {
         helpWin->authors_txt->wrap_mode(Fl_Text_Display::WRAP_AT_COLUMN, 50);
         snprintf(help_text_bffr, sizeof(help_text_bffr),
                  _("[*_ DEVELOPERS _*]\n  Facundo Gabriel Adorno (Argentina)\n    -Contact: adorno.facundo@gmail.com\n\n"
-                     "[*_ CONTRIBUTORS _*]\n  Nicolás Longardi (Uruguay)\n   -Contact: nico@locosporlinux.com\n"));
+                     "[*_ CONTRIBUTORS _*]\n  Nicolas Longardi (Uruguay)\n   -Contact: nico@locosporlinux.com\n"));
         helpWin->authors_txt->buffer()->text(help_text_bffr);
     }
     helpWin->show();

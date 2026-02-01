@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-24 01:46-0300\n"
-"PO-Revision-Date: 2025-12-24 01:58-0300\n"
+"POT-Creation-Date: 2026-02-01 13:35-0300\n"
+"PO-Revision-Date: 2026-02-01 13:36-0300\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: es\n"
@@ -37,30 +37,30 @@ msgstr ""
 "una combinación de teclas válida.\n"
 "\n"
 
-#: src/FLTube.cxx:93
+#: src/FLTube.cxx:95
 #, c-format
 msgid "Cleaning temporal files at %s."
 msgstr "Eliminando archivos temporales en %s."
 
-#: src/FLTube.cxx:101
+#: src/FLTube.cxx:103
 msgid "Closing FLtube... Bye!\n"
 msgstr "Cerrando FLTube... ¡Adiós!\n"
 
-#: src/FLTube.cxx:170
+#: src/FLTube.cxx:172
 #, c-format
 msgid "Resource image at '%s' cannot be loaded..."
 msgstr "El recurso de imágen en '%s' no puede ser cargado..."
 
-#: src/FLTube.cxx:196
+#: src/FLTube.cxx:198
 msgid "FLTube Help"
 msgstr "Ayuda de FLTube"
 
-#: src/FLTube.cxx:199
+#: src/FLTube.cxx:201
 #, c-format
 msgid "Version %s"
 msgstr "Versión %s"
 
-#: src/FLTube.cxx:208
+#: src/FLTube.cxx:210
 msgid ""
 "FLTube is an application for search & stream Youtube videos. You can search "
 "by a search term or by entering the URL of a specific YouTube video.\n"
@@ -108,7 +108,7 @@ msgstr ""
 "de corazón. Se generará una lista de videos llamada \"Liked\" para que "
 "puedas consultarla más adelante.\n"
 
-#: src/FLTube.cxx:215
+#: src/FLTube.cxx:217
 #, c-format
 msgid ""
 "- Focus at search input: %s\n"
@@ -144,7 +144,7 @@ msgstr ""
 "[NOTA] Los atajos por defecto puede ser modificados\n"
 "en el archivo de configuración %s.\n"
 
-#: src/FLTube.cxx:230
+#: src/FLTube.cxx:232
 #, c-format
 msgid ""
 "The current instance of FLTube is loading the configurations from %s file.\n"
@@ -180,7 +180,7 @@ msgstr ""
 " Los últimos dos parámetros pueden ser vacíos, pero DEBEN estar "
 "descomentadas si cambias el reproductor de video.\n"
 
-#: src/FLTube.cxx:236
+#: src/FLTube.cxx:238
 #, c-format
 msgid ""
 "[*_ DEVELOPERS _*]\n"
@@ -188,7 +188,7 @@ msgid ""
 "    -Contact: adorno.facundo@gmail.com\n"
 "\n"
 "[*_ CONTRIBUTORS _*]\n"
-"  Nicolás Longardi (Uruguay)\n"
+"  Nicolas Longardi (Uruguay)\n"
 "   -Contact: nico@locosporlinux.com\n"
 msgstr ""
 "[*_ DESARROLLADORES _*]\n"
@@ -196,14 +196,14 @@ msgstr ""
 "    -Contacto: adorno.facundo@gmail.com\n"
 "\n"
 "[*_ COLABORADORES _*]\n"
-"  Nicolás Longardi (Uruguay)\n"
+"  Nicolas Longardi (Uruguay)\n"
 "   -Contact: nico@locosporlinux.com\n"
 
-#: src/FLTube.cxx:281 src/FLTube.cxx:593
+#: src/FLTube.cxx:282 src/FLTube.cxx:625
 msgid "Your device is offline. Check your internet connection."
 msgstr "Tu dispositivo está fuera de línea. Revisa tu conexión a internet."
 
-#: src/FLTube.cxx:282 src/FLTube.cxx:594
+#: src/FLTube.cxx:283 src/FLTube.cxx:626
 msgid ""
 "There seems that you don't have access to the Internet. Please, verify you "
 "network connection before proceed..."
@@ -211,27 +211,27 @@ msgstr ""
 "Parece que no tienes conexión a Internet. Por favor, verifica tu conexión de "
 "red antes de proceder..."
 
-#: src/FLTube.cxx:301
+#: src/FLTube.cxx:302
 #, c-format
 msgid "Starting streaming preview of video '%s' - (%s)..."
 msgstr "Iniciando previsualización del video '%s' - (%s)..."
 
-#: src/FLTube.cxx:305
+#: src/FLTube.cxx:317
 msgid ""
 "Cannot get video URL. Review the video metadata enabling app debugging..."
 msgstr ""
 "No se puede descargar URL de video. Revisa los metadatos del video "
 "habilitando el debugging de la app..."
 
-#: src/FLTube.cxx:356
+#: src/FLTube.cxx:366
 msgid "viewers"
 msgstr "viendo"
 
-#: src/FLTube.cxx:356
+#: src/FLTube.cxx:366
 msgid "views"
 msgstr "vistas"
 
-#: src/FLTube.cxx:359
+#: src/FLTube.cxx:369
 #, c-format
 msgid ""
 "Error when getting count of viewers of video: (title: \"%s\", ID: \"%s\")"
@@ -239,20 +239,20 @@ msgstr ""
 "Error al obtener cantidad de espectadores de un video: (título: \"%s\", ID: "
 "\"%s\")"
 
-#: src/FLTube.cxx:362
+#: src/FLTube.cxx:372
 msgid "Unknown"
 msgstr "Desconocido"
 
-#: src/FLTube.cxx:375
+#: src/FLTube.cxx:385
 msgid ""
 "Something went wrong when generating a resize thumbnail for video with ID="
 msgstr "Algo falló al generar una miniatura re-escalada para el video con ID="
 
-#: src/FLTube.cxx:484
+#: src/FLTube.cxx:494
 msgid "Loading configurations from "
 msgstr "Cargando configuraciones desde "
 
-#: src/FLTube.cxx:490
+#: src/FLTube.cxx:500
 msgid ""
 "yt-dlp is not installed on your system or its binary is not at $PATH system "
 "variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run "
@@ -262,11 +262,11 @@ msgstr ""
 "variable $PATH del sistema. Instalalo desde https://github.com/yt-dlp/yt-"
 "dlp. Ó ejecuta en una terminal el comando 'install_yt-dlp'."
 
-#: src/FLTube.cxx:491
+#: src/FLTube.cxx:501
 msgid "yt-dlp is not installed. Closing app...\n"
 msgstr "yt-dlp no está instalado. Cerrando app...\n"
 
-#: src/FLTube.cxx:520
+#: src/FLTube.cxx:530
 msgid ""
 "Default streaming resolution (360p) changed at configuration to this new "
 "resolution: "
@@ -274,12 +274,12 @@ msgstr ""
 "Resolución de streaming por defecto (360p) fue cambiada mediante "
 "configuración a esta nueva resolución: "
 
-#: src/FLTube.cxx:600
+#: src/FLTube.cxx:632
 #, c-format
 msgid "Searching for results for '%s' user input..."
 msgstr "Buscando resultados para la entrada del usuario: '%s' ..."
 
-#: src/FLTube.cxx:605
+#: src/FLTube.cxx:637
 msgid ""
 "For now, only Youtube URL's are valid for download. Please, edit your input "
 "text or search using a generic term."
@@ -287,53 +287,53 @@ msgstr ""
 "Por ahora, sólo URL's de Youtube son válidas para descargar. Por favor, "
 "edita tu entrada ó realiza una búsqueda por término de búsqueda."
 
-#: src/FLTube.cxx:645
+#: src/FLTube.cxx:677
 msgid "The Fl_Button is inexistent when search videos for a channel!!!\n"
 msgstr ""
 "El FL_Button es inexistente al hacer búsqueda de videos para un canal!!!\n"
 
-#: src/FLTube.cxx:651
+#: src/FLTube.cxx:683
 msgid ""
 "Channel ID is empty. Please verify the video metadata initilization!!!\n"
 msgstr ""
 "El ID del Canal es inexistente. Por favor, verifica la inicialización de los "
 "metadatos del video!!!\n"
 
-#: src/FLTube.cxx:675
+#: src/FLTube.cxx:707
 msgid "The Fl_Input search widget inexistent!!!\n"
 msgstr "El widget de búsqueda FL_Input no existe!!!\n"
 
-#: src/FLTube.cxx:681
+#: src/FLTube.cxx:713
 msgid "Search input is empty. Please, retry and enter a valid text."
 msgstr ""
 "La entrada está vacía. Por favor, re-inténtalo e ingresa un texto válido."
 
-#: src/FLTube.cxx:787
+#: src/FLTube.cxx:819
 #, c-format
 msgid "Loading custom config file %s.\n"
 msgstr "Cargando archivo de configuración personalizado: %s.\r\n"
 
-#: src/FLTube.cxx:790
+#: src/FLTube.cxx:822
 #, c-format
 msgid "Specified path at --config parameter does not exist.\n"
 msgstr "La ruta especificada en el parámetro --config no existe.\n"
 
-#: src/FLTube.cxx:792
+#: src/FLTube.cxx:824
 #, c-format
 msgid "--config parameter with no path specified.\n"
 msgstr "El parámetro --config no especifica una ruta de archivo.\n"
 
-#: src/FLTube.cxx:798
+#: src/FLTube.cxx:830
 #, c-format
 msgid "DEBUG MODE enabled.\n"
 msgstr "MODO DEBUG habilitado.\n"
 
-#: src/FLTube.cxx:825
+#: src/FLTube.cxx:858
 #, c-format
 msgid "Starting FLTube v.%s\n"
 msgstr "Iniciando FLTube v.%s\n"
 
-#: src/FLTube.cxx:844
+#: src/FLTube.cxx:877
 msgid "The FLTube main window has loaded."
 msgstr "La ventana principal de FLTube ha sido cargada."
 
@@ -347,7 +347,7 @@ msgstr "Se produjo un error al ejecutar el siguiente comando: %s \n"
 msgid "Closing the program due to an error.\n"
 msgstr "Cerrando el programa debido a un error.\n"
 
-#: src/fltube_utils.cxx:372
+#: src/fltube_utils.cxx:380
 #, c-format
 msgid "Connection testing failure: %s. Check your connectivity.\n"
 msgstr "Prueba de conexión fallida: %s. Verifica tu conectividad.\n"

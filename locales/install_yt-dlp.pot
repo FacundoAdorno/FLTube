@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-23 00:09-0300\n"
+"POT-Creation-Date: 2026-02-01 13:34-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: scripts/install_yt-dlp.sh:38
+#: scripts/install_yt-dlp.sh:39
 #, sh-printf-format
 msgid ""
 "[ == HELP == ]\n"
@@ -42,47 +42,47 @@ msgid ""
 "  -h,   Show this usage help."
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:86
+#: scripts/install_yt-dlp.sh:87
 #, sh-printf-format
 msgid "'%s' does not exists. Do you want to create it?"
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:88 scripts/install_yt-dlp.sh:94
+#: scripts/install_yt-dlp.sh:89 scripts/install_yt-dlp.sh:95
 #, sh-printf-format
 msgid "Directory '%s' created."
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:90
+#: scripts/install_yt-dlp.sh:91
 #, sh-printf-format
 msgid "You must create '%s' before procced. Aborting installation..."
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:96
+#: scripts/install_yt-dlp.sh:97
 msgid "Starting 'yt-dlp' DOWNLOAD..."
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:100
+#: scripts/install_yt-dlp.sh:101
 #, sh-printf-format
 msgid "'yt-dlp' installed at %s/yt-dlp path."
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:109
+#: scripts/install_yt-dlp.sh:110
 #, sh-printf-format
 msgid "Starting 'quickjs@%s' DOWNLOAD..."
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:115
+#: scripts/install_yt-dlp.sh:116
 #, sh-printf-format
 msgid "'quickjs' installed at %s/%s path."
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:118
+#: scripts/install_yt-dlp.sh:119
 msgid ""
 "'quickjs' cannot be downloaded for some reason. Download manually or run "
 "this script again..."
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:147
+#: scripts/install_yt-dlp.sh:148
 #, sh-printf-format
 msgid ""
 "'yt-dlp' is installed globally at your system %s.\n"
@@ -92,20 +92,20 @@ msgid ""
 "system?"
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:162
+#: scripts/install_yt-dlp.sh:163
 #, sh-printf-format
 msgid "'yt-dlp' is not in your system. Do you want to install at '%s'?"
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:167
+#: scripts/install_yt-dlp.sh:168
 msgid "Installation aborted by user choice..."
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:176
+#: scripts/install_yt-dlp.sh:177
 #, sh-printf-format
 msgid "Do you want to update 'yt-dlp@%s' to any NEW VERSION (if any)?"
 msgstr ""
 
-#: scripts/install_yt-dlp.sh:181
+#: scripts/install_yt-dlp.sh:182
 msgid "yt-dlp update process aborted by user choice..."
 msgstr ""

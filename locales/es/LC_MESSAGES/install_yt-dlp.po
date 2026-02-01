@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: install_yt-dlp by FLTube\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-23 00:09-0300\n"
+"POT-Creation-Date: 2026-02-01 13:34-0300\n"
 "PO-Revision-Date: 2025-11-22 23:42-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.8\n"
 
-#: scripts/install_yt-dlp.sh:38
+#: scripts/install_yt-dlp.sh:39
 #, sh-printf-format
 msgid ""
 "[ == HELP == ]\n"
@@ -64,41 +64,41 @@ msgstr ""
 "ejecución.\n"
 "  -h,   Muestra este texto de ayuda."
 
-#: scripts/install_yt-dlp.sh:86
+#: scripts/install_yt-dlp.sh:87
 #, sh-printf-format
 msgid "'%s' does not exists. Do you want to create it?"
 msgstr "'%s' No existe. ¿Deseas crearlo?"
 
-#: scripts/install_yt-dlp.sh:88 scripts/install_yt-dlp.sh:94
+#: scripts/install_yt-dlp.sh:89 scripts/install_yt-dlp.sh:95
 #, sh-printf-format
 msgid "Directory '%s' created."
 msgstr "Directorio '%s' creado."
 
-#: scripts/install_yt-dlp.sh:90
+#: scripts/install_yt-dlp.sh:91
 #, sh-printf-format
 msgid "You must create '%s' before procced. Aborting installation..."
 msgstr "Debes crear '%s' antes de proceder. Abortando instalación..."
 
-#: scripts/install_yt-dlp.sh:96
+#: scripts/install_yt-dlp.sh:97
 msgid "Starting 'yt-dlp' DOWNLOAD..."
 msgstr "Comenzando la DESCARGA de 'yt-dlp'..."
 
-#: scripts/install_yt-dlp.sh:100
+#: scripts/install_yt-dlp.sh:101
 #, sh-printf-format
 msgid "'yt-dlp' installed at %s/yt-dlp path."
 msgstr "'yt-dlp' instalado en la ruta %s/yt-dlp."
 
-#: scripts/install_yt-dlp.sh:109
+#: scripts/install_yt-dlp.sh:110
 #, sh-printf-format
 msgid "Starting 'quickjs@%s' DOWNLOAD..."
 msgstr "Comenzando la DESCARGA de 'QuickJS@%s'..."
 
-#: scripts/install_yt-dlp.sh:115
+#: scripts/install_yt-dlp.sh:116
 #, sh-printf-format
 msgid "'quickjs' installed at %s/%s path."
 msgstr "'QuickJS' instalado en la ruta %s/%s."
 
-#: scripts/install_yt-dlp.sh:118
+#: scripts/install_yt-dlp.sh:119
 msgid ""
 "'quickjs' cannot be downloaded for some reason. Download manually or run "
 "this script again..."
@@ -106,7 +106,7 @@ msgstr ""
 "'QuickJS' no puede ser descargado por alguna razón. Descargalo manualmente o "
 "ejecuta este script nuevamente..."
 
-#: scripts/install_yt-dlp.sh:147
+#: scripts/install_yt-dlp.sh:148
 #, sh-printf-format
 msgid ""
 "'yt-dlp' is installed globally at your system %s.\n"
@@ -120,22 +120,22 @@ msgstr ""
 "para descargar la última versión de 'yt-dlp'.\n"
 "    ¿Deseas continuar e instalar otro binario de 'yt-dlp' en el sistema?"
 
-#: scripts/install_yt-dlp.sh:162
+#: scripts/install_yt-dlp.sh:163
 #, sh-printf-format
 msgid "'yt-dlp' is not in your system. Do you want to install at '%s'?"
 msgstr "'yt-dlp' no está instalado en tu sistema. ¿Deseas instalarlo en '%s'?"
 
-#: scripts/install_yt-dlp.sh:167
+#: scripts/install_yt-dlp.sh:168
 msgid "Installation aborted by user choice..."
 msgstr "Instalación abortada por elección del usuario..."
 
-#: scripts/install_yt-dlp.sh:176
+#: scripts/install_yt-dlp.sh:177
 #, sh-printf-format
 msgid "Do you want to update 'yt-dlp@%s' to any NEW VERSION (if any)?"
 msgstr ""
 "¿Deseas actualizar 'yt-dlp@%s' a una NUEVA VERSIÓN (si es que hay otra más "
 "reciente)?"
 
-#: scripts/install_yt-dlp.sh:181
+#: scripts/install_yt-dlp.sh:182
 msgid "yt-dlp update process aborted by user choice..."
 msgstr "actualización abortada por elección del usuario..."

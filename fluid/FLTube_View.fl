@@ -8,7 +8,7 @@ i18n_gnu_static_function gettext_noop
 header_name {.h}
 code_name {.cxx}
 comment {/*
- * Copyright (C) 2025 - FLtube
+ * Copyright (C) 2025-2026 - FLtube
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, version 3, as published
