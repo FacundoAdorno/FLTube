@@ -68,10 +68,11 @@ install: all
 	mv $(TARGET) $(PREFIX)/usr/local/bin/
 	cp $(SCRIPTS_DIR)/install_yt-dlp.sh $(PREFIX)/usr/local/bin/
 
-	mkdir -p $(PREFIX)/usr/local/share/icons/fltube/ $(PREFIX)/usr/local/share/{applications,fltube/resources/img}
+	mkdir -p $(PREFIX)/usr/local/share/icons/fltube/ $(PREFIX)/usr/local/share/{applications,fltube/resources/img,fltube/resources/animations}
 	cp resources/desktop/fltube.desktop $(PREFIX)/usr/local/share/applications/
 	cp resources/icons/*.png $(PREFIX)/usr/local/share/icons/fltube/
 	cp resources/img/*.png $(PREFIX)/usr/local/share/fltube/resources/img/
+	cp resources/animations/*.tar.gz $(PREFIX)/usr/local/share/fltube/resources/animations/
 
 uninstall:
 	rm $(PREFIX)/usr/local/etc/fltube/fltube.conf $(PREFIX)/usr/local/bin/fltube $(PREFIX)/usr/local/bin/install_yt-dlp.sh $(PREFIX)/usr/local/share/applications/fltube.desktop $(PREFIX)/usr/local/share/icons/fltube/*.png $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/FLTube.mo $(PREFIX)/usr/local/share/locale/es/LC_MESSAGES/install_yt-dlp.mo $(PREFIX)/usr/local/share/fltube/resources/img/*.png

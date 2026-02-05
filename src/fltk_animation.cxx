@@ -13,7 +13,6 @@
 
 
 #include "../include/fltk_animation.h"
-#include <filesystem>
 
 SimpleAnimation::SimpleAnimation(Fl_Box* box, std::string path_compressed_animation, std::string extraction_path, int count_of_frames, FPS_MS animation_fps): PATH_TO_COMPRESSED_ANIMATION(path_compressed_animation), PATH_TO_EXTRACTED_FRAMES(extraction_path), NUMBER_OF_FRAMES(count_of_frames), FPS(animation_fps), target_box_for_animation(box), current_frame(0), images({}), has_errors(false)
     {

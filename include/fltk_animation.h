@@ -17,6 +17,7 @@
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Box.H>
+#include <FL/Fl.H>
 #include <string>
 #include <vector>
 #include <iostream>
