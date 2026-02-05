@@ -5,4 +5,5 @@ curl.tcz
 ffmpeg4.tcz
 bash.tcz
 gettext.tcz
+libarchive3.tcz
 python3.11.tcz

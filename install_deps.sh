@@ -3,9 +3,9 @@
 ## Use this script to install all system packages required for compilation of FLTube from source.
 
 # Packages required for Compilation at Debians-based systems.
-COMPILATION_DEPS_DEBIAN="libfltk1.3-dev pkg-config libcurl4-openssl-dev g++ python3 gettext wget mplayer ffmpeg libpng-dev zlib1g-dev libjpeg-dev libxrender-dev libxcursor-dev libxfixes-dev libxext-dev libxft-dev libfontconfig1-dev libxinerama-dev"
+COMPILATION_DEPS_DEBIAN="libfltk1.3-dev pkg-config libcurl4-openssl-dev g++ python3 gettext wget mplayer ffmpeg libpng-dev zlib1g-dev libjpeg-dev libxrender-dev libxcursor-dev libxfixes-dev libxext-dev libxft-dev libfontconfig1-dev libxinerama-dev libarchive-dev"
 # Packages required for Compilation at TinyCoreLinux-based systems.
-COMPILATION_DEPS_TINYCORE="make.tcz fluid.tcz pkg-config.tcz gettext.tcz curl-dev.tcz gcc.tcz glibc_base-dev.tcz tcc.tcz  mplayer-cli.tcz ffmpeg4.tcz libEGL.tcz bash.tcz squashfs-tools.tcz"
+COMPILATION_DEPS_TINYCORE="make.tcz fluid.tcz pkg-config.tcz gettext.tcz curl-dev.tcz gcc.tcz glibc_base-dev.tcz tcc.tcz  mplayer-cli.tcz ffmpeg4.tcz libEGL.tcz bash.tcz squashfs-tools.tcz libarchive3-dev.tcz"
 
 case "$1" in
     --debian)

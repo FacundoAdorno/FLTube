@@ -5,7 +5,7 @@ Maintainer: Facundo G. Adorno <adorno.facundo@gmail.com>
 Architecture: -REPLACE_ARCH-
 Vcs-Git: https://gitlab.com/facuA/fltube.git
 Version: -REPLACE_VERSION-
-Depends: curl, python3, gettext, wget, mplayer, ffmpeg
+Depends: curl, python3, gettext, wget, mplayer, ffmpeg, libarchive13
 Description: Lightweight FLTK App for search & stream Youtube videos.
  FLTube is an application for search & stream Youtube videos. For low-resources PC's. Written for FLTK and powered by yt-dlp.
 Description-es: Aplicación ligera para buscar y reproducir videos desde Youtube.
