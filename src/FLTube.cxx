@@ -17,6 +17,7 @@
 #include "../include/fltube_utils.h"
 #include "../include/configuration_manager.h"
 #include "../include/userdata_manager.h"
+#include "../include/fltk_animation.h"
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -81,6 +82,10 @@ Fl_PNG_Image* already_viewed_image = nullptr;
 
 Fl_PNG_Image* like_icon_image = nullptr;
 Fl_PNG_Image* like_red_icon_image = nullptr;
+
+Fl_Cursor current_displayed_cursor = FL_CURSOR_DEFAULT;
+
+SimpleAnimation* play_animation;
 
 std::shared_ptr<TerminalLogger> logger;
 
@@ -312,6 +317,10 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
         std::thread worker(stream_lambda, url, vi->is_live_image->visible(), STREAM_VIDEO_RESOLUTION, media_player, (STREAM_VIDEO_RESOLUTION != VCODEC_RESOLUTIONS::R360p));
 
         worker.detach();
+        if (! play_animation->fail_to_load()) {
+            play_animation->set_box(vi->thumbnail_overlay);
+            play_animation->start();
+        }
         lock_buttons(false);
     } else {
         logger->error(_("Cannot get video URL. Review the video metadata enabling app debugging..."));
@@ -504,6 +513,10 @@ void pre_init() {
     //Init Localization. Use locale path specified at config, or custom config default_locale_path().
     setup_gettext("", config->getProperty("LOCALE_PATH", default_locale_path().c_str()));
 
+    //Create temporal directory and change current working directory to that dir.
+    std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
+    std::filesystem::current_path(FLTUBE_TEMPORAL_DIR);
+
     media_player = new MediaPlayerInfo();
     if(config->existProperty("STREAM_PLAYER_PATH")) {
         media_player->binary_path = config->getProperty("STREAM_PLAYER_PATH", "");
@@ -534,16 +547,18 @@ void pre_init() {
     like_icon_image = load_resource_image("heart_18p.png");
     like_red_icon_image = load_resource_image("heart_18p_red.png");
 
-    //Create temporal directory and change current working directory to that dir.
-    std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
-    std::filesystem::current_path(FLTUBE_TEMPORAL_DIR);
+    // Load here all animations used at this program.
+    play_animation =  new SimpleAnimation(nullptr, RESOURCES_PATH + "/animations/playicon2/playicon2.tar.gz", FLTUBE_TEMPORAL_DIR + "/animations/playicon2", 31, FPS_MS::_30FPS);
 
     // Add a custom FLTK event dispatcher
     Fl::event_dispatch([](int event, Fl_Window* w) -> int{
         if (streaming_in_progress) {
-            // If streaming is in progress, then turncursor to default if changed...
-            mainWin->cursor(FL_CURSOR_WAIT);
-            Fl::check();
+            // If streaming is in progress, then turn cursor to default if changed...
+            if (current_displayed_cursor == FL_CURSOR_DEFAULT) {
+                mainWin->cursor(FL_CURSOR_WAIT);
+                current_displayed_cursor = FL_CURSOR_WAIT;
+                Fl::check();
+            }
             switch (event) {
                 case FL_PUSH:
                 case FL_RELEASE:
@@ -554,7 +569,15 @@ void pre_init() {
                     return 1;       // Ignore this events when streaming in course...
             }
         } else {
-            mainWin->cursor(FL_CURSOR_DEFAULT);
+            if ( current_displayed_cursor == FL_CURSOR_WAIT)  {
+                mainWin->cursor(FL_CURSOR_DEFAULT);
+                current_displayed_cursor = FL_CURSOR_DEFAULT;
+            }
+            // Remove the play animation...
+            if(!play_animation->fail_to_load() && play_animation->has_box() && play_animation->is_active()) {
+                play_animation->stop();
+                play_animation->clear_box();
+            }
             Fl::check();
         }
         return Fl::handle_(event, w);      // Otherwise, let default FLTK Handler handle the event...
@@ -619,6 +642,7 @@ VideoInfo* create_video_group(int posx, int posy) {
 void doSearch(const char* input_text, bool is_a_channel) {
     //Change cursor to wait symbol, to indicate that the search is in process...
     mainWin->cursor(FL_CURSOR_WAIT);
+    current_displayed_cursor = FL_CURSOR_WAIT;
     Fl::check();
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
@@ -666,6 +690,7 @@ void doSearch(const char* input_text, bool is_a_channel) {
     update_video_info();
     //Restore cursor to default when search is done.
     mainWin->cursor(FL_CURSOR_DEFAULT);
+    current_displayed_cursor = FL_CURSOR_DEFAULT;
     Fl::check();
 }
 

@@ -51,6 +51,7 @@ class VideoInfo : public Fl_Group {
 public:
   VideoInfo(int X, int Y, int W, int H, const char *L = 0);
   Fl_Button *thumbnail;
+  Fl_Box *thumbnail_overlay;
   Fl_Box *views_spectators;
   Fl_Box *is_live_image;
   Fl_Box *already_viewed_icon;

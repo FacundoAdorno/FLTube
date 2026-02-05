@@ -1,9 +1,9 @@
 # Variables
 CXX      = $(shell fltk-config --cxx)
 DEBUG    = -g
-CXXFLAGS = $(shell fltk-config --use-images --cxxflags) -fexceptions -Iinclude `pkg-config --cflags libcurl`
+CXXFLAGS = $(shell fltk-config --use-images --cxxflags) -fexceptions -Iinclude `pkg-config --cflags libcurl` `pkg-config --cflags libarchive`
 #LDFLAGS  = $(shell fltk-config --use-gl --use-images --ldflags) `pkg-config --libs libcurl`
-LDSTATIC  = $(shell fltk-config --use-images --ldstaticflags) -fexceptions `pkg-config --libs libcurl`
+LDSTATIC  = $(shell fltk-config --use-images --ldstaticflags) -fexceptions `pkg-config --libs libcurl` `pkg-config --libs libarchive`
 LINK     = $(CXX)
 SHELL 	:= /bin/bash
 
@@ -26,7 +26,7 @@ INSTALL_YTDLP_SCRIPTNAME = install_yt-dlp
 LOCALE_INSTALL_DIR = /usr/local/share/locale
 # Files
 TARGET = $(BUILD_DIR)/fltube
-SOURCES_LIST = fltube_utils.cxx gnugettext_utils.cxx FLTube_View.cxx FLTube.cxx configuration_manager.cxx userdata_manager.cxx
+SOURCES_LIST = fltube_utils.cxx gnugettext_utils.cxx FLTube_View.cxx FLTube.cxx configuration_manager.cxx userdata_manager.cxx fltk_animation.cxx
 SOURCES = $(addprefix $(SRC_DIR)/, $(SOURCES_LIST))
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cxx=$(BUILD_DIR)/%.o)
 FLTUBE_VERSION=2.1.0

@@ -107,6 +107,10 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
   { thumbnail = new Fl_Button(6, 5, 95, 80);
     thumbnail->tooltip(_("Click to stream the video (preview it)..."));
   } // Fl_Button* thumbnail
+  { thumbnail_overlay = new Fl_Box(6, 5, 95, 80);
+    thumbnail_overlay->tooltip(_("This video is currently played..."));
+    thumbnail_overlay->hide();
+  } // Fl_Box* thumbnail_overlay
   { views_spectators = new Fl_Box(105, 43, 110, 20);
     views_spectators->tooltip(_("Total video views, or if live current count of concurrent spectators."));
     views_spectators->align(Fl_Align(356|FL_ALIGN_INSIDE));
