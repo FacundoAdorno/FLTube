@@ -135,7 +135,11 @@ void SimpleAnimation::set_box(Fl_Box* box) {
 }
 
 SimpleAnimation::~SimpleAnimation(){
-    //TODO finalizar este método...
+    // Release memory deleting pointer to images.
+    for (auto& img: images) {
+        delete img;
+    }
+    images.clear();
 }
 
 Fl_RGB_Image* SimpleAnimation::load_image(const char* path) {

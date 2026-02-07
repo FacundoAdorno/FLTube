@@ -548,6 +548,7 @@ void pre_init() {
     like_red_icon_image = load_resource_image("heart_18p_red.png");
 
     // Load here all animations used at this program.
+    logger->debug("Starting to loading app animations...");
     play_animation =  new SimpleAnimation(nullptr, RESOURCES_PATH + "/animations/playicon_simple.tar.gz", FLTUBE_TEMPORAL_DIR + "/animations/playicon2", 2, FPS_MS::_2FPS);
 
     // Add a custom FLTK event dispatcher
