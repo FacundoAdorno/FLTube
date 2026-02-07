@@ -134,6 +134,10 @@ void SimpleAnimation::set_box(Fl_Box* box) {
     reset();
 }
 
+SimpleAnimation::~SimpleAnimation(){
+    //TODO finalizar este método...
+}
+
 Fl_RGB_Image* SimpleAnimation::load_image(const char* path) {
     // Load PNG Image
     Fl_PNG_Image* png_image = new Fl_PNG_Image(path);

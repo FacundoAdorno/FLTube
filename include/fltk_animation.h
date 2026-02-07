@@ -28,6 +28,10 @@
 
 // It indicates how long a millisecond lasts according to the number of FPS.
 enum FPS_MS {
+    _1FPS  = 1000,
+    _2FPS  = 500,
+    _4FPS  = 250,
+    _5FPS  = 200,
     _10FPS = 100,
     _20FPS = 50,
     _30FPS = 33,

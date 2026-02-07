@@ -548,7 +548,7 @@ void pre_init() {
     like_red_icon_image = load_resource_image("heart_18p_red.png");
 
     // Load here all animations used at this program.
-    play_animation =  new SimpleAnimation(nullptr, RESOURCES_PATH + "/animations/playicon2.tar.gz", FLTUBE_TEMPORAL_DIR + "/animations/playicon2", 31, FPS_MS::_30FPS);
+    play_animation =  new SimpleAnimation(nullptr, RESOURCES_PATH + "/animations/playicon_simple.tar.gz", FLTUBE_TEMPORAL_DIR + "/animations/playicon2", 2, FPS_MS::_2FPS);
 
     // Add a custom FLTK event dispatcher
     Fl::event_dispatch([](int event, Fl_Window* w) -> int{
