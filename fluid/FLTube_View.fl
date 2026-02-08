@@ -86,11 +86,14 @@ widget_class FLTubeMainWindow {
   }
 }
 
-widget_class VideoInfo {open selected
+widget_class VideoInfo {open
   xywh {0 0 577 91} visible position_relative
 } {
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
+  }
+  Fl_Box thumbnail_overlay {selected
+    tooltip {This video is currently played...} xywh {6 5 95 80} hide
   }
   Fl_Box views_spectators {
     tooltip {Total video views, or if live current count of concurrent spectators.} bind_image 1 xywh {105 43 110 20} align 372

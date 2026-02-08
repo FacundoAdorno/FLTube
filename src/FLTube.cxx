@@ -38,6 +38,10 @@ VCODEC_RESOLUTIONS STREAM_VIDEO_RESOLUTION = R360p;
 
 // Array that holds the search results WIDGETS, in groups of size @SEARCH_PAGE_SIZE...
 std::array <VideoInfo*,SEARCH_PAGE_SIZE> video_info_arr{ nullptr, nullptr, nullptr, nullptr };
+
+// Pointer to the video currently selected for stream...
+VideoInfo* video_selected_for_stream = nullptr;
+
 // Array that holds the search results METADATA, in groups of size @SEARCH_PAGE_SIZE...
 std::array <YTDLP_Video_Metadata*,SEARCH_PAGE_SIZE> video_metadata{ nullptr, nullptr, nullptr, nullptr };
 
@@ -82,14 +86,22 @@ Fl_PNG_Image* already_viewed_image = nullptr;
 Fl_PNG_Image* like_icon_image = nullptr;
 Fl_PNG_Image* like_red_icon_image = nullptr;
 
+Fl_PNG_Image* playicon_image = nullptr;
+
+/* Keep the current displayed cursor. FLTK doesn't have a way to know this. */
+Fl_Cursor current_displayed_cursor = FL_CURSOR_DEFAULT;
+
 std::shared_ptr<TerminalLogger> logger;
 
-std::atomic<bool> streaming_in_progress(false);
+std::atomic<bool> ytdlp_action_in_progress(false);
 
 /**
  * Callback for main window close action. By default, exit app with success status code (0).
  */
 void exitApp(unsigned short int exitStatusCode = FLT_OK) {
+    if (ytdlp_action_in_progress) {
+        logger->info(_("The main window was closed by user demand when a video was in streaming."));
+    }
     //Do some cleaning...
     char message[1024];
     snprintf(message, sizeof(message), _("Cleaning temporal files at %s."), FLTUBE_TEMPORAL_DIR.c_str());
@@ -193,6 +205,15 @@ void openURI(const char* uri) {
     }
 }
 
+/* Change the current window cursor to any valid Fl_Cursor. If no parameter passed, change to FL_CURSOR_DEFAULT. */
+void change_cursor(Fl_Cursor new_cursor = FL_CURSOR_DEFAULT) {
+    if (current_displayed_cursor != new_cursor) {
+        mainWin->cursor(new_cursor);
+        current_displayed_cursor = new_cursor;
+        Fl::check();
+    }
+}
+
 void showFLTubeHelpWindow(Fl_Widget* w) {
     if (helpWin == nullptr) {
         helpWin = new HelpFLTubeWindow(480, 352, _("FLTube Help"));
@@ -276,7 +297,7 @@ void lock_buttons(bool lock){
 
 /** Callback to preview a video... */
 void preview_video_cb(Fl_Button* widget, void* video_url){
-    if (streaming_in_progress)
+    if (ytdlp_action_in_progress)
         return;
     if (! verify_network_connection()) {
         logger->warn(_("Your device is offline. Check your internet connection."));
@@ -287,6 +308,9 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
     std::string* url = static_cast<std::string*>(video_url);
     if (url){
         VideoInfo *vi = static_cast<VideoInfo *>(widget->parent());
+        video_selected_for_stream = vi;
+        video_selected_for_stream->thumbnail_overlay->image(playicon_image);
+        video_selected_for_stream->thumbnail_overlay->show();
         //Registering view of current video at History List...
         std::string id = *url;
         replace_all(id, std::string(YOUTUBE_URL_PREFIX), "");
@@ -301,18 +325,16 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
         char message[256];
         snprintf(message, sizeof(message), _("Starting streaming preview of video '%s' - (%s)..."), vi->title->label(), url->c_str());
         logger->info(message);
-        lock_buttons(true);
         auto stream_lambda = [&](std::string* url, bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp, bool use_alternative_method) {
-            streaming_in_progress = true;
+            ytdlp_action_in_progress = true;
             stream_video(url->c_str(), is_a_live, v_resolution, mp, use_alternative_method);
-            streaming_in_progress = false;
+            ytdlp_action_in_progress = false;
 
         };
         // TODO: in the future, a ThreadPool of one or more threads could be implemented for optimization. More info at https://www.geeksforgeeks.org/cpp/thread-pool-in-cpp/.
         std::thread worker(stream_lambda, url, vi->is_live_image->visible(), STREAM_VIDEO_RESOLUTION, media_player, (STREAM_VIDEO_RESOLUTION != VCODEC_RESOLUTIONS::R360p));
 
         worker.detach();
-        lock_buttons(false);
     } else {
         logger->error(_("Cannot get video URL. Review the video metadata enabling app debugging..."));
     }
@@ -533,6 +555,7 @@ void pre_init() {
     already_viewed_image = load_resource_image("clock_18p.png");
     like_icon_image = load_resource_image("heart_18p.png");
     like_red_icon_image = load_resource_image("heart_18p_red.png");
+    playicon_image = load_resource_image("playicon.png");
 
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
@@ -540,10 +563,10 @@ void pre_init() {
 
     // Add a custom FLTK event dispatcher
     Fl::event_dispatch([](int event, Fl_Window* w) -> int{
-        if (streaming_in_progress) {
-            // If streaming is in progress, then turncursor to default if changed...
-            mainWin->cursor(FL_CURSOR_WAIT);
-            Fl::check();
+        if (ytdlp_action_in_progress) {
+            // If streaming is in progress, then turn cursor to default if changed...
+            if (current_displayed_cursor != FL_CURSOR_WAIT) lock_buttons(true);
+            change_cursor(FL_CURSOR_WAIT);
             switch (event) {
                 case FL_PUSH:
                 case FL_RELEASE:
@@ -554,8 +577,15 @@ void pre_init() {
                     return 1;       // Ignore this events when streaming in course...
             }
         } else {
-            mainWin->cursor(FL_CURSOR_DEFAULT);
-            Fl::check();
+            if (current_displayed_cursor != FL_CURSOR_DEFAULT) {
+                lock_buttons(false);
+                if (video_selected_for_stream->thumbnail_overlay->visible()) {
+                    video_selected_for_stream->thumbnail_overlay->image(nullptr);
+                    video_selected_for_stream->thumbnail_overlay->hide();
+                    video_selected_for_stream = nullptr;
+                }
+            }
+            change_cursor();
         }
         return Fl::handle_(event, w);      // Otherwise, let default FLTK Handler handle the event...
     });
@@ -618,8 +648,8 @@ VideoInfo* create_video_group(int posx, int posy) {
  */
 void doSearch(const char* input_text, bool is_a_channel) {
     //Change cursor to wait symbol, to indicate that the search is in process...
-    mainWin->cursor(FL_CURSOR_WAIT);
-    Fl::check();
+    ytdlp_action_in_progress = true;
+    change_cursor(FL_CURSOR_WAIT);
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
         logger->warn(_("Your device is offline. Check your internet connection."));
@@ -665,12 +695,12 @@ void doSearch(const char* input_text, bool is_a_channel) {
     }
     update_video_info();
     //Restore cursor to default when search is done.
-    mainWin->cursor(FL_CURSOR_DEFAULT);
-    Fl::check();
+    ytdlp_action_in_progress = false;
+    change_cursor();
 }
 
 /*
- *
+ *  Callback to get videos from an specific Youtube channel.
  */
 void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
     if (bttn == nullptr) {
