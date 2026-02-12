@@ -53,19 +53,10 @@ const std::string DEFAULT_PLAYER_EXTRAPARAMS_LIVE = "-demuxer lavf -cache 2048";
 
 const std::string DOWNLOAD_VIDEO_PREFERRED_EXT = "mp4";
 
-const std::string YOUTUBE_EXTRACTOR_NAME = "youtube";
-
 const std::string HTTP_PREFIX = "http://";
 const std::string HTTPS_PREFIX = "https://";
 const std::string YOUTUBE_URL_PREFIX = HTTPS_PREFIX + "youtu.be/";
 
-/*Enum for the target video resolutions. */
-enum VCODEC_RESOLUTIONS {
-    R240p = 240, R360p = 360, R480p = 480, R720p = 720, R1080p = 1080 };
-
-static std::array<const char*,2> VCODEC_IMPL_NAMES = {"avc1", "av01"};
-// The default resolution used to streaming videos.
-const int DEFAULT_STREAM_VIDEO_RESOLUTION = VCODEC_RESOLUTIONS::R360p;
 
 /** FLtube custom status codes definition... */
 enum FLTUBE_STATUS_CODES {
@@ -109,7 +100,9 @@ struct Pagination_Info {
     int size;
     int index;
 
-    Pagination_Info(int size, int index): size(size), index(index) {}
+    Pagination_Info():size(0), index(0) {};
+
+    Pagination_Info(int size, int index): size(size), index(index) {};
 
     /** Minimum lower end is 1. */
     int lower_end() const {
@@ -119,20 +112,6 @@ struct Pagination_Info {
     int upper_end() const {
         return ((index + 1) * size);
     }
-};
-
-/** Youtube video metadata. */
-struct YTDLP_Video_Metadata{
-    std::string id;
-    std::string title;
-    std::string url;
-    std::string upload_date;
-    std::string creators;
-    std::string duration;
-    std::string channel_id;
-    std::string thumbnail_url;
-    std::string live_status;
-    std::string viewers_count;
 };
 
 struct MediaPlayerInfo {
@@ -148,8 +127,6 @@ std::string exec(const char* cmd);
 
 bool isUrl(const char* user_input);
 
-bool isYoutubeURL(const char* url);
-
 const std::string currentDateTime();
 
 const char* getHomePathOr(const char* defaultPath);
@@ -161,20 +138,6 @@ bool checkDirectoryPermissions(const char* directory, std::array<SIMPLE_FS_PERMI
 bool canWriteOnDir(const char* directory);
 
 bool isInstalledYTDLP();
-
-std::string do_ytdlp_search(const char* search_term, const char* extractor_name, Pagination_Info page_info, bool get_channel_videos = false);
-
-static std::string do_youtube_search(const char* byTerm);
-
-std::string get_videoURL_metadata(const char* video_url);
-
-void stream_video(const char* video_url, const bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp, bool use_alternative_method = false);
-
-void download_video(const char* video_url, const char* download_path, VCODEC_RESOLUTIONS v_resolution, const char* vcodec);
-
-YTDLP_Video_Metadata* parse_YT_Video_Metadata(const char ytdlp_video_metadata[512]);
-
-std::string* get_metric_abbreviation(int number);
 
 static CURL* get_curl_handle(const char* forURL, FILE* output_file = nullptr);
 

@@ -57,7 +57,7 @@ static std::string getActiveTabName();
 static void markLikedVideo_cb(Fl_Widget *wdg);
 static void pre_init();
 static void post_init();
-static void doSearch(const char* input_text, bool is_a_channel = false);
+static void doSearch(const char* input_text);
 static void getYTChannelVideo_cb(Fl_Button *bttn, void* channel_id_str);
 static const char* getSearchValue(Fl_Input *input);
 static void searchButtonAction_cb(Fl_Widget *wdgt, Fl_Input *input);

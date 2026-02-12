@@ -15,6 +15,7 @@
 #include "../include/FLTube.h"
 #include "../include/FLTube_View.h"
 #include "../include/fltube_utils.h"
+#include "../include/ytdlp_helper.h"
 #include "../include/configuration_manager.h"
 #include "../include/userdata_manager.h"
 
@@ -78,6 +79,8 @@ MediaPlayerInfo* media_player;
 ConfigurationManager* config = nullptr;
 
 UserDataManager* userdata = nullptr;
+
+YtDlp_Helper* ytdlp = nullptr;
 
 Fl_PNG_Image* live_image = nullptr;
 
@@ -327,7 +330,9 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
         logger->info(message);
         auto stream_lambda = [&](std::string* url, bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp, bool use_alternative_method) {
             ytdlp_action_in_progress = true;
-            stream_video(url->c_str(), is_a_live, v_resolution, mp, use_alternative_method);
+            //TODO 'ytdlp' variable must be protected when using in other thread????????
+            ytdlp->is_live(is_a_live);
+            ytdlp->stream(url->c_str());
             ytdlp_action_in_progress = false;
 
         };
@@ -385,7 +390,7 @@ void update_video_info() {
             }
             video_info_arr[j]->like_icon_bttn->redraw();
             try {
-                snprintf(text_buffer, sizeof(text_buffer), "%s %s", get_metric_abbreviation(std::stoi(video_metadata[j]->viewers_count))->c_str(), (is_livestream) ? _("viewers") : _("views"));
+                snprintf(text_buffer, sizeof(text_buffer), "%s %s", YtDlp_Helper::get_metric_abbreviation(std::stoi(video_metadata[j]->viewers_count))->c_str(), (is_livestream) ? _("viewers") : _("views"));
             } catch (const std::invalid_argument& ex) {
                 char err_msg[256];
                 snprintf(err_msg, sizeof(err_msg), _("Error when getting count of viewers of video: (title: \"%s\", ID: \"%s\")"), video_metadata[j]->title.c_str(), video_metadata[j]->id.c_str());
@@ -551,6 +556,7 @@ void pre_init() {
         if (STREAM_VIDEO_RESOLUTION != DEFAULT_STREAM_VIDEO_RESOLUTION)
             logger->debug(_("Default streaming resolution (360p) changed at configuration to this new resolution: ") + std::to_string(STREAM_VIDEO_RESOLUTION));
     }
+
     live_image = load_resource_image("livebutton_18p.png");
     already_viewed_image = load_resource_image("clock_18p.png");
     like_icon_image = load_resource_image("heart_18p.png");
@@ -560,6 +566,9 @@ void pre_init() {
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
     std::filesystem::current_path(FLTUBE_TEMPORAL_DIR);
+
+    bool enable_alt_stream = config->getBoolProperty("ENABLE_ALTERNATIVE_STREAM_METHOD", true);
+    ytdlp = new YtDlp_Helper(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, FLTUBE_TEMPORAL_DIR);
 
     // Add a custom FLTK event dispatcher
     Fl::event_dispatch([](int event, Fl_Window* w) -> int{
@@ -646,7 +655,7 @@ VideoInfo* create_video_group(int posx, int posy) {
 /**
  * Search by YT URL or search term. Or if "is_a_channel" is set, then return videos from channel URL specified at "input_text".
  */
-void doSearch(const char* input_text, bool is_a_channel) {
+void doSearch(const char* input_text) {
     //Change cursor to wait symbol, to indicate that the search is in process...
     ytdlp_action_in_progress = true;
     change_cursor(FL_CURSOR_WAIT);
@@ -662,22 +671,25 @@ void doSearch(const char* input_text, bool is_a_channel) {
     snprintf(message, sizeof(message), _("Searching for results for '%s' user input..."), input_text);
     logger->debug(std::string(message));
     std::string result;
+    Pagination_Info page_i;
     if (isUrl(input_text) && !SEARCH_BY_CHANNEL_F) {
-        if(!isYoutubeURL(input_text)){
+        if(!YtDlp_Helper::isYoutubeURL(input_text)){
             std::string warn_message = _("For now, only Youtube URL's are valid for download. Please, edit your input text or search using a generic term.");
             showMessageWindow(warn_message.c_str());
             logger->warn(warn_message);
             return;
         }
-        result = get_videoURL_metadata(input_text);
+        ytdlp->set_search_type(SEARCH_BY_TYPE::VIDEO_URL);
+        page_i = Pagination_Info();
 
     } else {
-        Pagination_Info page_i(SEARCH_PAGE_SIZE, SEARCH_PAGE_INDEX);
+        page_i = Pagination_Info(SEARCH_PAGE_SIZE, SEARCH_PAGE_INDEX);
         if (SEARCH_PAGE_INDEX == 0) {
             mainWin->next_results_bttn->activate();
         }
-        result = do_ytdlp_search(input_text, YOUTUBE_EXTRACTOR_NAME.c_str(), page_i, SEARCH_BY_CHANNEL_F);
+        ytdlp->set_search_type( (SEARCH_BY_CHANNEL_F) ? SEARCH_BY_TYPE::CHANNEL_URL : SEARCH_BY_TYPE::TERM);
     }
+    result = ytdlp->search(input_text, page_i);
     logger->debug(result);
     // Read input lines until an empty line is encountered
     std::istringstream result_sstream(result);
@@ -686,7 +698,7 @@ void doSearch(const char* input_text, bool is_a_channel) {
         getline(result_sstream, line);
         if (!line.empty()) {
             //Set the video metadata at the array...
-            video_metadata[i] = parse_YT_Video_Metadata(line.c_str());
+            video_metadata[i] = YtDlp_Helper::parse_metadata(line.c_str());
         } else if(video_metadata[i] != nullptr){
             //Or release the unused pointers to free memory...
             delete video_metadata[i];
@@ -723,7 +735,7 @@ void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
     snprintf(channel_videos_URL, sizeof(channel_videos_URL), "https://www.youtube.com/channel/%s/videos", channel_id->c_str());
     mainWin->search_term_or_url->value(channel_videos_URL);
     lock_buttons(true);
-    doSearch(channel_videos_URL, true);
+    doSearch(channel_videos_URL);
     lock_buttons(false);
     mainWin->previous_results_bttn->deactivate();
 }
