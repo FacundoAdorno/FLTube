@@ -328,7 +328,7 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
         char message[256];
         snprintf(message, sizeof(message), _("Starting streaming preview of video '%s' - (%s)..."), vi->title->label(), url->c_str());
         logger->info(message);
-        auto stream_lambda = [&](std::string* url, bool is_a_live, VCODEC_RESOLUTIONS v_resolution, const MediaPlayerInfo* mp, bool use_alternative_method) {
+        auto stream_lambda = [&](std::string* url, bool is_a_live) {
             ytdlp_action_in_progress = true;
             //TODO 'ytdlp' variable must be protected when using in other thread????????
             ytdlp->is_live(is_a_live);
@@ -337,7 +337,7 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
 
         };
         // TODO: in the future, a ThreadPool of one or more threads could be implemented for optimization. More info at https://www.geeksforgeeks.org/cpp/thread-pool-in-cpp/.
-        std::thread worker(stream_lambda, url, vi->is_live_image->visible(), STREAM_VIDEO_RESOLUTION, media_player, (STREAM_VIDEO_RESOLUTION != VCODEC_RESOLUTIONS::R360p));
+        std::thread worker(stream_lambda, url, vi->is_live_image->visible());
 
         worker.detach();
     } else {
