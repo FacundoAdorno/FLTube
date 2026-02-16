@@ -8,7 +8,6 @@ su "$nonroot_user" <<EOF
 FLTUBE_USER_CONFIGDIR=/home/$nonroot_user/.config/fltube
 FLTUBE_USERDATA_DIR=/home/$nonroot_user/.local/share/fltube
 YTDLP_USER_CONFIGDIR=/home/$nonroot_user/.config/yt-dlp
-FIRST_INSTALL_FLAG=/home/$nonroot_user/.local/share/fltube/.already_installed.flag
 if [ ! -f "\$FLTUBE_USER_CONFIGDIR"/fltube.conf ]; then
     [ ! -d "\$FLTUBE_USER_CONFIGDIR" ] && mkdir -p "\$FLTUBE_USER_CONFIGDIR"
 	cp /tmp/tcloop/fltube/usr/local/etc/fltube/fltube.conf "\$FLTUBE_USER_CONFIGDIR"
@@ -20,14 +19,6 @@ if [ ! -f "\$YTDLP_USER_CONFIGDIR"/config ]; then
     [ ! -d "\$YTDLP_USER_CONFIGDIR" ] && mkdir -p "\$YTDLP_USER_CONFIGDIR"
 	echo "Creating user configuration file for 'yt-dlp' at \$YTDLP_USER_CONFIGDIR."
 	cp /tmp/yt-dlp_config "\$YTDLP_USER_CONFIGDIR/config"
-fi
-
-if [ ! -f "\$FIRST_INSTALL_FLAG" ]; then
-    echo "Installing following required dependencies for the FIRS TIME: [*] yt-dlp and [*] QuickJS..."
-    #Install yt-dlp and external js runtime, if not already installed.
-    command -v yt-dlp >/dev/null 2>&1 || { install_yt-dlp.sh -y; }
-    command -v qjs >/dev/null 2>&1 || { install_yt-dlp.sh -j -y; }
-    echo "FLTube was installed at: `date`" > "\$FIRST_INSTALL_FLAG"
 fi
 
 EOF
