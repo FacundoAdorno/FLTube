@@ -92,7 +92,7 @@ widget_class VideoInfo {open
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
   }
-  Fl_Box thumbnail_overlay {selected
+  Fl_Box thumbnail_overlay {
     tooltip {This video is currently played...} xywh {6 5 95 80} hide
   }
   Fl_Box views_spectators {
@@ -106,6 +106,9 @@ widget_class VideoInfo {open
   }
   Fl_Button like_icon_bttn {
     tooltip {Press to mark the video as "Liked".} xywh {295 43 20 20} box NO_BOX down_box THIN_UP_FRAME
+  }
+  Fl_Button cache_bttn {selected
+    xywh {535 43 20 20} box NO_BOX down_box THIN_UP_FRAME hide
   }
   Fl_Box title {
     xywh {105 6 450 37} labelfont 1 align 213

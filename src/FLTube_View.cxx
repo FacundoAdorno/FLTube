@@ -129,6 +129,11 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
     like_icon_bttn->box(FL_NO_BOX);
     like_icon_bttn->down_box(FL_THIN_UP_FRAME);
   } // Fl_Button* like_icon_bttn
+  { cache_bttn = new Fl_Button(535, 43, 20, 20);
+    cache_bttn->box(FL_NO_BOX);
+    cache_bttn->down_box(FL_THIN_UP_FRAME);
+    cache_bttn->hide();
+  } // Fl_Button* cache_bttn
   { title = new Fl_Box(105, 6, 450, 37);
     title->labelfont(1);
     title->align(Fl_Align(197|FL_ALIGN_INSIDE));

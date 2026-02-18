@@ -101,21 +101,27 @@ void YtDlp_Helper::stream(const char* video_url) {
     char get_final_url_cmd[2048];
     char stream_videoplayer_cmd[2048];
     char stream_format[100];
-    std::string url_result;
+    std::string final_url_result;
     snprintf(stream_format, sizeof(stream_format), "res:%d,+codec:avc1:m4a", this->video_resolution);
     if (this->is_live_flag) {
         snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
                  "yt-dlp -S \"%s\" -o - \"%s\" | %s %s %s -", stream_format, video_url, this->media_player->binary_path.c_str(), this->media_player->parameters.c_str(), this->media_player->extra_live_parameters.c_str());
     } else {
         // If video is not live, 1rst try to obtain final video URL using default method...
-        snprintf(get_final_url_cmd, sizeof(get_final_url_cmd), "yt-dlp -S \"%s\" -g \"%s\" 2> %s/ytdlp_errors.log", stream_format, video_url, this->TEMP_WORKING_DIR.c_str());
-        this->logger->debug("EXEC COMMAND = " + std::string(get_final_url_cmd) + "\n");
-        url_result = exec(get_final_url_cmd);
-        replace_all(url_result, "\n", "");
-        if (url_result != "") {
+        // 1rst: lookup final video URL if exists at cache...
+        final_url_result = cache->get_entry_value(video_url);
+        if (final_url_result == CacheEntry::EMPTY_VALUE) {
+            // 2nd: if final video url is not cached, then obtain it using yt-dlp.
+            snprintf(get_final_url_cmd, sizeof(get_final_url_cmd), "yt-dlp -S \"%s\" -g \"%s\" 2> %s/ytdlp_errors.log", stream_format, video_url, this->TEMP_WORKING_DIR.c_str());
+            this->logger->debug("EXEC COMMAND = " + std::string(get_final_url_cmd) + "\n");
+            final_url_result = exec(get_final_url_cmd);
+            replace_all(final_url_result, "\n", "");
+        }
+        if (final_url_result != "") {
             // Once final URL is obtained, then open at configured Media Player...
             snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                    "%s %s \"%s\"", this->media_player->binary_path.c_str(), this->media_player->parameters.c_str(), url_result.c_str());
+                    "%s %s \"%s\"", this->media_player->binary_path.c_str(), this->media_player->parameters.c_str(), final_url_result.c_str());
+            cache->add_entry(video_url, final_url_result);
         } else {
             // If default method doesn't works, then try the alternative method (if configured this way)...
             if (this->enable_alternative_stream_method) {

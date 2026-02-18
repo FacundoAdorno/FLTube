@@ -56,6 +56,7 @@ public:
   Fl_Box *is_live_image;
   Fl_Box *already_viewed_icon;
   Fl_Button *like_icon_bttn;
+  Fl_Button *cache_bttn;
   Fl_Box *title;
   Fl_Box *duration;
   Fl_Box *uploadDate;

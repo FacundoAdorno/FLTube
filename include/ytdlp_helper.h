@@ -17,6 +17,7 @@
 #include <string>
 #include <array>
 #include "fltube_utils.h"
+#include "cache.h"
 
 /** Youtube video metadata. */
 struct YTDLP_Video_Metadata{
@@ -53,6 +54,10 @@ const int DEFAULT_STREAM_VIDEO_RESOLUTION = VCODEC_RESOLUTIONS::R360p;
  * The default stream resolution is 360p, unless changed at configuration. Also, you can specify if the video to stream is a "live video".
  */
 class YtDlp_Helper {
+
+    //TODO: in the future, this class must be proxied by a YtDlp_Helper_Cached class or similar, that handles references to the real
+    //      "YtDlp_Helper" and only comunicates to the yt-dlp binnary if some request is not cached...
+    //        MORE INFO: https://en.wikipedia.org/wiki/Proxy_pattern
     private:
         std::string TEMP_WORKING_DIR;
 
@@ -73,6 +78,8 @@ class YtDlp_Helper {
 
         std::shared_ptr<TerminalLogger> logger;
 
+        std::shared_ptr<GeneralCache> cache;
+
     public:
         /** Metadata print template for youtube search videos.  **/
         const static std::string PRINT_METADATA_TEMPLATE;
@@ -80,8 +87,8 @@ class YtDlp_Helper {
         YTDLP_EXTRACTOR extractor;
 
 
-        YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::string working_dir):
-            is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg)
+        YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<GeneralCache> const& cache, std::string working_dir):
+            is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache)
             {
                 if (working_dir == "")
                     TEMP_WORKING_DIR = std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/";

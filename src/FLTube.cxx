@@ -18,6 +18,7 @@
 #include "../include/ytdlp_helper.h"
 #include "../include/configuration_manager.h"
 #include "../include/userdata_manager.h"
+#include "../include/cache.h"
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -82,14 +83,14 @@ UserDataManager* userdata = nullptr;
 
 YtDlp_Helper* ytdlp = nullptr;
 
+std::shared_ptr<GeneralCache> cache = nullptr;
+
 Fl_PNG_Image* live_image = nullptr;
-
 Fl_PNG_Image* already_viewed_image = nullptr;
-
 Fl_PNG_Image* like_icon_image = nullptr;
 Fl_PNG_Image* like_red_icon_image = nullptr;
-
 Fl_PNG_Image* playicon_image = nullptr;
+Fl_PNG_Image* cached_icon_image = nullptr;
 
 /* Keep the current displayed cursor. FLTK doesn't have a way to know this. */
 Fl_Cursor current_displayed_cursor = FL_CURSOR_DEFAULT;
@@ -389,6 +390,16 @@ void update_video_info() {
                 video_info_arr[j]->like_icon_bttn->image(like_icon_image);
             }
             video_info_arr[j]->like_icon_bttn->redraw();
+            // Update Cache icon
+            if (cache->is_cached(video_metadata[j]->url)) {
+                char cache_tooltip[128];
+                std::snprintf(cache_tooltip, sizeof(cache_tooltip), _("Video URL Cached (valid until %s). Click to remove from cache."),
+                              cache->get_cache_expiration_date(video_metadata[j]->url).c_str());
+                video_info_arr[j]->cache_bttn->copy_tooltip(cache_tooltip);
+                video_info_arr[j]->cache_bttn->show();
+            } else {
+                video_info_arr[j]->cache_bttn->hide();
+            }
             try {
                 snprintf(text_buffer, sizeof(text_buffer), "%s %s", YtDlp_Helper::get_metric_abbreviation(std::stoi(video_metadata[j]->viewers_count))->c_str(), (is_livestream) ? _("viewers") : _("views"));
             } catch (const std::invalid_argument& ex) {
@@ -509,6 +520,18 @@ void markLikedVideo_cb(Fl_Widget *wdg) {
     }
 }
 
+void removeFromCache_cb(Fl_Widget *wdg) {
+    VideoInfo* vi = static_cast<VideoInfo*>(wdg->parent());
+    //Registering view of current video at History List...
+    std::string video_url = *static_cast<std::string*>(vi->thumbnail->user_data());
+    if (cache->is_cached(video_url)) {
+        char mssg[256];
+        snprintf(mssg, sizeof(mssg), _("The following cache was invalidated by user request: id=%s; expiration_date=%s."), video_url.c_str(), cache->get_cache_expiration_date(video_url).c_str());
+        if (cache->remove_entry(video_url)) logger->debug(mssg);
+    }
+    wdg->hide();
+}
+
 /**
  * Hook: Actions to execute before main window is drawn...
  */
@@ -521,6 +544,8 @@ void pre_init() {
     logger->debug(_("Loading configurations from ") + CONFIGFILE_PATH);
     config = new ConfigurationManager(CONFIGFILE_PATH.c_str(), logger);
     userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion(), logger);
+    //TODO Create properties defining if enable the use of cache and the TTL for every cache entry...
+    cache = std::make_shared<GeneralCache>(logger);
     AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
 
     if ( !AVOID_INITIAL_CHECKS && !isInstalledYTDLP() ) {
@@ -562,13 +587,14 @@ void pre_init() {
     like_icon_image = load_resource_image("heart_18p.png");
     like_red_icon_image = load_resource_image("heart_18p_red.png");
     playicon_image = load_resource_image("playicon.png");
+    cached_icon_image = load_resource_image("cache_icon_18p.png");
 
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
     std::filesystem::current_path(FLTUBE_TEMPORAL_DIR);
 
     bool enable_alt_stream = config->getBoolProperty("ENABLE_ALTERNATIVE_STREAM_METHOD", true);
-    ytdlp = new YtDlp_Helper(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, FLTUBE_TEMPORAL_DIR);
+    ytdlp = new YtDlp_Helper(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR);
 
     // Add a custom FLTK event dispatcher
     Fl::event_dispatch([](int event, Fl_Window* w) -> int{
@@ -639,7 +665,7 @@ void post_init() {
 }
 
 /**
- * Create a new group to view video info.
+ * Create a new group to display video info.
  */
 VideoInfo* create_video_group(int posx, int posy) {
     VideoInfo *video_info = new VideoInfo (posx, posy, 600, 90, "");
@@ -649,6 +675,8 @@ VideoInfo* create_video_group(int posx, int posy) {
     if (already_viewed_image != nullptr) video_info->already_viewed_icon->image(already_viewed_image);
     if (like_icon_image != nullptr) video_info->like_icon_bttn->image(like_icon_image);
     video_info->like_icon_bttn->callback((Fl_Callback*)markLikedVideo_cb);
+    if (cached_icon_image != nullptr) video_info->cache_bttn->image(cached_icon_image);
+    video_info->cache_bttn->callback((Fl_Callback*)removeFromCache_cb);
     return video_info;
 }
 
