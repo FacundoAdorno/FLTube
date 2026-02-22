@@ -83,7 +83,7 @@ UserDataManager* userdata = nullptr;
 
 YtDlp_Helper* ytdlp = nullptr;
 
-std::shared_ptr<GeneralCache> cache = nullptr;
+std::shared_ptr<PermanentDiskCache> cache = nullptr;
 
 Fl_PNG_Image* live_image = nullptr;
 Fl_PNG_Image* already_viewed_image = nullptr;
@@ -114,6 +114,8 @@ void exitApp(unsigned short int exitStatusCode = FLT_OK) {
     if (helpWin != nullptr) delete helpWin;
     if (message_window != nullptr) delete message_window;
     delete userdata;
+    delete ytdlp;
+    cache->finish();
     delete mainWin;
     //Exiting the app...
     logger->info(_("Closing FLtube... Bye!\n"));
@@ -545,7 +547,9 @@ void pre_init() {
     config = new ConfigurationManager(CONFIGFILE_PATH.c_str(), logger);
     userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion(), logger);
     //TODO Create properties defining if enable the use of cache and the TTL for every cache entry...
-    cache = std::make_shared<GeneralCache>(logger);
+    cache = std::make_shared<PermanentDiskCache>(logger);
+    cache->set_save_directory_path(std::string(getHomePathOr("")) + "/.cache/fltube", "fltube_url_cache.txt");
+    cache->init();
     AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
 
     if ( !AVOID_INITIAL_CHECKS && !isInstalledYTDLP() ) {

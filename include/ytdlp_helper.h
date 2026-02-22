@@ -78,7 +78,7 @@ class YtDlp_Helper {
 
         std::shared_ptr<TerminalLogger> logger;
 
-        std::shared_ptr<GeneralCache> cache;
+        std::shared_ptr<PermanentDiskCache> cache;
 
     public:
         /** Metadata print template for youtube search videos.  **/
@@ -87,7 +87,7 @@ class YtDlp_Helper {
         YTDLP_EXTRACTOR extractor;
 
 
-        YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<GeneralCache> const& cache, std::string working_dir):
+        YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache, std::string working_dir):
             is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache)
             {
                 if (working_dir == "")
