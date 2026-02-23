@@ -32,6 +32,7 @@ nonroot_user=$(logname)   #This is the name of the user that run the "apt instal
 su "$nonroot_user" <<EOF
 FLTUBE_USER_CONFIGDIR=\$HOME/.config/fltube
 FLTUBE_USERDATA_DIR=\$HOME/.local/share/fltube
+FLTUBE_CACHE_DIR=\$HOME/.cache/fltube
 YTDLP_USER_CONFIGDIR=\$HOME/.config/yt-dlp
 if [ ! -f "\$FLTUBE_USER_CONFIGDIR"/fltube.conf ]; then
     [ ! -d "\$FLTUBE_USER_CONFIGDIR" ] && mkdir -p "\$FLTUBE_USER_CONFIGDIR"
@@ -42,6 +43,11 @@ fi
 if [ ! -e "\$FLTUBE_USERDATA_DIR" ]; then
     echo "Creating userdata directory at \$FLTUBE_USERDATA_DIR."
     mkdir -p "\$FLTUBE_USERDATA_DIR"
+fi
+
+if [ ! -e "\$FLTUBE_CACHE_DIR" ]; then
+    echo "Creating cache directory at \$FLTUBE_CACHE_DIR."
+    mkdir -p "\$FLTUBE_CACHE_DIR"
 fi
 
 if [ ! -f "\$YTDLP_USER_CONFIGDIR"/config ]; then

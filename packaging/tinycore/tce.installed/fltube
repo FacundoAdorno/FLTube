@@ -7,6 +7,7 @@ nonroot_user="$(cat /etc/sysconfig/tcuser)"
 su "$nonroot_user" <<EOF
 FLTUBE_USER_CONFIGDIR=/home/$nonroot_user/.config/fltube
 FLTUBE_USERDATA_DIR=/home/$nonroot_user/.local/share/fltube
+FLTUBE_CACHE_DIR=/home/$nonroot_user/.cache/fltube
 YTDLP_USER_CONFIGDIR=/home/$nonroot_user/.config/yt-dlp
 if [ ! -f "\$FLTUBE_USER_CONFIGDIR"/fltube.conf ]; then
     [ ! -d "\$FLTUBE_USER_CONFIGDIR" ] && mkdir -p "\$FLTUBE_USER_CONFIGDIR"
@@ -14,6 +15,8 @@ if [ ! -f "\$FLTUBE_USER_CONFIGDIR"/fltube.conf ]; then
 fi
 
 [ ! -d "\$FLTUBE_USERDATA_DIR" ] && mkdir -p "\$FLTUBE_USERDATA_DIR"
+
+[ ! -d "\$FLTUBE_CACHE_DIR" ] && mkdir -p "\$FLTUBE_CACHE_DIR"
 
 if [ ! -f "\$YTDLP_USER_CONFIGDIR"/config ]; then
     [ ! -d "\$YTDLP_USER_CONFIGDIR" ] && mkdir -p "\$YTDLP_USER_CONFIGDIR"
