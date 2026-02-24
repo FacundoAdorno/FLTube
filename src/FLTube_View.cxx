@@ -379,3 +379,45 @@ void HelpFLTubeWindow::_HelpFLTubeWindow() {
   set_modal();
   end();
 }
+
+InitialLoadingWindow::InitialLoadingWindow(int X, int Y, int W, int H, const char *L) :
+  Fl_Double_Window(X, Y, W, H, L)
+{
+  _InitialLoadingWindow();
+}
+
+InitialLoadingWindow::InitialLoadingWindow(int W, int H, const char *L) :
+  Fl_Double_Window(0, 0, W, H, L)
+{
+  clear_flag(16);
+  _InitialLoadingWindow();
+}
+
+InitialLoadingWindow::InitialLoadingWindow() :
+  Fl_Double_Window(0, 0, 236, 180, 0)
+{
+  clear_flag(16);
+  _InitialLoadingWindow();
+}
+
+void InitialLoadingWindow::_InitialLoadingWindow() {
+  this->box(FL_FLAT_BOX);
+  this->color(FL_BACKGROUND_COLOR);
+  this->selection_color(FL_BACKGROUND_COLOR);
+  this->labeltype(FL_NO_LABEL);
+  this->labelfont(0);
+  this->labelsize(14);
+  this->labelcolor(FL_FOREGROUND_COLOR);
+  this->align(Fl_Align(FL_ALIGN_TOP));
+  this->when(FL_WHEN_RELEASE);
+  { fltube_logo = new Fl_Box(5, 13, 225, 125, _("LOADING..."));
+    fltube_logo->tooltip(_("Please wait until the application data is loaded. This may take a little whil"
+"e..."));
+    fltube_logo->labelfont(1);
+  } // Fl_Box* fltube_logo
+  { loading_about_data = new Fl_Box(10, 145, 220, 30);
+    loading_about_data->labelfont(2);
+    loading_about_data->labelsize(12);
+  } // Fl_Box* loading_about_data
+  end();
+}

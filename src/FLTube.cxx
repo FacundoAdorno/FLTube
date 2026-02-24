@@ -29,6 +29,8 @@ HelpFLTubeWindow* helpWin = (HelpFLTubeWindow*) 0;
 /** Generic message window.*/
 TinyMessageWindow* message_window = (TinyMessageWindow *)0;
 
+InitialLoadingWindow* initial_win = (InitialLoadingWindow*)0;
+
 // Current page index at search results navigation.
 int SEARCH_PAGE_INDEX = 0;
 
@@ -98,6 +100,8 @@ Fl_Cursor current_displayed_cursor = FL_CURSOR_DEFAULT;
 std::shared_ptr<TerminalLogger> logger;
 
 std::atomic<bool> ytdlp_action_in_progress(false);
+
+std::atomic<bool> SHOWING_LOADING_SCREEN_F(false);
 
 /**
  * Callback for main window close action. By default, exit app with success status code (0).
@@ -211,6 +215,13 @@ void openURI(const char* uri) {
     }
 }
 
+void showInitialWindow(){
+    initial_win = new InitialLoadingWindow();
+    initial_win->show();
+    SHOWING_LOADING_SCREEN_F = true;
+    initial_win->fltube_logo->image(load_resource_image("loading.png"));
+}
+
 /* Change the current window cursor to any valid Fl_Cursor. If no parameter passed, change to FL_CURSOR_DEFAULT. */
 void change_cursor(Fl_Cursor new_cursor = FL_CURSOR_DEFAULT) {
     if (current_displayed_cursor != new_cursor) {
@@ -286,6 +297,7 @@ void lock_buttons(bool lock){
             video_info_arr[j]->thumbnail->deactivate();
             video_info_arr[j]->userUploader->deactivate();
             video_info_arr[j]->like_icon_bttn->deactivate();
+            video_info_arr[j]->cache_bttn->deactivate();
         }
     } else {
         //unlock
@@ -296,6 +308,7 @@ void lock_buttons(bool lock){
             video_info_arr[j]->thumbnail->activate();
             video_info_arr[j]->userUploader->activate();
             video_info_arr[j]->like_icon_bttn->activate();
+            video_info_arr[j]->cache_bttn->activate();
         }
     }
     Fl::check();
@@ -538,20 +551,23 @@ void removeFromCache_cb(Fl_Widget *wdg) {
  * Hook: Actions to execute before main window is drawn...
  */
 void pre_init() {
-    logger = std::make_shared<TerminalLogger>(DEBUG_ENABLED);
     ///// LOAD CONFIGURATIONS  //////
     // If not specified custom configuration file through parameter "--config"...
     if (CONFIGFILE_PATH.empty())
         CONFIGFILE_PATH = (std::filesystem::exists(USER_CONFIGFILE_PATH)) ? USER_CONFIGFILE_PATH : SYSTEM_CONFIGFILE_PATH;
     logger->debug(_("Loading configurations from ") + CONFIGFILE_PATH);
+    initial_win->loading_about_data->label(_("Processing configuration file..."));
     config = new ConfigurationManager(CONFIGFILE_PATH.c_str(), logger);
-    userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion(), logger);
+    initial_win->loading_about_data->label(_("Processing user configuration file..."));
+    userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion(std::string(VERSION)), logger);
     //TODO Create properties defining if enable the use of cache and the TTL for every cache entry...
+    initial_win->loading_about_data->label(_("Populating cache..."));
     cache = std::make_shared<PermanentDiskCache>(logger);
     cache->set_save_directory_path(std::string(getHomePathOr("")) + "/.cache/fltube", "fltube_url_cache.txt");
     cache->init();
     AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
 
+    initial_win->loading_about_data->label(_("Checking 'yt-dlp' installation..."));
     if ( !AVOID_INITIAL_CHECKS && !isInstalledYTDLP() ) {
         showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run in a terminal the 'install_yt-dlp' script."));
         logger->error(_("yt-dlp is not installed. Closing app...\n"));
@@ -560,6 +576,7 @@ void pre_init() {
     //Init Localization. Use locale path specified at config, or custom config default_locale_path().
     setup_gettext("", config->getProperty("LOCALE_PATH", default_locale_path().c_str()));
 
+    initial_win->loading_about_data->label(_("Configuring the application..."));
     media_player = new MediaPlayerInfo();
     if(config->existProperty("STREAM_PLAYER_PATH")) {
         media_player->binary_path = config->getProperty("STREAM_PLAYER_PATH", "");
@@ -586,6 +603,7 @@ void pre_init() {
             logger->debug(_("Default streaming resolution (360p) changed at configuration to this new resolution: ") + std::to_string(STREAM_VIDEO_RESOLUTION));
     }
 
+    initial_win->loading_about_data->label(_("Loading resources files..."));
     live_image = load_resource_image("livebutton_18p.png");
     already_viewed_image = load_resource_image("clock_18p.png");
     like_icon_image = load_resource_image("heart_18p.png");
@@ -599,6 +617,10 @@ void pre_init() {
 
     bool enable_alt_stream = config->getBoolProperty("ENABLE_ALTERNATIVE_STREAM_METHOD", true);
     ytdlp = new YtDlp_Helper(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR);
+
+    if (initial_win) {
+        SHOWING_LOADING_SCREEN_F = false;
+    }
 
     // Add a custom FLTK event dispatcher
     Fl::event_dispatch([](int event, Fl_Window* w) -> int{
@@ -628,7 +650,6 @@ void pre_init() {
         }
         return Fl::handle_(event, w);      // Otherwise, let default FLTK Handler handle the event...
     });
-
 }
 
 /**
@@ -906,27 +927,24 @@ void parseOptions(int argc, char **argv){
     }
 }
 
-// Returns the current version of this software expressed as an Integer (for example: 2.1.4 is expressed as 214).
-int getIntVersion() {
-    std::string version(VERSION);
-    replace_all(version, ".", "");
-    try {
-        return std::stoi(version);
-    } catch (const std::invalid_argument& e) {
-        char message[256];
-        snprintf(message, sizeof(message), "Error on VERSION number format (%s). The version must be expressed as numbers separated by dots.\n", VERSION);
-        logger->error(message);
-        return -100000;
-    }
-}
-
 //////////////////////////////////////////////////////////////////////////////////
 ///////////////// MAIN     MAIN     MAIN        MAIN        MAIN   //////////////
 //////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char **argv) {
     parseOptions(argc, argv);
-    pre_init();
+    logger = std::make_shared<TerminalLogger>(DEBUG_ENABLED);
+    showInitialWindow();
+    std::thread worker(pre_init);
+    worker.detach();
+    while (initial_win->shown()) {
+        Fl::check();
+        if (!SHOWING_LOADING_SCREEN_F) {
+            break;
+        }
+    }
+    initial_win->hide();
+    delete initial_win;
 
     char message[64];
     snprintf(message, sizeof(message), _("Starting FLTube v.%s\n"), VERSION);

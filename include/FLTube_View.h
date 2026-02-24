@@ -110,4 +110,14 @@ public:
   Fl_Group *authors_tab;
   Fl_Text_Display *authors_txt;
 };
+
+class InitialLoadingWindow : public Fl_Double_Window {
+  void _InitialLoadingWindow();
+public:
+  InitialLoadingWindow(int X, int Y, int W, int H, const char *L = 0);
+  InitialLoadingWindow(int W, int H, const char *L = 0);
+  InitialLoadingWindow();
+  Fl_Box *fltube_logo;
+  Fl_Box *loading_about_data;
+};
 #endif

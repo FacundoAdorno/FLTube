@@ -12,6 +12,7 @@
  */
 
 #include "../include/fltube_utils.h"
+#include <cstdio>
 
 /** Mapping FS_PERMISSION_NAMES to corresponding std::filesystem::perms. */
 static const std::map<SIMPLE_FS_PERMISSION, std::map<std::string, std::filesystem::perms>> perms_map = {
@@ -345,6 +346,19 @@ void replace_all(std::string &original_text, const std::string &toReplace, const
  */
 bool isNumber(const std::string& str) {
     return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
+}
+
+// Returns the current version of this software expressed as an Integer (for example: 2.1.4 is expressed as 214).
+int getIntVersion(std::string version) {
+    replace_all(version, ".", "");
+    try {
+        return std::stoi(version);
+    } catch (const std::invalid_argument& e) {
+        char message[256];
+        snprintf(message, sizeof(message), "[ERROR] Invalid VERSION number format (%s). The version must be expressed as numbers separated by dots.\n", version.c_str());
+        printf("%s", message);
+        return -100000;
+    }
 }
 
 

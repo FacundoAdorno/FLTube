@@ -159,4 +159,6 @@ void replace_all(std::string &original_text, const std::string &toReplace, const
 
 bool isNumber(const std::string& str);
 
+int getIntVersion(std::string version);
+
 #endif

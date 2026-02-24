@@ -86,8 +86,8 @@ widget_class FLTubeMainWindow {
   }
 }
 
-widget_class VideoInfo {open
-  xywh {0 0 577 91} visible position_relative
+widget_class VideoInfo {
+  xywh {511 418 577 91} hide position_relative
 } {
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
@@ -96,10 +96,10 @@ widget_class VideoInfo {open
     tooltip {This video is currently played...} xywh {6 5 95 80} hide
   }
   Fl_Box views_spectators {
-    tooltip {Total video views, or if live current count of concurrent spectators.} bind_image 1 xywh {105 43 110 20} align 372
+    tooltip {Total video views, or if live current count of concurrent spectators.} xywh {105 43 110 20} align 372
   }
   Fl_Box is_live_image {
-    tooltip {The video is live.} bind_image 1 xywh {220 43 40 20} align 288 hide
+    tooltip {The video is live.} xywh {220 43 40 20} align 288 hide
   }
   Fl_Box already_viewed_icon {
     tooltip {You have view this video in the past.} xywh {268 43 20 20} align 288
@@ -107,7 +107,7 @@ widget_class VideoInfo {open
   Fl_Button like_icon_bttn {
     tooltip {Press to mark the video as "Liked".} xywh {295 43 20 20} box NO_BOX down_box THIN_UP_FRAME
   }
-  Fl_Button cache_bttn {selected
+  Fl_Button cache_bttn {
     xywh {535 43 20 20} box NO_BOX down_box THIN_UP_FRAME hide
   }
   Fl_Box title {
@@ -161,8 +161,8 @@ widget_class TinyChoiceWindow {
 }
 
 widget_class HelpFLTubeWindow {
-  label {FLTube Help} open
-  xywh {0 0 480 352} hide
+  label {FLTube Help}
+  xywh {560 288 480 352} hide
   class Fl_Double_Window modal
 } {
   Fl_Group {} {
@@ -247,5 +247,18 @@ widget_class HelpFLTubeWindow {
         xywh {19 189 442 148} box NO_BOX color 49 align 129
       }
     }
+  }
+}
+
+widget_class InitialLoadingWindow {open
+  xywh {0 0 236 180}
+  class Fl_Double_Window visible
+} {
+  Fl_Box fltube_logo {
+    label {LOADING...}
+    tooltip {Please wait until the application data is loaded. This may take a little while...} xywh {5 13 225 125} labelfont 1
+  }
+  Fl_Box loading_about_data {selected
+    xywh {10 145 220 30} labelfont 2 labelsize 12
   }
 }
