@@ -388,7 +388,7 @@ void TerminalLogger::debug(std::string log_message) {
 void center_window(Fl_Window* win) {
     int screen_w = Fl::w();
     int screen_h = Fl::h();
-    int center_x = (screen_w - win->w());
-    int center_y = (screen_h - win->h());
+    int center_x = (screen_w - win->w()) / 2;
+    int center_y = (screen_h - win->h()) / 2;
     win->position(center_x, center_y);
 }

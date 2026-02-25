@@ -493,6 +493,13 @@ bool updateVideoMetadataFromVideoList() {
 void getVideosAtList_cb(Fl_Choice* w, void* a){
     SEARCH_PAGE_INDEX = 0;
     mainWin->previous_results_bttn->deactivate();
+    // Check if there is Internet connectivity before do a search...
+    if (! verify_network_connection()) {
+        logger->warn(_("Your device is offline. Check your internet connection."));
+        showMessageWindow( _("There seems that you don't have access to the Internet. "
+        "Please, verify you network connection before proceed..."));
+        return;
+    }
     updateVideoMetadataFromVideoList();
 };
 
@@ -718,6 +725,9 @@ void doSearch(const char* input_text) {
     change_cursor(FL_CURSOR_WAIT);
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
+        //Restore cursor after search failed because no Internet is available...
+        ytdlp_action_in_progress = false;
+        change_cursor();
         logger->warn(_("Your device is offline. Check your internet connection."));
         showMessageWindow( _("There seems that you don't have access to the Internet. "
                             "Please, verify you network connection before proceed..."));
@@ -731,6 +741,9 @@ void doSearch(const char* input_text) {
     Pagination_Info page_i;
     if (isUrl(input_text) && !SEARCH_BY_CHANNEL_F) {
         if(!YtDlp_Helper::isYoutubeURL(input_text)){
+            //Restore cursor after search failed because no Internet is available...
+            ytdlp_action_in_progress = false;
+            change_cursor();
             std::string warn_message = _("For now, only Youtube URL's are valid for download. Please, edit your input text or search using a generic term.");
             showMessageWindow(warn_message.c_str());
             logger->warn(warn_message);
