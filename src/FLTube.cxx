@@ -142,6 +142,7 @@ void showMessageWindow(const char* message){
         message_window->close_bttn->callback((Fl_Callback*)closeWindow_cb, (void*)(message_window));
         message_window->set_modal();
     }
+    center_window(message_window);
     message_window->show();
     message_window->error_label->label(message);
 
@@ -159,6 +160,7 @@ void showMessageWindow(const char* message){
 bool showChoiceWindow(const char* message, bool& keepShowingFlag) {
     bool choice_result = false;
     TinyChoiceWindow* choiceWindow = new TinyChoiceWindow();
+    center_window(choiceWindow);
     choiceWindow->cancel_bttn->callback( [] (Fl_Widget* widget, void* data) {
         bool* accept_ch = static_cast<bool*>(data);
         *accept_ch = false;
@@ -220,6 +222,7 @@ void showInitialWindow(){
     initial_win->show();
     SHOWING_LOADING_SCREEN_F = true;
     initial_win->fltube_logo->image(load_resource_image("loading.png"));
+    center_window(initial_win);
 }
 
 /* Change the current window cursor to any valid Fl_Cursor. If no parameter passed, change to FL_CURSOR_DEFAULT. */
@@ -277,6 +280,7 @@ void showFLTubeHelpWindow(Fl_Widget* w) {
                      "[*_ CONTRIBUTORS _*]\n  Nicolas Longardi (Uruguay)\n   -Contact: nico@locosporlinux.com\n"));
         helpWin->authors_txt->buffer()->text(help_text_bffr);
     }
+    center_window(helpWin);
     helpWin->show();
     // Loop until the message window is closed...
     while (helpWin->shown()) {
@@ -950,8 +954,9 @@ int main(int argc, char **argv) {
     snprintf(message, sizeof(message), _("Starting FLTube v.%s\n"), VERSION);
     logger->info(message);
 
-    char win_title[30] = "FLTube ";
-    mainWin = new FLTubeMainWindow(593, 540, strcat(win_title, VERSION));
+    snprintf(message, sizeof(message), "FLTube %s", VERSION);
+    mainWin = new FLTubeMainWindow(593, 540, message);
+    center_window(mainWin);
     mainWin->callback((Fl_Callback*)exitApp);
     mainWin->search_term_or_url->when(FL_WHEN_ENTER_KEY);
     mainWin->search_term_or_url->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));

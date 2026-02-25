@@ -394,7 +394,7 @@ InitialLoadingWindow::InitialLoadingWindow(int W, int H, const char *L) :
 }
 
 InitialLoadingWindow::InitialLoadingWindow() :
-  Fl_Double_Window(0, 0, 236, 180, 0)
+  Fl_Double_Window(0, 0, 236, 180, "Loading FLTube")
 {
   clear_flag(16);
   _InitialLoadingWindow();
@@ -419,5 +419,6 @@ void InitialLoadingWindow::_InitialLoadingWindow() {
     loading_about_data->labelfont(2);
     loading_about_data->labelsize(12);
   } // Fl_Box* loading_about_data
+  set_modal();
   end();
 }

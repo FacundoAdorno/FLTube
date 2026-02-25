@@ -250,15 +250,16 @@ widget_class HelpFLTubeWindow {
   }
 }
 
-widget_class InitialLoadingWindow {open
+widget_class InitialLoadingWindow {
+  label {Loading FLTube} open selected
   xywh {0 0 236 180}
-  class Fl_Double_Window visible
+  class Fl_Double_Window modal visible
 } {
   Fl_Box fltube_logo {
     label {LOADING...}
     tooltip {Please wait until the application data is loaded. This may take a little while...} xywh {5 13 225 125} labelfont 1
   }
-  Fl_Box loading_about_data {selected
+  Fl_Box loading_about_data {
     xywh {10 145 220 30} labelfont 2 labelsize 12
   }
 }

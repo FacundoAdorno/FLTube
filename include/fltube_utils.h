@@ -36,6 +36,8 @@
 
 #include <FL/Fl_Image.H>
 #include <FL/Fl_JPEG_Image.H>
+#include <FL/Fl.H>
+#include <FL/Fl_Window.H>
 #include "gnugettext_utils.h"
 
 
@@ -160,5 +162,7 @@ void replace_all(std::string &original_text, const std::string &toReplace, const
 bool isNumber(const std::string& str);
 
 int getIntVersion(std::string version);
+
+void center_window(Fl_Window* win);
 
 #endif

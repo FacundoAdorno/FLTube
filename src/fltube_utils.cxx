@@ -12,7 +12,6 @@
  */
 
 #include "../include/fltube_utils.h"
-#include <cstdio>
 
 /** Mapping FS_PERMISSION_NAMES to corresponding std::filesystem::perms. */
 static const std::map<SIMPLE_FS_PERMISSION, std::map<std::string, std::filesystem::perms>> perms_map = {
@@ -383,4 +382,13 @@ void TerminalLogger::debug(std::string log_message) {
     if (debug_enabled) {
         printf(PRINT_FORMAT.c_str(), "\033[33m\033[1m[DEBUG]\033[0m ", currentDateTime().c_str(), log_message.c_str());
     }
+}
+
+/*  Center on the main screen a window passed as parameter... */
+void center_window(Fl_Window* win) {
+    int screen_w = Fl::w();
+    int screen_h = Fl::h();
+    int center_x = (screen_w - win->w());
+    int center_y = (screen_h - win->h());
+    win->position(center_x, center_y);
 }
