@@ -58,6 +58,7 @@ public:
   Fl_Button *like_icon_bttn;
   Fl_Button *cache_bttn;
   Fl_Box *title;
+  Fl_Button *remove_bttn;
   Fl_Box *duration;
   Fl_Box *uploadDate;
   Fl_Button *userUploader;

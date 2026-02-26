@@ -93,6 +93,7 @@ Fl_PNG_Image* like_icon_image = nullptr;
 Fl_PNG_Image* like_red_icon_image = nullptr;
 Fl_PNG_Image* playicon_image = nullptr;
 Fl_PNG_Image* cached_icon_image = nullptr;
+Fl_PNG_Image* remove_video_icon_image = nullptr;
 
 /* Keep the current displayed cursor. FLTK doesn't have a way to know this. */
 Fl_Cursor current_displayed_cursor = FL_CURSOR_DEFAULT;
@@ -381,6 +382,8 @@ void update_video_info() {
     YTDLP_Video_Metadata* ytvm = nullptr;
     char text_buffer[128];
     bool is_livestream;
+    char* tabname = static_cast<char*>(mainWin->central_tabs->value()->user_data());
+    bool displaying_video_list_tab = (tabname == TAB_VIDEOLIST_NAME);
     for (int j=0; j < video_metadata.size(); j++) {
       if (video_metadata[j] != nullptr) {
             is_livestream = (video_metadata[j]->live_status == "is_live");
@@ -418,6 +421,14 @@ void update_video_info() {
                 video_info_arr[j]->cache_bttn->show();
             } else {
                 video_info_arr[j]->cache_bttn->hide();
+            }
+            // If displaying the videos when the @TAB_VIDEOLIST_NAME is selected, then shows the "remove from list" button...
+            if (displaying_video_list_tab) {
+                video_info_arr[j]->remove_bttn->show();
+                video_info_arr[j]->remove_bttn->activate();
+            } else {
+                video_info_arr[j]->remove_bttn->hide();
+                video_info_arr[j]->remove_bttn->deactivate();
             }
             try {
                 snprintf(text_buffer, sizeof(text_buffer), "%s %s", YtDlp_Helper::get_metric_abbreviation(std::stoi(video_metadata[j]->viewers_count))->c_str(), (is_livestream) ? _("viewers") : _("views"));
@@ -558,6 +569,24 @@ void removeFromCache_cb(Fl_Widget *wdg) {
     wdg->hide();
 }
 
+/* Callback to remove a video from a video list: (the History Navigation list, the Liked list, or any other custom list). */
+void removeFromVideoList_cb(Fl_Widget *wdg) {
+    // Avoid proceed the callback action if there is no video list displaying currently...
+    if (getActiveTabName() != TAB_VIDEOLIST_NAME) return;
+
+    VideoInfo* vi = static_cast<VideoInfo*>(wdg->parent());
+    std::string video_url = *static_cast<std::string*>(vi->thumbnail->user_data());
+    std::string video_id = video_url;
+    replace_all(video_id, std::string(YOUTUBE_URL_PREFIX), "");
+    std::string selected_list = mainWin->videolist_selector->mvalue()->label();
+    if (userdata->removeVideoFromList(video_id, selected_list)) {
+        char mssg[256];
+        snprintf(mssg, sizeof(mssg), _("Remove video '%s' from list '%s'."), video_url.c_str(), selected_list.c_str());
+        logger->debug(mssg);
+    }
+    updateVideoMetadataFromVideoList();
+}
+
 /**
  * Hook: Actions to execute before main window is drawn...
  */
@@ -621,6 +650,7 @@ void pre_init() {
     like_red_icon_image = load_resource_image("heart_18p_red.png");
     playicon_image = load_resource_image("playicon.png");
     cached_icon_image = load_resource_image("cache_icon_18p.png");
+    remove_video_icon_image = load_resource_image("remove_video_icon_14p.png");
 
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
@@ -713,6 +743,8 @@ VideoInfo* create_video_group(int posx, int posy) {
     video_info->like_icon_bttn->callback((Fl_Callback*)markLikedVideo_cb);
     if (cached_icon_image != nullptr) video_info->cache_bttn->image(cached_icon_image);
     video_info->cache_bttn->callback((Fl_Callback*)removeFromCache_cb);
+    if (remove_video_icon_image != nullptr) video_info->remove_bttn->image(remove_video_icon_image);
+    video_info->remove_bttn->callback((Fl_Callback*)removeFromVideoList_cb);
     return video_info;
 }
 

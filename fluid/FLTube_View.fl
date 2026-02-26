@@ -32,7 +32,7 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 }
 
 widget_class FLTubeMainWindow {
-  label FLTube open
+  label FLTube
   xywh {0 0 593 540}
   class Fl_Double_Window visible
 } {
@@ -86,8 +86,8 @@ widget_class FLTubeMainWindow {
   }
 }
 
-widget_class VideoInfo {
-  xywh {511 418 577 91} hide position_relative
+widget_class VideoInfo {open
+  xywh {0 0 577 91} visible position_relative
 } {
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
@@ -110,8 +110,11 @@ widget_class VideoInfo {
   Fl_Button cache_bttn {
     xywh {535 43 20 20} box NO_BOX down_box THIN_UP_FRAME hide
   }
-  Fl_Box title {
-    xywh {105 6 450 37} labelfont 1 align 213
+  Fl_Box title {selected
+    xywh {105 6 435 37} labelfont 1 align 213
+  }
+  Fl_Button remove_bttn {selected
+    tooltip {Click to remove video from current list.} xywh {538 7 16 16} down_box DOWN_BOX hide deactivate
   }
   Fl_Box duration {
     tooltip {Duration expressed as H:MM:SS.} xywh {105 65 70 20} labelfont 2 align 20
@@ -251,9 +254,9 @@ widget_class HelpFLTubeWindow {
 }
 
 widget_class InitialLoadingWindow {
-  label {Loading FLTube} open selected
-  xywh {0 0 236 180}
-  class Fl_Double_Window modal visible
+  label {Loading FLTube}
+  xywh {0 0 236 180} hide
+  class Fl_Double_Window modal
 } {
   Fl_Box fltube_logo {
     label {LOADING...}

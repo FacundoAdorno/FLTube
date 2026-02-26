@@ -134,10 +134,16 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
     cache_bttn->down_box(FL_THIN_UP_FRAME);
     cache_bttn->hide();
   } // Fl_Button* cache_bttn
-  { title = new Fl_Box(105, 6, 450, 37);
+  { title = new Fl_Box(105, 6, 435, 37);
     title->labelfont(1);
     title->align(Fl_Align(197|FL_ALIGN_INSIDE));
   } // Fl_Box* title
+  { remove_bttn = new Fl_Button(538, 7, 16, 16);
+    remove_bttn->tooltip(_("Click to remove video from current list."));
+    remove_bttn->down_box(FL_DOWN_BOX);
+    remove_bttn->hide();
+    remove_bttn->deactivate();
+  } // Fl_Button* remove_bttn
   { duration = new Fl_Box(105, 65, 70, 20);
     duration->tooltip(_("Duration expressed as H:MM:SS."));
     duration->labelfont(2);
