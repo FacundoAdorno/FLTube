@@ -42,8 +42,10 @@ public:
   Fl_Choice *videolist_selector;
   Fl_Group *search_result_selectors;
   Fl_Group *pagination_controls;
+  Fl_Button *first_page_bttn;
   Fl_Button *previous_results_bttn;
   Fl_Button *next_results_bttn;
+  Fl_Button *last_page_bttn;
 };
 #include <FL/Fl_Box.H>
 

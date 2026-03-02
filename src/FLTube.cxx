@@ -31,23 +31,17 @@ TinyMessageWindow* message_window = (TinyMessageWindow *)0;
 
 InitialLoadingWindow* initial_win = (InitialLoadingWindow*)0;
 
-// Current page index at search results navigation.
-int SEARCH_PAGE_INDEX = 0;
-
-// Count of search results per page. BEWARE: don't modify this value unless you change the view at Fltube_View.cxx file.'
-const int SEARCH_PAGE_SIZE = 4;
-
 // Default resolution for video streaming
 VCODEC_RESOLUTIONS STREAM_VIDEO_RESOLUTION = R360p;
 
-// Array that holds the search results WIDGETS, in groups of size @SEARCH_PAGE_SIZE...
-std::array <VideoInfo*,SEARCH_PAGE_SIZE> video_info_arr{ nullptr, nullptr, nullptr, nullptr };
+// Array that holds the search results WIDGETS, in groups of size @PaginationManager::SEARCH_PAGE_SIZE...
+std::array <VideoInfo*, PaginationManager::SEARCH_PAGE_SIZE> video_info_arr{ nullptr, nullptr, nullptr, nullptr };
 
 // Pointer to the video currently selected for stream...
 VideoInfo* video_selected_for_stream = nullptr;
 
-// Array that holds the search results METADATA, in groups of size @SEARCH_PAGE_SIZE...
-std::array <YTDLP_Video_Metadata*,SEARCH_PAGE_SIZE> video_metadata{ nullptr, nullptr, nullptr, nullptr };
+// Array that holds the search results METADATA, in groups of size @PaginationManager::SEARCH_PAGE_SIZE...
+std::array <YTDLP_Video_Metadata*, PaginationManager::SEARCH_PAGE_SIZE> video_metadata{ nullptr, nullptr, nullptr, nullptr };
 
 const std::string FLTUBE_TEMPORAL_DIR(std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/");
 
@@ -86,6 +80,8 @@ UserDataManager* userdata = nullptr;
 YtDlp_Helper* ytdlp = nullptr;
 
 std::shared_ptr<PermanentDiskCache> cache = nullptr;
+
+PaginationManager* page_manager = nullptr;
 
 Fl_PNG_Image* live_image = nullptr;
 Fl_PNG_Image* already_viewed_image = nullptr;
@@ -297,23 +293,33 @@ void lock_buttons(bool lock){
     if (lock) {
         mainWin->do_search_bttn->deactivate();
         mainWin->next_results_bttn->deactivate();
+        mainWin->last_page_bttn->deactivate();
         mainWin->previous_results_bttn->deactivate();
+        mainWin->first_page_bttn->deactivate();
         for (int j=0; j < video_info_arr.size(); j++) {
             video_info_arr[j]->thumbnail->deactivate();
             video_info_arr[j]->userUploader->deactivate();
             video_info_arr[j]->like_icon_bttn->deactivate();
             video_info_arr[j]->cache_bttn->deactivate();
+            if (video_info_arr[j]->remove_bttn->visible()) {
+                video_info_arr[j]->remove_bttn->deactivate();
+            }
         }
     } else {
         //unlock
         mainWin->do_search_bttn->activate();
         mainWin->next_results_bttn->activate();
+        mainWin->last_page_bttn->activate();
         mainWin->previous_results_bttn->activate();
+        mainWin->first_page_bttn->activate();
         for (int j=0; j < video_info_arr.size(); j++) {
             video_info_arr[j]->thumbnail->activate();
             video_info_arr[j]->userUploader->activate();
             video_info_arr[j]->like_icon_bttn->activate();
             video_info_arr[j]->cache_bttn->activate();
+            if (video_info_arr[j]->remove_bttn->visible()) {
+                video_info_arr[j]->remove_bttn->activate();
+            }
         }
     }
     Fl::check();
@@ -479,8 +485,9 @@ bool updateVideoMetadataFromVideoList() {
     Fl::check();
     std::string selected_list = mainWin->videolist_selector->mvalue()->label();
     VideoList* vlist = userdata->getVideoList(selected_list);
-    int next_video_position = (SEARCH_PAGE_INDEX * SEARCH_PAGE_SIZE);
-    for (int i=0; i < SEARCH_PAGE_SIZE; i++) {
+    Pagination_Info current_page = page_manager->current();
+    int next_video_position = (current_page.index * current_page.size);
+    for (int i=0; i < PaginationManager::SEARCH_PAGE_SIZE; i++) {
         if (next_video_position < vlist->getLength()) {
             video_metadata[i] = vlist->toYTDLPVideo(vlist->getVideoAt(next_video_position));
         } else {
@@ -491,10 +498,13 @@ bool updateVideoMetadataFromVideoList() {
 
     update_video_info();
 
-    if (next_video_position < vlist->getLength())
+    if (next_video_position < vlist->getLength()) {
         mainWin->next_results_bttn->activate();
+        mainWin->last_page_bttn->activate();
+    }
     if (vlist->getLength() < next_video_position + 1){
         mainWin->next_results_bttn->deactivate();     // If the list doesn't have more elements to show, deactivate next button...'
+        mainWin->last_page_bttn->deactivate();
         return false;
     }
 
@@ -502,8 +512,13 @@ bool updateVideoMetadataFromVideoList() {
 }
 
 void getVideosAtList_cb(Fl_Choice* w, void* a){
-    SEARCH_PAGE_INDEX = 0;
+    std::string selected_list = mainWin->videolist_selector->mvalue()->label();
+    VideoList* vlist = userdata->getVideoList(selected_list);
+    page_manager->reset();
+    page_manager->limit(true);
+    page_manager->set_max_results(vlist->getLength());
     mainWin->previous_results_bttn->deactivate();
+    mainWin->first_page_bttn->deactivate();
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
         logger->warn(_("Your device is offline. Check your internet connection."));
@@ -524,7 +539,10 @@ void selectCentralTab_cb(Fl_Choice* w, void* a){
     if (tabname == TAB_SEARCH_NAME) {
         mainWin->search_term_or_url->value("");
         mainWin->previous_results_bttn->deactivate();
+        mainWin->first_page_bttn->deactivate();
         mainWin->next_results_bttn->deactivate();
+        mainWin->last_page_bttn->deactivate();
+        page_manager->reset();
         clear_video_info();
     }
 }
@@ -583,6 +601,8 @@ void removeFromVideoList_cb(Fl_Widget *wdg) {
         char mssg[256];
         snprintf(mssg, sizeof(mssg), _("Remove video '%s' from list '%s'."), video_url.c_str(), selected_list.c_str());
         logger->debug(mssg);
+        // Decrement the count of current list's videos at the pagination manager.
+        page_manager->set_max_results(page_manager->get_count_results() - 1);
     }
     updateVideoMetadataFromVideoList();
 }
@@ -600,6 +620,7 @@ void pre_init() {
     config = new ConfigurationManager(CONFIGFILE_PATH.c_str(), logger);
     initial_win->loading_about_data->label(_("Processing user configuration file..."));
     userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion(std::string(VERSION)), logger);
+    page_manager = new PaginationManager();
     //TODO Create properties defining if enable the use of cache and the TTL for every cache entry...
     initial_win->loading_about_data->label(_("Populating cache..."));
     cache = std::make_shared<PermanentDiskCache>(logger);
@@ -608,6 +629,7 @@ void pre_init() {
     AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
 
     initial_win->loading_about_data->label(_("Checking 'yt-dlp' installation..."));
+    logger->info(_("Cheking if yt-dlp is at your system PATH..."));
     if ( !AVOID_INITIAL_CHECKS && !isInstalledYTDLP() ) {
         showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run in a terminal the 'install_yt-dlp' script."));
         logger->error(_("yt-dlp is not installed. Closing app...\n"));
@@ -770,7 +792,6 @@ void doSearch(const char* input_text) {
     snprintf(message, sizeof(message), _("Searching for results for '%s' user input..."), input_text);
     logger->debug(std::string(message));
     std::string result;
-    Pagination_Info page_i;
     if (isUrl(input_text) && !SEARCH_BY_CHANNEL_F) {
         if(!YtDlp_Helper::isYoutubeURL(input_text)){
             //Restore cursor after search failed because no Internet is available...
@@ -782,21 +803,22 @@ void doSearch(const char* input_text) {
             return;
         }
         ytdlp->set_search_type(SEARCH_BY_TYPE::VIDEO_URL);
-        page_i = Pagination_Info();
+        page_manager->reset();
+        page_manager->limit(true);
+        page_manager->set_max_results(1);
 
     } else {
-        page_i = Pagination_Info(SEARCH_PAGE_SIZE, SEARCH_PAGE_INDEX);
-        if (SEARCH_PAGE_INDEX == 0) {
+        if (page_manager->current().index == 0) {
             mainWin->next_results_bttn->activate();
         }
         ytdlp->set_search_type( (SEARCH_BY_CHANNEL_F) ? SEARCH_BY_TYPE::CHANNEL_URL : SEARCH_BY_TYPE::TERM);
     }
-    result = ytdlp->search(input_text, page_i);
+    result = ytdlp->search(input_text, page_manager->current());
     logger->debug(result);
     // Read input lines until an empty line is encountered
     std::istringstream result_sstream(result);
     std::string line;
-    for (int i=0; i < SEARCH_PAGE_SIZE; i++) {
+    for (int i=0; i < PaginationManager::SEARCH_PAGE_SIZE; i++) {
         getline(result_sstream, line);
         if (!line.empty()) {
             //Set the video metadata at the array...
@@ -822,7 +844,7 @@ void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
         return;
     }
     std::string* channel_id =  static_cast<std::string*>(channel_id_str);
-    printf("CHANNEL ID: %s", channel_id->c_str());
+    logger->debug("Looking up videos of CHANNEL with ID: " + *channel_id);
     if (channel_id == nullptr || channel_id->empty()) {
         logger->error(_("Channel ID is empty. Please verify the video metadata initilization!!!\n"));
         return;
@@ -831,7 +853,7 @@ void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
         // If "My Lists" tab is open, then change to the main searchbox tab...
         mainWin->central_tabs->value(mainWin->searchbox_tab);
     }
-    SEARCH_PAGE_INDEX = 0;
+    page_manager->reset();
     SEARCH_BY_CHANNEL_F = true;
     char channel_videos_URL[256];
     snprintf(channel_videos_URL, sizeof(channel_videos_URL), "https://www.youtube.com/channel/%s/videos", channel_id->c_str());
@@ -840,6 +862,8 @@ void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
     doSearch(channel_videos_URL);
     lock_buttons(false);
     mainWin->previous_results_bttn->deactivate();
+    mainWin->first_page_bttn->deactivate();
+    mainWin->last_page_bttn->deactivate();
 }
 
 
@@ -865,7 +889,7 @@ const char* getSearchValue(Fl_Input *input){
  */
 void searchButtonAction_cb(Fl_Widget *wdgt, Fl_Input *input){
     //Reset global pagination index and "deactivate" previos button...
-    SEARCH_PAGE_INDEX = 0;
+    page_manager->reset();
     SEARCH_BY_CHANNEL_F = false;
     const char* input_text = getSearchValue(input);
     if (input_text != nullptr)  {
@@ -874,13 +898,12 @@ void searchButtonAction_cb(Fl_Widget *wdgt, Fl_Input *input){
         lock_buttons(false);
     }
     mainWin->previous_results_bttn->deactivate();
+    mainWin->first_page_bttn->deactivate();
+    if (!page_manager->exists_next()) mainWin->next_results_bttn->deactivate();
+    if (page_manager->is_last_page_known()) mainWin->last_page_bttn->deactivate();
 }
 
-/** Callback for Previous results button... */
-void getPreviousSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
-    if (SEARCH_PAGE_INDEX>0) {
-        SEARCH_PAGE_INDEX--;
-    }
+void change_results_page(Fl_Input *input) {
     if ( getActiveTabName() == TAB_SEARCH_NAME ) {
         const char* input_text = getSearchValue(input);
         if (input_text != nullptr)  {
@@ -894,29 +917,65 @@ void getPreviousSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
         updateVideoMetadataFromVideoList();
         lock_buttons(false);
     }
-    if (SEARCH_PAGE_INDEX == 0) {
+}
+
+/** Callback for Previous results button... */
+void getPreviousSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
+    page_manager->previous();
+    change_results_page(input);
+    if (!page_manager->exists_previous()) {
+        mainWin->previous_results_bttn->deactivate();
+        mainWin->first_page_bttn->deactivate();
+    }
+}
+
+void getFirstResultsPage_cb(Fl_Widget* widget, Fl_Input *input) {
+    page_manager->first();
+    change_results_page(input);
+    if (page_manager->exists_next()) {
+        mainWin->next_results_bttn->activate();
+        mainWin->last_page_bttn->activate();
+    } else {
+        mainWin->next_results_bttn->deactivate();
+        mainWin->last_page_bttn->deactivate();
+    }
+    mainWin->previous_results_bttn->deactivate();
+    mainWin->first_page_bttn->deactivate();
+}
+
+void getLastKnownResultsPage_cb (Fl_Widget* widget, Fl_Input *input) {
+    page_manager->last();
+    change_results_page(input);
+    mainWin->last_page_bttn->deactivate();
+    if (page_manager->is_limited()) mainWin->next_results_bttn->deactivate();
+    if (page_manager->exists_previous()) {
+        mainWin->previous_results_bttn->activate();
+        mainWin->first_page_bttn->activate();
+    } else {
         mainWin->previous_results_bttn->deactivate();
     }
 }
+
 /** Callback for Next results button.. */
 void getNextSearchResults_cb(Fl_Widget* widget, Fl_Input *input){
     //TODO: what to do if there is no more results? It must be controlled in some way...
-    SEARCH_PAGE_INDEX++;
-    if (getActiveTabName() == TAB_SEARCH_NAME) {
-        const char* input_text = getSearchValue(input);
-        if (input_text != nullptr) {
-            lock_buttons(true);
-            doSearch(input_text);
-            lock_buttons(false);
+    page_manager->next();
+    change_results_page(input);
+    if (page_manager->is_limited()) {
+        if (!page_manager->exists_next()){
+            mainWin->next_results_bttn->deactivate();
+            mainWin->last_page_bttn->deactivate();
+        } else {
+            mainWin->next_results_bttn->activate();
+            mainWin->last_page_bttn->activate();
         }
-    }
-    if (getActiveTabName() == TAB_VIDEOLIST_NAME) {
-        lock_buttons(true);
-        bool areMoreVideos = updateVideoMetadataFromVideoList();
-        lock_buttons(false);
-        if (!areMoreVideos) mainWin->next_results_bttn->deactivate();
+    } else {
+        //If pagination is not limited...
+        if (page_manager->is_last_page_known()) mainWin->last_page_bttn->deactivate();
+        else mainWin->last_page_bttn->activate();
     }
     mainWin->previous_results_bttn->activate();
+    mainWin->first_page_bttn->activate();
 }
 
 /*
@@ -1011,6 +1070,10 @@ int main(int argc, char **argv) {
     mainWin->previous_results_bttn->deactivate();
     mainWin->next_results_bttn->callback((Fl_Callback*)getNextSearchResults_cb, (void*)(mainWin->search_term_or_url));
     mainWin->next_results_bttn->deactivate();
+    mainWin->first_page_bttn->callback((Fl_Callback*)getFirstResultsPage_cb, (void*)(mainWin->search_term_or_url));
+    mainWin->first_page_bttn->deactivate();
+    mainWin->last_page_bttn->callback((Fl_Callback*)getLastKnownResultsPage_cb, (void*)(mainWin->search_term_or_url));
+    mainWin->last_page_bttn->deactivate();
 
     post_init();
     //mainWin->show(argc, argv);    //TODO Avoid passing parameters to the mainWin function to prevent undesirable logs.

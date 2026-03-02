@@ -150,7 +150,6 @@ bool canWriteOnDir(const char* directory){
  * Returns true if yt-dlp exists on system path...
  */
 bool isInstalledYTDLP() {
-    printf("Cheking if yt-dlp is at your system PATH...\n");
     int yt_dlp_version_status = system ("yt-dlp --version");
     if ( yt_dlp_version_status != 0 ) {
         return false;
@@ -360,6 +359,15 @@ int getIntVersion(std::string version) {
     }
 }
 
+/*  Center on the main screen a window passed as parameter... */
+void center_window(Fl_Window* win) {
+    int screen_w = Fl::w();
+    int screen_h = Fl::h();
+    int center_x = (screen_w - win->w()) / 2;
+    int center_y = (screen_h - win->h()) / 2;
+    win->position(center_x, center_y);
+}
+
 
 void TerminalLogger::log(std::string log_message, LogLevel log_lvl) {
     printf(PRINT_FORMAT.c_str(), "\033[1m[UNKNOWN]\033[0m ", currentDateTime().c_str(), log_message.c_str());
@@ -384,11 +392,67 @@ void TerminalLogger::debug(std::string log_message) {
     }
 }
 
-/*  Center on the main screen a window passed as parameter... */
-void center_window(Fl_Window* win) {
-    int screen_w = Fl::w();
-    int screen_h = Fl::h();
-    int center_x = (screen_w - win->w()) / 2;
-    int center_y = (screen_h - win->h()) / 2;
-    win->position(center_x, center_y);
+Pagination_Info PaginationManager::next() {
+    Pagination_Info next_page;
+    if (exists_next()) {
+        search_page_index++;
+        next_page = Pagination_Info(SEARCH_PAGE_SIZE, search_page_index);
+        // printf("SEARCH PAGE INDEX: %d, Upper Limit: %d, Count of results: %d \n", search_page_index, next_page.upper_end(), count_of_results);
+        // Increment count_of_results if reached a new max size of count results...
+        if (!limit_results_count &&  next_page.upper_end() > count_of_results) {
+            // printf("Increment count of results (%d) to a new number (%d) \n", count_of_results, count_of_results + SEARCH_PAGE_SIZE);
+            count_of_results += SEARCH_PAGE_SIZE;
+        }
+    } else {
+        next_page = Pagination_Info(SEARCH_PAGE_SIZE, search_page_index);
+    }
+    return next_page;
+}
+
+Pagination_Info PaginationManager::previous() {
+    if (exists_previous()) {
+        search_page_index--;
+    }
+    return Pagination_Info(SEARCH_PAGE_SIZE, search_page_index);
+}
+
+Pagination_Info PaginationManager::current() {
+    return Pagination_Info(SEARCH_PAGE_SIZE, search_page_index);
+}
+
+Pagination_Info PaginationManager::first() {
+    search_page_index = 0;
+    return Pagination_Info(SEARCH_PAGE_SIZE, search_page_index);
+}
+
+Pagination_Info PaginationManager::last() {
+    // Integer division always return the integer part of the result.
+    search_page_index = ((int)count_of_results - 1) / SEARCH_PAGE_SIZE;
+    // printf("COUNT OF RESULTS: %d, NEW search page index %d \n", count_of_results, search_page_index);
+    return Pagination_Info(SEARCH_PAGE_SIZE, search_page_index);
+}
+
+void PaginationManager::reset() {
+    search_page_index = 0;
+    count_of_results = SEARCH_PAGE_SIZE;
+    limit_results_count = false;
+}
+
+bool PaginationManager::exists_next() {
+    // Always exists a next page to lookup if results count is not restricted.
+    if (!limit_results_count) return true;
+    else {
+        //Otherwise, check if lower limit of a next page is less or equal than count of results.
+        Pagination_Info pi = Pagination_Info(SEARCH_PAGE_SIZE, search_page_index + 1);
+        return pi.lower_end() <= count_of_results;
+    }
+}
+
+bool PaginationManager::exists_previous() {
+    return search_page_index > 0;
+}
+
+bool PaginationManager::is_last_page_known() {
+    int last_page_index = ((int)count_of_results - 1) / SEARCH_PAGE_SIZE;
+    return search_page_index == last_page_index;
 }

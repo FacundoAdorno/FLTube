@@ -90,12 +90,18 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     search_result_selectors->end();
   } // Fl_Group* search_result_selectors
   { pagination_controls = new Fl_Group(9, 508, 577, 30);
-    { previous_results_bttn = new Fl_Button(10, 510, 135, 23, _("<&Previous"));
+    { first_page_bttn = new Fl_Button(10, 510, 18, 23, _("<l"));
+      first_page_bttn->tooltip(_("Go to the first page."));
+    } // Fl_Button* first_page_bttn
+    { previous_results_bttn = new Fl_Button(30, 510, 115, 23, _("<&Previous"));
       previous_results_bttn->tooltip(_("Get previous results of current search results set."));
     } // Fl_Button* previous_results_bttn
-    { next_results_bttn = new Fl_Button(450, 510, 135, 23, _("&Next>"));
+    { next_results_bttn = new Fl_Button(450, 510, 115, 23, _("&Next>"));
       next_results_bttn->tooltip(_("Get following results of current search results set."));
     } // Fl_Button* next_results_bttn
+    { last_page_bttn = new Fl_Button(567, 510, 18, 23, _("l>"));
+      last_page_bttn->tooltip(_("Go to the last loaded page."));
+    } // Fl_Button* last_page_bttn
     pagination_controls->end();
   } // Fl_Group* pagination_controls
   end();

@@ -32,7 +32,7 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 }
 
 widget_class FLTubeMainWindow {
-  label FLTube
+  label FLTube open
   xywh {0 0 593 540}
   class Fl_Double_Window visible
 } {
@@ -69,24 +69,32 @@ widget_class FLTubeMainWindow {
       } {}
     }
   }
-  Fl_Group search_result_selectors {
+  Fl_Group search_result_selectors {selected
     xywh {10 126 575 380} box THIN_UP_BOX
   } {}
   Fl_Group pagination_controls {open
     xywh {9 508 577 30}
   } {
+    Fl_Button first_page_bttn {
+      label {<l}
+      tooltip {Go to the first page.} xywh {10 510 18 23}
+    }
     Fl_Button previous_results_bttn {
       label {<&Previous}
-      tooltip {Get previous results of current search results set.} xywh {10 510 135 23}
+      tooltip {Get previous results of current search results set.} xywh {30 510 115 23}
     }
     Fl_Button next_results_bttn {
       label {&Next>}
-      tooltip {Get following results of current search results set.} xywh {450 510 135 23}
+      tooltip {Get following results of current search results set.} xywh {450 510 115 23}
+    }
+    Fl_Button last_page_bttn {
+      label {l>}
+      tooltip {Go to the last loaded page.} xywh {567 510 18 23}
     }
   }
 }
 
-widget_class VideoInfo {open
+widget_class VideoInfo {
   xywh {0 0 577 91} visible position_relative
 } {
   Fl_Button thumbnail {
@@ -110,10 +118,10 @@ widget_class VideoInfo {open
   Fl_Button cache_bttn {
     xywh {535 43 20 20} box NO_BOX down_box THIN_UP_FRAME hide
   }
-  Fl_Box title {selected
+  Fl_Box title {
     xywh {105 6 435 37} labelfont 1 align 213
   }
-  Fl_Button remove_bttn {selected
+  Fl_Button remove_bttn {
     tooltip {Click to remove video from current list.} xywh {538 7 16 16} down_box DOWN_BOX hide deactivate
   }
   Fl_Box duration {

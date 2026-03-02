@@ -116,6 +116,59 @@ struct Pagination_Info {
     }
 };
 
+class PaginationManager {
+private:
+    /* Current page index at search results navigation. */
+    unsigned int search_page_index;
+
+    /* Maintains the maximum number of results obtained so far, or indicates the maximum number of results
+     * configured for the current pagination. */
+    unsigned int count_of_results;
+    /* If true, keep unchanged the count of results when get next page.  */
+    bool limit_results_count;
+public:
+    /* Count of search results per page. BEWARE: don't modify this value unless you change the view at Fltube_View.cxx file. */
+    const static int SEARCH_PAGE_SIZE = 4;
+    /* Create a Pagination Manager with a page size of 4 videos per page, and the start page index set to 0. */
+    PaginationManager(): search_page_index(0), count_of_results(SEARCH_PAGE_SIZE), limit_results_count(false) {};
+    /* Get next page and update the count of results adding @SEARCH_PAGE_SIZE to current count, unless @limit_results_count is true. */
+    Pagination_Info next();
+    /* Get previous page. If already at first page, return first page again. */
+    Pagination_Info previous();
+    /* Get current page. */
+    Pagination_Info current();
+    /* Return first page. */
+    Pagination_Info first();
+    /* Return last known page (calculation: [count_of_results MOD page_size] + 1 ). */
+    Pagination_Info last();
+    /* Set the page index to 0, reset the initial count of results, and unlimit the pagination. */
+    void reset();
+    /* Limits pagination to a maximum number of pages according to the value set in the set_max_results() method. */
+    void limit(bool is_limited) {
+        limit_results_count = is_limited;
+    }
+
+    bool is_limited() {
+        return limit_results_count;
+    }
+
+    void set_max_results(unsigned int count) {
+        count_of_results = count;
+    }
+
+    unsigned int get_count_results() {
+        return count_of_results;
+    }
+
+    /* Returns true if exists a next page to lookup. */
+    bool exists_next();
+    /* Returns true if exists a previous page to lookup. */
+    bool exists_previous();
+
+    bool is_last_page_known();
+
+};
+
 struct MediaPlayerInfo {
     // The name of the binary (or system path) of the media player.
     std::string binary_path;
