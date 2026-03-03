@@ -117,6 +117,7 @@ void exitApp(unsigned short int exitStatusCode = FLT_OK) {
     delete userdata;
     delete ytdlp;
     cache->finish();
+    delete page_manager;
     delete mainWin;
     //Exiting the app...
     logger->info(_("Closing FLtube... Bye!\n"));
@@ -844,7 +845,7 @@ void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
         return;
     }
     std::string* channel_id =  static_cast<std::string*>(channel_id_str);
-    logger->debug("Looking up videos of CHANNEL with ID: " + *channel_id);
+    logger->debug(_("Looking up videos of CHANNEL with ID: ") + *channel_id);
     if (channel_id == nullptr || channel_id->empty()) {
         logger->error(_("Channel ID is empty. Please verify the video metadata initilization!!!\n"));
         return;
