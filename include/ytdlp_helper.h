@@ -33,6 +33,8 @@ struct YTDLP_Video_Metadata{
     std::string viewers_count;
 };
 
+typedef std::array<YTDLP_Video_Metadata*, PaginationManager::SEARCH_PAGE_SIZE> yt_metadata_arr;
+
 enum YTDLP_EXTRACTOR { YOUTUBE };
 
 /*  Used to define if a search is going to be by a search term, the videos from an specific channel or user,
@@ -47,6 +49,8 @@ enum VCODEC_RESOLUTIONS {
 static std::array<const char*,2> VCODEC_IMPL_NAMES = {"avc1", "av01"};
 // The default resolution used to streaming videos.
 const int DEFAULT_STREAM_VIDEO_RESOLUTION = VCODEC_RESOLUTIONS::R360p;
+
+
 
 /* Use this class for search and streams videos using "yt-dlp" commandline tool.
  * Search a video/videos using a single URL, a Channel URL or a search term.
@@ -74,11 +78,13 @@ class YtDlp_Helper {
         bool is_live_flag;
 
         /* Method to define the specific search parameters for Youtube Extractor, and make the videos search.  */
-        std::string do_youtube_search(const char* search_text, Pagination_Info page_info);
+        yt_metadata_arr do_youtube_search(const char* search_text, Pagination_Info page_info);
 
         std::shared_ptr<TerminalLogger> logger;
 
         std::shared_ptr<PermanentDiskCache> cache;
+
+        std::map<std::string, std::vector<std::string>> search_cache;
 
     public:
         /** Metadata print template for youtube search videos.  **/
@@ -88,7 +94,7 @@ class YtDlp_Helper {
 
 
         YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache, std::string working_dir):
-            is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache)
+            is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache), search_cache({})
             {
                 if (working_dir == "")
                     TEMP_WORKING_DIR = std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/";
@@ -97,7 +103,7 @@ class YtDlp_Helper {
             };
 
         /*  Search one or more videos. This will be determined according to the type of search is configured. */
-        std::string search(const char* search_text_parameter, Pagination_Info page_info);
+        yt_metadata_arr search(const char* search_text_parameter, Pagination_Info page_info);
 
         /*  Start the streaming of an specific video URL. If the video is live, you should specify this before stream.
          *  If the default stream method is not working, stream using the alternative method (if configured this way). */

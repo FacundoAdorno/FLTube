@@ -64,16 +64,16 @@ YTDLP_Video_Metadata* YtDlp_Helper::parse_metadata(const char ytdlp_video_metada
  * Make a search by term in the specified extractor (i.e. "youtube", etc.). See a complete list of extractors at yt-dlp docs.
  * For now, only do searchs at Youtube.
  */
-std::string YtDlp_Helper::search(const char* search_term, Pagination_Info page_info){
+yt_metadata_arr YtDlp_Helper::search(const char* search_term, Pagination_Info page_info){
 
     if (this->extractor == YTDLP_EXTRACTOR::YOUTUBE) {
         return this->do_youtube_search(search_term, page_info);
     } else {
-        return "No extractor matched...";
+        return {};
     }
 }
 
-std::string YtDlp_Helper::do_youtube_search(const char* search_text ,Pagination_Info page_info){
+yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Pagination_Info page_info){
     char search_component[128];
     Pagination_Info page_info_ = page_info;
     int start_list_pos, end_list_pos;
@@ -94,7 +94,25 @@ std::string YtDlp_Helper::do_youtube_search(const char* search_text ,Pagination_
 
     snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, search_component,
              page_info_.lower_end(), page_info_.upper_end(), YtDlp_Helper::PRINT_METADATA_TEMPLATE.c_str());
-    return exec(ytdlp_cmd);
+    std::string result = exec(ytdlp_cmd);
+    logger->debug(result);
+    // Read input lines until an empty line is encountered
+    std::istringstream result_sstream(result);
+    std::string line;
+    yt_metadata_arr result_yt_metadata;
+
+    for (int i=0; i < PaginationManager::SEARCH_PAGE_SIZE; i++) {
+        getline(result_sstream, line);
+        if (!line.empty()) {
+            //Set the video metadata at the array...
+            result_yt_metadata[i] = YtDlp_Helper::parse_metadata(line.c_str());
+        } else if(result_yt_metadata[i] != nullptr){
+            //Or release the unused pointers to free memory...
+            delete result_yt_metadata[i];
+            result_yt_metadata[i] = nullptr;
+        }
+    }
+    return result_yt_metadata;
 }
 
 void YtDlp_Helper::stream(const char* video_url) {

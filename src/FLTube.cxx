@@ -792,7 +792,6 @@ void doSearch(const char* input_text) {
     char message[1024];
     snprintf(message, sizeof(message), _("Searching for results for '%s' user input..."), input_text);
     logger->debug(std::string(message));
-    std::string result;
     if (isUrl(input_text) && !SEARCH_BY_CHANNEL_F) {
         if(!YtDlp_Helper::isYoutubeURL(input_text)){
             //Restore cursor after search failed because no Internet is available...
@@ -814,22 +813,8 @@ void doSearch(const char* input_text) {
         }
         ytdlp->set_search_type( (SEARCH_BY_CHANNEL_F) ? SEARCH_BY_TYPE::CHANNEL_URL : SEARCH_BY_TYPE::TERM);
     }
-    result = ytdlp->search(input_text, page_manager->current());
-    logger->debug(result);
-    // Read input lines until an empty line is encountered
-    std::istringstream result_sstream(result);
-    std::string line;
-    for (int i=0; i < PaginationManager::SEARCH_PAGE_SIZE; i++) {
-        getline(result_sstream, line);
-        if (!line.empty()) {
-            //Set the video metadata at the array...
-            video_metadata[i] = YtDlp_Helper::parse_metadata(line.c_str());
-        } else if(video_metadata[i] != nullptr){
-            //Or release the unused pointers to free memory...
-            delete video_metadata[i];
-            video_metadata[i] = nullptr;
-        }
-    }
+    video_metadata = ytdlp->search(input_text, page_manager->current());
+    
     update_video_info();
     //Restore cursor to default when search is done.
     ytdlp_action_in_progress = false;
