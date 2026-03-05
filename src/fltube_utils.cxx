@@ -218,7 +218,7 @@ FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::
 bool verify_network_connection() {
     CURL *curl;
     CURLcode response;
-    const char* url_test = "https://youtube.com";
+    const char* url_test = "https://www.google.com";
     // Use null device to redirect CURL output...
     FILE* null_file = fopen("/dev/null", "w");
     if (null_file == nullptr)  {
