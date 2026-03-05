@@ -12,6 +12,7 @@
  */
 
 #include "../include/ytdlp_helper.h"
+#include <cstdio>
 
 const std::string YtDlp_Helper::PRINT_METADATA_TEMPLATE = "title=\\\"%(title)s\\\">>thumbnail=\\\"%(thumbnails.0.url)s" \
 "\\\">>creators=\\\"%(uploader,playlist_channel)s\\\">>video_id=\\\"%(id)s\\\">>upload_date=\\\"%(upload_date>%Y-%m-%d)s" \
@@ -60,14 +61,33 @@ YTDLP_Video_Metadata* YtDlp_Helper::parse_metadata(const char ytdlp_video_metada
     return metadata;
 }
 
+std::vector<YTDLP_Video_Metadata*> YtDlp_Helper::retrieve_metadata(const char* ytdlp_cmd) {
+    logger->debug(ytdlp_cmd);
+    std::string result = exec(ytdlp_cmd);
+    std::vector<YTDLP_Video_Metadata*> metadata;
+    logger->debug(result);
+    // Read input lines until an empty line is encountered
+    std::istringstream result_sstream(result);
+    std::string line;
+
+    getline(result_sstream, line);
+    while (!line.empty()) {
+        //Set the video metadata at the array...
+        metadata.push_back(YtDlp_Helper::parse_metadata(line.c_str()));
+        getline(result_sstream, line);
+    }
+    return metadata;
+}
+
 /**
  * Make a search by term in the specified extractor (i.e. "youtube", etc.). See a complete list of extractors at yt-dlp docs.
  * For now, only do searchs at Youtube.
  */
 yt_metadata_arr YtDlp_Helper::search(const char* search_term, Pagination_Info page_info){
-
+    std::string clean_text = std::string(search_term);
+    trim_and_clean(clean_text);
     if (this->extractor == YTDLP_EXTRACTOR::YOUTUBE) {
-        return this->do_youtube_search(search_term, page_info);
+        return this->do_youtube_search(clean_text.c_str(), page_info);
     } else {
         return {};
     }
@@ -75,8 +95,11 @@ yt_metadata_arr YtDlp_Helper::search(const char* search_term, Pagination_Info pa
 
 yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Pagination_Info page_info){
     char search_component[128];
+    yt_metadata_arr result_yt_metadata;
+    result_yt_metadata.fill(nullptr);
+    std::vector<YTDLP_Video_Metadata*> mtd;
     Pagination_Info page_info_ = page_info;
-    int start_list_pos, end_list_pos;
+    // Define search yt-dlp command, that will be used if necessary...
     switch (this->search_type) {
         case SEARCH_BY_TYPE::CHANNEL_URL:
             snprintf(search_component, sizeof(search_component), "%s", search_text);  //The term is a Channel URL...
@@ -86,31 +109,53 @@ yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Paginat
             page_info_ = Pagination_Info(1,0);
             break;
         case SEARCH_BY_TYPE::TERM:
-            snprintf(search_component, sizeof(search_component), "ytsearch%d:%s", page_info.upper_end(), search_text);  // Else, do a normal search by term.
+            // Else, do a normal search by term.
             break;
     }
     char ytdlp_cmd[512];
     char cmd_format[512] = "yt-dlp \"%s\" -I %d-%d --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date";
 
-    snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, search_component,
-             page_info_.lower_end(), page_info_.upper_end(), YtDlp_Helper::PRINT_METADATA_TEMPLATE.c_str());
-    std::string result = exec(ytdlp_cmd);
-    logger->debug(result);
-    // Read input lines until an empty line is encountered
-    std::istringstream result_sstream(result);
-    std::string line;
-    yt_metadata_arr result_yt_metadata;
+    // Check if exists cached results for this type of search...
+    if (search_type != SEARCH_BY_TYPE::VIDEO_URL) {
+        auto search_data = search_cache.find(search_text);
+        // If not cached, OR have to get more results, then retrieve and cache new results...
+        if (search_data == search_cache.end()
+                || (search_data != search_cache.end() && search_data->second.size() < page_info_.upper_end())) {
 
-    for (int i=0; i < PaginationManager::SEARCH_PAGE_SIZE; i++) {
-        getline(result_sstream, line);
-        if (!line.empty()) {
-            //Set the video metadata at the array...
-            result_yt_metadata[i] = YtDlp_Helper::parse_metadata(line.c_str());
-        } else if(result_yt_metadata[i] != nullptr){
-            //Or release the unused pointers to free memory...
-            delete result_yt_metadata[i];
-            result_yt_metadata[i] = nullptr;
+            int start, end;
+            if (search_data == search_cache.end()) {
+                search_cache[search_text] = {};
+                search_data = search_cache.find(search_text);
+                start = 1; end = batch_search_size;
+            } else {
+                start = search_data->second.size();
+                end = search_data->second.size() + batch_search_size;
+            }
+
+            if ( search_type == SEARCH_BY_TYPE::TERM) {
+                snprintf(search_component, sizeof(search_component), "ytsearch%d:%s", end, search_text);
+            }
+            snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, search_component, start, end, YtDlp_Helper::PRINT_METADATA_TEMPLATE.c_str());
+            mtd = retrieve_metadata(ytdlp_cmd);
+
+            for ( YTDLP_Video_Metadata* video_m: mtd) {
+                search_data->second.push_back(std::make_pair(video_m->id, video_m));
+            }
         }
+        auto search_cached_results = search_data->second;
+        int retrieve_position;
+        for (int i=0; i < PaginationManager::SEARCH_PAGE_SIZE; i++) {
+            retrieve_position = (page_info_.lower_end() - 1) + i;
+            if (retrieve_position < search_cached_results.size()) {
+                result_yt_metadata[i] = search_cached_results[retrieve_position].second;
+            }
+        }
+    } else {
+        // If search only one video (SEARCH_BY_TYPE::VIDEO_URL), then get its metadata...
+        snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, search_component,
+                 page_info_.lower_end(), page_info_.upper_end(), YtDlp_Helper::PRINT_METADATA_TEMPLATE.c_str());
+        mtd = retrieve_metadata(ytdlp_cmd);
+        if (!mtd.empty()) result_yt_metadata[0] = mtd[0];
     }
     return result_yt_metadata;
 }

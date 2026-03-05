@@ -308,6 +308,16 @@ void trim(std::string &s){
     }).base(), s.end());
 }
 
+/*
+ * Replace multiple spaces with a single space, besides erase all spaces at the begining or end of the parameter, modifing it.
+ */
+void trim_and_clean(std::string &s) {
+    // Use regular expression to replace multiple spaces with a single space
+    std::regex pattern("\\s+");
+    trim(s);
+    s = std::regex_replace(s, pattern, " ");
+}
+
 /** A quick way to split strings separated via any character delimiter.
 * A trim is made (delete initial or final spaces) over each token. */
 std::vector<std::string> tokenize(std::string s, const char delimiter) {

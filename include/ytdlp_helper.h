@@ -50,8 +50,6 @@ static std::array<const char*,2> VCODEC_IMPL_NAMES = {"avc1", "av01"};
 // The default resolution used to streaming videos.
 const int DEFAULT_STREAM_VIDEO_RESOLUTION = VCODEC_RESOLUTIONS::R360p;
 
-
-
 /* Use this class for search and streams videos using "yt-dlp" commandline tool.
  * Search a video/videos using a single URL, a Channel URL or a search term.
  * Stream a video from its URL using the configured multimedia player at @DEFAULT_STREAM_PLAYER.
@@ -77,30 +75,55 @@ class YtDlp_Helper {
         /*  If true, the video for stream is at live. This implies the use of custom parameters on yt-dlp for stream. */
         bool is_live_flag;
 
-        /* Method to define the specific search parameters for Youtube Extractor, and make the videos search.  */
-        yt_metadata_arr do_youtube_search(const char* search_text, Pagination_Info page_info);
-
         std::shared_ptr<TerminalLogger> logger;
 
         std::shared_ptr<PermanentDiskCache> cache;
 
-        std::map<std::string, std::vector<std::string>> search_cache;
+        unsigned int batch_search_size;
+
+        // TODO: in the future, this must be a template T @GeneralCache, when implemented...
+        /* This is a simple results cache, with the following semantics:
+         *      map <"search term / channel ID <map <"video_id", parsed metadata>>>"  */
+        std::map<std::string, std::vector<std::pair<std::string, YTDLP_Video_Metadata*>>> search_cache;
+
+        /* Method to define the specific search parameters for Youtube Extractor, and make the videos search.  */
+        yt_metadata_arr do_youtube_search(const char* search_text, Pagination_Info page_info);
+
+        std::vector<YTDLP_Video_Metadata*> retrieve_metadata(const char* search_text);
 
     public:
         /** Metadata print template for youtube search videos.  **/
         const static std::string PRINT_METADATA_TEMPLATE;
         VCODEC_RESOLUTIONS video_resolution;
         YTDLP_EXTRACTOR extractor;
+        const static int DEFAULT_MIN_BATCH_SIZE = 40;
+        const static int DEFAULT_MAX_BATCH_SIZE = 200;
 
 
-        YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache, std::string working_dir):
-            is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache), search_cache({})
+        YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache, std::string working_dir, unsigned int batch_size):
+            is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache),
+            batch_search_size(batch_size), search_cache({})
             {
                 if (working_dir == "")
                     TEMP_WORKING_DIR = std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/";
                 else
                     TEMP_WORKING_DIR = working_dir;
+
+                if (batch_size < PaginationManager::SEARCH_PAGE_SIZE || batch_size > DEFAULT_MAX_BATCH_SIZE) {
+                    logger->warn(_("Fallbacks to default minimun batch size for yt-dlp search. Check property 'PREFETCH_BATCH_RESULTS_SIZE' at fltube.conf file. Configured value cannot be greater than ") + DEFAULT_MAX_BATCH_SIZE);
+                    batch_search_size = DEFAULT_MIN_BATCH_SIZE;
+                }
             };
+
+        ~YtDlp_Helper() {
+            for (auto& pair : search_cache) {
+                for (auto& pair2: pair.second) {
+                    if (pair2.second != nullptr) delete pair2.second;
+                }
+                pair.second.clear();
+            }
+            search_cache.clear();
+        }
 
         /*  Search one or more videos. This will be determined according to the type of search is configured. */
         yt_metadata_arr search(const char* search_text_parameter, Pagination_Info page_info);

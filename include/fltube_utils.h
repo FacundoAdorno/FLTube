@@ -33,6 +33,7 @@
 #include <sys/stat.h>
 #include <algorithm>
 #include <cstring>
+#include <regex>
 
 #include <FL/Fl_Image.H>
 #include <FL/Fl_JPEG_Image.H>
@@ -207,6 +208,8 @@ std::string getOptionValue(int argc, char* argv[], const std::string& option);
 bool existsCmdOption(int argc, char* argv[], const std::string& option);
 
 void trim(std::string &s);
+
+void trim_and_clean(std::string &s);
 
 std::vector<std::string> tokenize(std::string s, const char delimiter);
 

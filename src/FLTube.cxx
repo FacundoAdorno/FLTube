@@ -19,6 +19,7 @@
 #include "../include/configuration_manager.h"
 #include "../include/userdata_manager.h"
 #include "../include/cache.h"
+#include <cstdio>
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -680,7 +681,8 @@ void pre_init() {
     std::filesystem::current_path(FLTUBE_TEMPORAL_DIR);
 
     bool enable_alt_stream = config->getBoolProperty("ENABLE_ALTERNATIVE_STREAM_METHOD", true);
-    ytdlp = new YtDlp_Helper(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR);
+    int batch_size = config->getIntProperty("PREFETCH_BATCH_RESULTS_SIZE", YtDlp_Helper::DEFAULT_MIN_BATCH_SIZE);
+    ytdlp = new YtDlp_Helper(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR, batch_size);
 
     if (initial_win) {
         SHOWING_LOADING_SCREEN_F = false;
@@ -814,8 +816,17 @@ void doSearch(const char* input_text) {
         ytdlp->set_search_type( (SEARCH_BY_CHANNEL_F) ? SEARCH_BY_TYPE::CHANNEL_URL : SEARCH_BY_TYPE::TERM);
     }
     video_metadata = ytdlp->search(input_text, page_manager->current());
-    
-    update_video_info();
+    bool is_empty_metadata = std::all_of(video_metadata.begin(), video_metadata.end(),
+                                         [](YTDLP_Video_Metadata* ptr) { return ptr == nullptr; });
+    bool are_more_results = std::none_of(video_metadata.begin(), video_metadata.end(),
+                                         [](YTDLP_Video_Metadata* ptr) { return ptr == nullptr; });
+    if (!is_empty_metadata)  {
+        update_video_info();
+    }
+    if (!are_more_results) {
+        page_manager->limit(true);
+        page_manager->set_max_results(page_manager->current().upper_end());
+    }
     //Restore cursor to default when search is done.
     ytdlp_action_in_progress = false;
     change_cursor();
