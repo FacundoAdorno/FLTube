@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-01 13:35-0300\n"
-"PO-Revision-Date: 2026-02-01 13:36-0300\n"
+"POT-Creation-Date: 2026-03-06 15:37-0300\n"
+"PO-Revision-Date: 2026-03-06 15:43-0300\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: es\n"
@@ -17,6 +17,90 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.8\n"
+
+#: src/cache.cxx:60
+msgid ""
+"The time-to-live for a cache entry must not be less than 120 seconds. "
+"Setting to default value."
+msgstr ""
+"El tiempo de vida de una entrada de caché no debe ser inferior a 120 "
+"segundos. Ajuste al valor predeterminado."
+
+#: src/cache.cxx:81
+#, c-format
+msgid ""
+"[ID = %s] Cannot create a cache entry whose value is empty. Aborting "
+"operation..."
+msgstr ""
+"[ID = %s] No se puede crear una entrada de caché con un valor vacío. "
+"Abortando operación..."
+
+#: src/cache.cxx:90
+msgid "Cache entry DELETED - ID = "
+msgstr "Entrada de caché ELIMINADA - ID = "
+
+#: src/cache.cxx:100
+msgid "Creating a new cache entry for ID = "
+msgstr "Creando una nueva entrada de caché para ID = "
+
+#: src/cache.cxx:152
+msgid ""
+"This is a 'in memory' cache, so no load data function is available. Ignoring "
+"this call..."
+msgstr ""
+"Esta es una caché 'en memoria', por lo que no está disponible la función de "
+"carga de datos. Ignorando esta llamada..."
+
+#: src/cache.cxx:157
+msgid ""
+"This is a 'in memory' cache, so no save function is available. Ignoring this "
+"call..."
+msgstr ""
+"Esta es una caché 'en memoria', por lo que no hay función de guardado "
+"disponible. Ignorando esta llamada..."
+
+#: src/cache.cxx:164
+msgid "No cache directory was specified. Please, fix it."
+msgstr "Ningún directorio fue seleccionado. Por favor, corrígelo."
+
+#: src/cache.cxx:167
+#, c-format
+msgid "The cache directory %s is invalid. Please, create it."
+msgstr "El directorio de caché %s es inválido. Por favor, créalo."
+
+#: src/cache.cxx:176
+msgid "The cache filename was not specified."
+msgstr "El nombre de archivo de caché no fue especificado."
+
+#: src/cache.cxx:187
+msgid "Cache directory falls back to a temporary one: "
+msgstr "Se utilizará un directorio de caché temporal: "
+
+#: src/cache.cxx:199
+msgid "Aborting cache data load because no cache path was specified..."
+msgstr ""
+"Abortando la carga de datos de caché porque ninguna ruta a una caché fue "
+"especificada..."
+
+#: src/cache.cxx:205
+#, c-format
+msgid "No cache file found at %s. Proceeding without loading cache data..."
+msgstr ""
+"No se encontró un archivo de caché en %s. Procediendo sin cagar datos de "
+"caché..."
+
+#: src/cache.cxx:250
+#, c-format
+msgid ""
+"Cache load statistics: ENTRIES_VALID=%d; ENTRIES_REJECTED=%d; "
+"ENTRIES_INVALID=%d; TOTAL_ENTRIES_PROCESSED=%d."
+msgstr ""
+"Estadísticas de carga de caché: ENTRADAS_VÁLIDAS=%d; ENTRADAS_RECHAZADAS=%d; "
+"ENTRADAS_INVÁLIDAS=%d; TOTAL_ENTRADAS_PROCESADAS=%d."
+
+#: src/cache.cxx:268
+msgid "All cache entries were saved at "
+msgstr "Todas las entradas de caché fueron guardadas en "
 
 #: src/configuration_manager.cxx:230
 #, c-format
@@ -37,30 +121,37 @@ msgstr ""
 "una combinación de teclas válida.\n"
 "\n"
 
-#: src/FLTube.cxx:95
+#: src/FLTube.cxx:109
+msgid ""
+"The main window was closed by user demand when a video was in streaming."
+msgstr ""
+"La ventana principal se cerró por demanda del usuario cuando un video estaba "
+"en transmisión."
+
+#: src/FLTube.cxx:113
 #, c-format
 msgid "Cleaning temporal files at %s."
 msgstr "Eliminando archivos temporales en %s."
 
-#: src/FLTube.cxx:103
+#: src/FLTube.cxx:124
 msgid "Closing FLtube... Bye!\n"
 msgstr "Cerrando FLTube... ¡Adiós!\n"
 
-#: src/FLTube.cxx:172
+#: src/FLTube.cxx:195
 #, c-format
 msgid "Resource image at '%s' cannot be loaded..."
 msgstr "El recurso de imágen en '%s' no puede ser cargado..."
 
-#: src/FLTube.cxx:198
+#: src/FLTube.cxx:238
 msgid "FLTube Help"
 msgstr "Ayuda de FLTube"
 
-#: src/FLTube.cxx:201
+#: src/FLTube.cxx:241
 #, c-format
 msgid "Version %s"
 msgstr "Versión %s"
 
-#: src/FLTube.cxx:210
+#: src/FLTube.cxx:250
 msgid ""
 "FLTube is an application for search & stream Youtube videos. You can search "
 "by a search term or by entering the URL of a specific YouTube video.\n"
@@ -74,7 +165,8 @@ msgid ""
 "\n"
 "If a search returns multiple results, they will be paginated, and you can "
 "navigate through them using the \"<Previous\" and \"Next>\" buttons at the "
-"bottom of the window.\n"
+"bottom of the window. You can jump yo the first page or the last loaded page "
+"using the \"<l\" and \"l>\" buttons.\n"
 "\n"
 "Every time you watch a video, it is added to an existing list called "
 "\"Navigation History\". This list can be consulted using the user interface "
@@ -83,6 +175,11 @@ msgid ""
 "Besides, you can mark a video as \"Liked\" pressing a button with heart "
 "shape. A video list called \"Liked\" will be generated to in order to "
 "consult it in the future.\n"
+"\n"
+"The application keeps a cache of the final URL of the latest viewed videos, "
+"in order to speed-up the video loading time. The duration of this cache is "
+"of 6 hours by default; passed that time, the cache entry will be invalidated "
+"and the video must be loaded again from Youtube servers.\n"
 msgstr ""
 "FLTube es una aplicación para buscar y stremear videos de Youtube. Puedes "
 "buscar por término de búsqueda o entrando la URL de un video de YouTube "
@@ -98,7 +195,8 @@ msgstr ""
 "\n"
 "Si una búsqueda retorna múltiples resultados, aparecerán paginados, y puedes "
 "navegar a través de éstos usando los botones \"<Previo\" y \"Siguiente>\" en "
-"la parte inferior de la ventana.\n"
+"la parte inferior de la ventana. Puede saltar a la primera página o a la "
+"última página cargada utilizando los botones \"<l\" y \"l>\".\n"
 "\n"
 "Cada vez que visualizas un video, se añade a una lista llamada \"Navigation "
 "History\". Puedes consultar esta lista desde la interfaz de usuario, en la "
@@ -107,8 +205,13 @@ msgstr ""
 "Además, puedes marcar un video como \"Me gusta\" pulsando el botón con forma "
 "de corazón. Se generará una lista de videos llamada \"Liked\" para que "
 "puedas consultarla más adelante.\n"
+"\n"
+"La aplicación guarda en caché la URL final de los últimos vídeos vistos para "
+"acelerar su carga. La duración predeterminada de esta caché es de 6 horas; "
+"una vez transcurrido este tiempo, la entrada de la caché se invalidará y el "
+"vídeo deberá volver a cargarse desde los servidores de YouTube.\n"
 
-#: src/FLTube.cxx:217
+#: src/FLTube.cxx:258
 #, c-format
 msgid ""
 "- Focus at search input: %s\n"
@@ -144,7 +247,7 @@ msgstr ""
 "[NOTA] Los atajos por defecto puede ser modificados\n"
 "en el archivo de configuración %s.\n"
 
-#: src/FLTube.cxx:232
+#: src/FLTube.cxx:273
 #, c-format
 msgid ""
 "The current instance of FLTube is loading the configurations from %s file.\n"
@@ -180,7 +283,7 @@ msgstr ""
 " Los últimos dos parámetros pueden ser vacíos, pero DEBEN estar "
 "descomentadas si cambias el reproductor de video.\n"
 
-#: src/FLTube.cxx:238
+#: src/FLTube.cxx:279
 #, c-format
 msgid ""
 "[*_ DEVELOPERS _*]\n"
@@ -199,11 +302,11 @@ msgstr ""
 "  Nicolas Longardi (Uruguay)\n"
 "   -Contact: nico@locosporlinux.com\n"
 
-#: src/FLTube.cxx:282 src/FLTube.cxx:625
+#: src/FLTube.cxx:336 src/FLTube.cxx:527 src/FLTube.cxx:789
 msgid "Your device is offline. Check your internet connection."
 msgstr "Tu dispositivo está fuera de línea. Revisa tu conexión a internet."
 
-#: src/FLTube.cxx:283 src/FLTube.cxx:626
+#: src/FLTube.cxx:337 src/FLTube.cxx:528 src/FLTube.cxx:790
 msgid ""
 "There seems that you don't have access to the Internet. Please, verify you "
 "network connection before proceed..."
@@ -211,27 +314,34 @@ msgstr ""
 "Parece que no tienes conexión a Internet. Por favor, verifica tu conexión de "
 "red antes de proceder..."
 
-#: src/FLTube.cxx:302
+#: src/FLTube.cxx:359
 #, c-format
 msgid "Starting streaming preview of video '%s' - (%s)..."
 msgstr "Iniciando previsualización del video '%s' - (%s)..."
 
-#: src/FLTube.cxx:317
+#: src/FLTube.cxx:374
 msgid ""
 "Cannot get video URL. Review the video metadata enabling app debugging..."
 msgstr ""
 "No se puede descargar URL de video. Revisa los metadatos del video "
 "habilitando el debugging de la app..."
 
-#: src/FLTube.cxx:366
+#: src/FLTube.cxx:427
+#, c-format
+msgid "Video URL Cached (valid until %s). Click to remove from cache."
+msgstr ""
+"URL de video cacheada (válida hasta %s). Haz clic para eliminarla de la "
+"caché."
+
+#: src/FLTube.cxx:443
 msgid "viewers"
 msgstr "viendo"
 
-#: src/FLTube.cxx:366
+#: src/FLTube.cxx:443
 msgid "views"
 msgstr "vistas"
 
-#: src/FLTube.cxx:369
+#: src/FLTube.cxx:446
 #, c-format
 msgid ""
 "Error when getting count of viewers of video: (title: \"%s\", ID: \"%s\")"
@@ -239,20 +349,54 @@ msgstr ""
 "Error al obtener cantidad de espectadores de un video: (título: \"%s\", ID: "
 "\"%s\")"
 
-#: src/FLTube.cxx:372
+#: src/FLTube.cxx:449
 msgid "Unknown"
 msgstr "Desconocido"
 
-#: src/FLTube.cxx:385
+#: src/FLTube.cxx:462
 msgid ""
 "Something went wrong when generating a resize thumbnail for video with ID="
 msgstr "Algo falló al generar una miniatura re-escalada para el video con ID="
 
-#: src/FLTube.cxx:494
+#: src/FLTube.cxx:587
+#, c-format
+msgid ""
+"The following cache was invalidated by user request: id=%s; "
+"expiration_date=%s."
+msgstr ""
+"La siguiente caché fue invalidada por solicitud del usuario: id=%s; "
+"expiration_date=%s."
+
+#: src/FLTube.cxx:605
+#, c-format
+msgid "Remove video '%s' from list '%s'."
+msgstr "Eliminar video '%s' de la lista '%s'."
+
+#: src/FLTube.cxx:621
 msgid "Loading configurations from "
 msgstr "Cargando configuraciones desde "
 
-#: src/FLTube.cxx:500
+#: src/FLTube.cxx:622
+msgid "Processing configuration file..."
+msgstr "Procesando archivo de configuración..."
+
+#: src/FLTube.cxx:624
+msgid "Processing user configuration file..."
+msgstr "Procesando archivo de listas de videos del usuario..."
+
+#: src/FLTube.cxx:628
+msgid "Populating cache..."
+msgstr "Poblando la caché..."
+
+#: src/FLTube.cxx:634
+msgid "Checking 'yt-dlp' installation..."
+msgstr "Verificando la instalación de 'yt-dlp'..."
+
+#: src/FLTube.cxx:635
+msgid "Cheking if yt-dlp is at your system PATH..."
+msgstr "Comprobando si yt-dlp está en el PATH de su sistema..."
+
+#: src/FLTube.cxx:637
 msgid ""
 "yt-dlp is not installed on your system or its binary is not at $PATH system "
 "variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run "
@@ -262,11 +406,15 @@ msgstr ""
 "variable $PATH del sistema. Instalalo desde https://github.com/yt-dlp/yt-"
 "dlp. Ó ejecuta en una terminal el comando 'install_yt-dlp'."
 
-#: src/FLTube.cxx:501
+#: src/FLTube.cxx:638
 msgid "yt-dlp is not installed. Closing app...\n"
 msgstr "yt-dlp no está instalado. Cerrando app...\n"
 
-#: src/FLTube.cxx:530
+#: src/FLTube.cxx:644
+msgid "Configuring the application..."
+msgstr "Configurando la aplicación..."
+
+#: src/FLTube.cxx:668
 msgid ""
 "Default streaming resolution (360p) changed at configuration to this new "
 "resolution: "
@@ -274,12 +422,16 @@ msgstr ""
 "Resolución de streaming por defecto (360p) fue cambiada mediante "
 "configuración a esta nueva resolución: "
 
-#: src/FLTube.cxx:632
+#: src/FLTube.cxx:671
+msgid "Loading resources files..."
+msgstr "Cargando archivos de recursos..."
+
+#: src/FLTube.cxx:796
 #, c-format
 msgid "Searching for results for '%s' user input..."
 msgstr "Buscando resultados para la entrada del usuario: '%s' ..."
 
-#: src/FLTube.cxx:637
+#: src/FLTube.cxx:803
 msgid ""
 "For now, only Youtube URL's are valid for download. Please, edit your input "
 "text or search using a generic term."
@@ -287,53 +439,57 @@ msgstr ""
 "Por ahora, sólo URL's de Youtube son válidas para descargar. Por favor, "
 "edita tu entrada ó realiza una búsqueda por término de búsqueda."
 
-#: src/FLTube.cxx:677
+#: src/FLTube.cxx:841
 msgid "The Fl_Button is inexistent when search videos for a channel!!!\n"
 msgstr ""
 "El FL_Button es inexistente al hacer búsqueda de videos para un canal!!!\n"
 
-#: src/FLTube.cxx:683
+#: src/FLTube.cxx:845
+msgid "Looking up videos of CHANNEL with ID: "
+msgstr "Buscando video del canal con ID: "
+
+#: src/FLTube.cxx:847
 msgid ""
 "Channel ID is empty. Please verify the video metadata initilization!!!\n"
 msgstr ""
 "El ID del Canal es inexistente. Por favor, verifica la inicialización de los "
 "metadatos del video!!!\n"
 
-#: src/FLTube.cxx:707
+#: src/FLTube.cxx:873
 msgid "The Fl_Input search widget inexistent!!!\n"
 msgstr "El widget de búsqueda FL_Input no existe!!!\n"
 
-#: src/FLTube.cxx:713
+#: src/FLTube.cxx:879
 msgid "Search input is empty. Please, retry and enter a valid text."
 msgstr ""
 "La entrada está vacía. Por favor, re-inténtalo e ingresa un texto válido."
 
-#: src/FLTube.cxx:819
+#: src/FLTube.cxx:1020
 #, c-format
 msgid "Loading custom config file %s.\n"
 msgstr "Cargando archivo de configuración personalizado: %s.\r\n"
 
-#: src/FLTube.cxx:822
+#: src/FLTube.cxx:1023
 #, c-format
 msgid "Specified path at --config parameter does not exist.\n"
 msgstr "La ruta especificada en el parámetro --config no existe.\n"
 
-#: src/FLTube.cxx:824
+#: src/FLTube.cxx:1025
 #, c-format
 msgid "--config parameter with no path specified.\n"
 msgstr "El parámetro --config no especifica una ruta de archivo.\n"
 
-#: src/FLTube.cxx:830
+#: src/FLTube.cxx:1031
 #, c-format
 msgid "DEBUG MODE enabled.\n"
 msgstr "MODO DEBUG habilitado.\n"
 
-#: src/FLTube.cxx:858
+#: src/FLTube.cxx:1056
 #, c-format
 msgid "Starting FLTube v.%s\n"
 msgstr "Iniciando FLTube v.%s\n"
 
-#: src/FLTube.cxx:877
+#: src/FLTube.cxx:1080
 msgid "The FLTube main window has loaded."
 msgstr "La ventana principal de FLTube ha sido cargada."
 
@@ -347,7 +503,7 @@ msgstr "Se produjo un error al ejecutar el siguiente comando: %s \n"
 msgid "Closing the program due to an error.\n"
 msgstr "Cerrando el programa debido a un error.\n"
 
-#: src/fltube_utils.cxx:380
+#: src/fltube_utils.cxx:232
 #, c-format
 msgid "Connection testing failure: %s. Check your connectivity.\n"
 msgstr "Prueba de conexión fallida: %s. Verifica tu conectividad.\n"
@@ -402,149 +558,185 @@ msgid "Lists  "
 msgstr "Listas "
 
 #: src/FLTube_View.cxx:93
+msgid "<l"
+msgstr "<l"
+
+#: src/FLTube_View.cxx:94
+msgid "Go to the first page."
+msgstr "Ir a la primer página."
+
+#: src/FLTube_View.cxx:96
 msgid "<&Previous"
 msgstr "<&Previo"
 
-#: src/FLTube_View.cxx:94
+#: src/FLTube_View.cxx:97
 msgid "Get previous results of current search results set."
 msgstr ""
 "Obtener resultados anteriores del conjunto de resultados de búsqueda actual."
 
-#: src/FLTube_View.cxx:96
+#: src/FLTube_View.cxx:99
 msgid "&Next>"
 msgstr "Siguie&nte>"
 
-#: src/FLTube_View.cxx:97
+#: src/FLTube_View.cxx:100
 msgid "Get following results of current search results set."
 msgstr ""
 "Obtenga los siguientes resultados del conjunto de resultados de búsqueda "
 "actual."
 
-#: src/FLTube_View.cxx:108
+#: src/FLTube_View.cxx:102
+msgid "l>"
+msgstr "l>"
+
+#: src/FLTube_View.cxx:103
+msgid "Go to the last loaded page."
+msgstr "Ir a la última página cargada."
+
+#: src/FLTube_View.cxx:114
 msgid "Click to stream the video (preview it)..."
 msgstr "Clic para streamear el video (previsualizarlo)..."
 
-#: src/FLTube_View.cxx:111
+#: src/FLTube_View.cxx:117
+msgid "This video is currently played..."
+msgstr "Actualmente, este video está reproduciéndose..."
+
+#: src/FLTube_View.cxx:121
 msgid "Total video views, or if live current count of concurrent spectators."
 msgstr ""
 "Visualizaciones totales de un video, ó si es un video en vivo, la cantidad "
 "de espectadores en concurrente."
 
-#: src/FLTube_View.cxx:115
+#: src/FLTube_View.cxx:125
 msgid "The video is live."
 msgstr "Este video está en vivo."
 
-#: src/FLTube_View.cxx:120
+#: src/FLTube_View.cxx:130
 msgid "You have view this video in the past."
 msgstr "Has visto este video en el pasado."
 
-#: src/FLTube_View.cxx:124
+#: src/FLTube_View.cxx:134
 msgid "Press to mark the video as \"Liked\"."
 msgstr "Presiona para marcar el video como \"Me gusta\"."
 
-#: src/FLTube_View.cxx:133
+#: src/FLTube_View.cxx:148
+msgid "Click to remove video from current list."
+msgstr "Haz click para remover el video de la lista actual."
+
+#: src/FLTube_View.cxx:154
 msgid "Duration expressed as H:MM:SS."
 msgstr "Duración expresada como H:MM:SS."
 
-#: src/FLTube_View.cxx:138
+#: src/FLTube_View.cxx:159
 msgid "Video upload date."
 msgstr "Fecha de carga del video."
 
-#: src/FLTube_View.cxx:143
+#: src/FLTube_View.cxx:164
 msgid "Click to list all channel's video."
 msgstr "Haga clic para ver todos los vídeos del canal."
 
-#: src/FLTube_View.cxx:184
+#: src/FLTube_View.cxx:205
 msgid "Close and exit"
 msgstr "Cerrar y salir"
 
-#: src/FLTube_View.cxx:224
+#: src/FLTube_View.cxx:245
 msgid "Accept"
 msgstr "Aceptar"
 
-#: src/FLTube_View.cxx:227
+#: src/FLTube_View.cxx:248
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/FLTube_View.cxx:230
+#: src/FLTube_View.cxx:251
 msgid "Don't warn me again and ACCEPT always."
 msgstr "No advertirme de vuelta y aceptar siempre."
 
-#: src/FLTube_View.cxx:231
+#: src/FLTube_View.cxx:252
 msgid "Check if don't want to be warn again, assuming all risks."
 msgstr "Marca si no quieres volver a avisar, asumiendo todos los riesgos."
 
-#: src/FLTube_View.cxx:273
+#: src/FLTube_View.cxx:294
 msgid "FLTube"
 msgstr "FLTube"
 
-#: src/FLTube_View.cxx:279
+#: src/FLTube_View.cxx:300
 msgid "Version x.y.z"
 msgstr "Versión x.y.z"
 
-#: src/FLTube_View.cxx:283
+#: src/FLTube_View.cxx:304
 msgid "Watch YouTube videos in your very old PC."
 msgstr "Mira videos de YouTube en tu antigua PC."
 
-#: src/FLTube_View.cxx:287
+#: src/FLTube_View.cxx:308
 msgid "Technologies:"
 msgstr "Tecnologías:"
 
-#: src/FLTube_View.cxx:290
+#: src/FLTube_View.cxx:311
 msgid "Source code at:"
 msgstr "Código fuente:"
 
-#: src/FLTube_View.cxx:293
+#: src/FLTube_View.cxx:314
 msgid "Licensed under GNU GPL v3.0."
 msgstr "Licenciado bajo GNU GPL v3.0."
 
-#: src/FLTube_View.cxx:296
+#: src/FLTube_View.cxx:317
 msgid "FLTK"
 msgstr "FLTK"
 
-#: src/FLTube_View.cxx:297
+#: src/FLTube_View.cxx:318
 msgid "Click to open FLTK official website."
 msgstr "Haz clic para abrir el sitio web oficial de FLTK."
 
-#: src/FLTube_View.cxx:303
+#: src/FLTube_View.cxx:324
 msgid "gitlab.com/facuA/fltube"
 msgstr "gitlab.com/facuA/fltube"
 
-#: src/FLTube_View.cxx:304
+#: src/FLTube_View.cxx:325
 msgid "Click to open FLTube repository."
 msgstr "Haz clic para abrir el repositorio de FLTube."
 
-#: src/FLTube_View.cxx:310
+#: src/FLTube_View.cxx:331
 msgid "yt-dlp"
 msgstr "yt-dlp"
 
-#: src/FLTube_View.cxx:311
+#: src/FLTube_View.cxx:332
 msgid "Click to open yt-dlp official website."
 msgstr "Haz clic para abrir el sitio web oficial de yt-dlp."
 
-#: src/FLTube_View.cxx:316
+#: src/FLTube_View.cxx:337
 msgid "C++"
 msgstr "C++"
 
-#: src/FLTube_View.cxx:317
+#: src/FLTube_View.cxx:338
 msgid "Click to open C++ official website."
 msgstr "Haz clic para abrir el sitio web oficial de C++."
 
-#: src/FLTube_View.cxx:325
+#: src/FLTube_View.cxx:346
 msgid "How to use"
 msgstr "Cómo se usa"
 
-#: src/FLTube_View.cxx:335
+#: src/FLTube_View.cxx:356
 msgid "Shortcuts"
 msgstr "Atajos"
 
-#: src/FLTube_View.cxx:346
+#: src/FLTube_View.cxx:367
 msgid "Configuration"
 msgstr "Configuración"
 
-#: src/FLTube_View.cxx:357
+#: src/FLTube_View.cxx:378
 msgid "Authors"
 msgstr "Autores"
+
+#: src/FLTube_View.cxx:425
+msgid "LOADING..."
+msgstr "CARGANDO..."
+
+#: src/FLTube_View.cxx:426
+msgid ""
+"Please wait until the application data is loaded. This may take a little "
+"while..."
+msgstr ""
+"Espere a que se carguen los datos de la aplicación. Esto podría tardar un "
+"poco..."
 
 #: src/userdata_manager.cxx:38
 #, c-format
@@ -657,6 +849,32 @@ msgstr "No se puede eliminar un video en la lista inexistente '%s'.\n"
 msgid "Error: Cannot add a null video.\n"
 msgstr "Error: no se puede agregar un video nulo.\n"
 
+#: src/ytdlp_helper.cxx:191
+msgid ""
+"The default stream command doesn't work. Fallback to the alternative method "
+"to get final video URL."
+msgstr ""
+"El comando de transmisión predeterminado no funciona. Recurra al método "
+"alternativo para obtener la URL final del video."
+
+#: src/ytdlp_helper.cxx:196
+msgid ""
+"Cannot obtain URL for specified video, and alternative stream method is "
+"disabled."
+msgstr ""
+"No se puede obtener la URL del video especificado y el método de transmisión "
+"alternativo está deshabilitado."
+
+#: include/ytdlp_helper.h:113
+msgid ""
+"Fallbacks to default minimun batch size for yt-dlp search. Check property "
+"'PREFETCH_BATCH_RESULTS_SIZE' at fltube.conf file. Configured value cannot "
+"be greater than "
+msgstr ""
+"Se configura el tamaño de lote mínimo predeterminado para la búsqueda en yt-"
+"dlp. Verifique la propiedad 'PREFETCH_BATCH_RESULTS_SIZE' en el archivo "
+"fltube.conf. El valor configurado no puede ser mayor que "
+
 #, c-format
 #~ msgid ""
 #~ "Invalid configuration at property '%s' (CURRENT VALUE: %s). Please, "
@@ -703,9 +921,6 @@ msgstr "Error: no se puede agregar un video nulo.\n"
 
 #~ msgid "Select a download directory"
 #~ msgstr "Haga clic para cambiar el directorio de descarga"
-
-#~ msgid "No directory was selected."
-#~ msgstr "Ningún directorio fue seleccionado."
 
 #~ msgid "Output log:"
 #~ msgstr "Log de salida:"
