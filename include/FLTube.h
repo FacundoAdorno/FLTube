@@ -30,10 +30,15 @@
 #include <thread>
 #include <atomic>
 
+// This macro must be injected at compilation time...
+#ifndef VERSION_STRING
+#define VERSION_STRING "unknown"
+#endif
+
 /* The @VERSION MUST be expressed as numbers separated by dots (<number>.<number>.<number>), in example: 2.10.3.
  * MUST NOT BE something like "2.10.3.rc1"...
  */
-static const char* VERSION = "2.1.0";
+static const char* VERSION = VERSION_STRING;
 
 /**  Save this object as user_data in buttons callbacks for Video Info. */
 struct DownloadVideoCBData {

@@ -1,7 +1,8 @@
 # Variables
 CXX      = $(shell fltk-config --cxx)
 DEBUG    = -g
-CXXFLAGS = $(shell fltk-config --use-images --cxxflags) -fexceptions -Iinclude `pkg-config --cflags libcurl`
+FLTUBE_VERSION=$(shell cat VERSION)
+CXXFLAGS = $(shell fltk-config --use-images --cxxflags) -fexceptions -Iinclude `pkg-config --cflags libcurl` -DVERSION_STRING="\"$(FLTUBE_VERSION)\""
 #LDFLAGS  = $(shell fltk-config --use-gl --use-images --ldflags) `pkg-config --libs libcurl`
 LDSTATIC  = $(shell fltk-config --use-images --ldstaticflags) -fexceptions `pkg-config --libs libcurl`
 LINK     = $(CXX)
@@ -29,7 +30,6 @@ TARGET = $(BUILD_DIR)/fltube
 SOURCES_LIST = fltube_utils.cxx gnugettext_utils.cxx FLTube_View.cxx FLTube.cxx configuration_manager.cxx userdata_manager.cxx ytdlp_helper.cxx cache.cxx
 SOURCES = $(addprefix $(SRC_DIR)/, $(SOURCES_LIST))
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cxx=$(BUILD_DIR)/%.o)
-FLTUBE_VERSION=2.1.0
 DEB_PACKAGE_NAME=fltube_$(FLTUBE_VERSION)-$(ARCH_CPU).deb
 TCZ_PACKAGE_NAME=fltube_$(FLTUBE_VERSION)_tcz.tar.gz
 
