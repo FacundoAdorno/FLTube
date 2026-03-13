@@ -707,7 +707,7 @@ void pre_init() {
         } else {
             if (current_displayed_cursor != FL_CURSOR_DEFAULT) {
                 lock_buttons(false);
-                if (video_selected_for_stream->thumbnail_overlay->visible()) {
+                if (video_selected_for_stream != nullptr && video_selected_for_stream->thumbnail_overlay->visible()) {
                     video_selected_for_stream->thumbnail_overlay->image(nullptr);
                     video_selected_for_stream->thumbnail_overlay->hide();
                     video_selected_for_stream = nullptr;
