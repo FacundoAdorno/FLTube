@@ -453,7 +453,10 @@ void update_video_info() {
             video_info_arr[j]->thumbnail->user_data(static_cast<void*>(&video_metadata[j]->url));
 
             //Download, resize and update the video thumbnail image...
-            std::string thumbn_url = video_metadata[j]->thumbnail_url.substr(0, video_metadata[j]->thumbnail_url.find("?"));
+            int cut_pos = video_metadata[j]->thumbnail_url.find("hq720.jpg?");
+            if (cut_pos == std::string::npos)   cut_pos = video_metadata[j]->thumbnail_url.find("hqdefault.jpg?");
+            std::string thumbn_url = video_metadata[j]->thumbnail_url.substr(0, cut_pos)
+                + ((cut_pos != std::string::npos) ? "mqdefault.jpg" : "");
             std::string thumbn_name = "th_" + video_metadata[j]->id + ".jpg";
             if (download_file(thumbn_url, FLTUBE_TEMPORAL_DIR, thumbn_name) != FLT_DOWNLOAD_FL_FAILED) {
                 int targetWidth = video_info_arr[j]->thumbnail->w();
