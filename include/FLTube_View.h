@@ -15,6 +15,7 @@
 #ifndef FLTube_View_h
 #define FLTube_View_h
 #include <FL/Fl.H>
+#include "../include/custom_classes.h"
 #ifndef GETTEXT_MACROS_H
 #define GETTEXT_MACROS_H
 #define _(String) gettext(String)
@@ -24,7 +25,6 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Choice.H>
 
 class FLTubeMainWindow : public Fl_Double_Window {
@@ -36,7 +36,7 @@ public:
   Fl_Button *about_bttn;
   Fl_Tabs *central_tabs;
   Fl_Group *searchbox_tab;
-  Fl_Input *search_term_or_url;
+  SearchInput *search_term_or_url;
   Fl_Button *do_search_bttn;
   Fl_Group *videolists_tab;
   Fl_Choice *videolist_selector;

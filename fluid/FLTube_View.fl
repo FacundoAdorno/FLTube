@@ -21,6 +21,9 @@ comment {/*
  */} {in_source in_header
 }
 
+decl {\#include "../include/custom_classes.h"} {public global
+}
+
 declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 } {
   decl {\#define GETTEXT_MACROS_H} {public global
@@ -33,8 +36,8 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 
 widget_class FLTubeMainWindow {
   label FLTube open
-  xywh {0 0 593 540}
-  class Fl_Double_Window visible
+  xywh {0 0 593 540} hide
+  class Fl_Double_Window
 } {
   Fl_Button about_bttn {
     label Help
@@ -49,8 +52,9 @@ widget_class FLTubeMainWindow {
       tooltip {Search videos at this section.} xywh {9 56 576 64} box UP_FRAME selection_color 47 labelfont 1 align 5
     } {
       Fl_Input search_term_or_url {
-        label {Term/URL  }
-        tooltip {Enter a search term for search or a valid Youtube URL.} xywh {110 63 460 24} align 132
+        label {Term/URL  } selected
+        tooltip {Enter a search term for search or a valid Youtube URL. TIP: use the Up and Down arrow keys to navigate previous search terms.} xywh {110 63 460 24} align 132
+        class SearchInput
       }
       Fl_Button do_search_bttn {
         label {Go &search!}
@@ -69,7 +73,7 @@ widget_class FLTubeMainWindow {
       } {}
     }
   }
-  Fl_Group search_result_selectors {selected
+  Fl_Group search_result_selectors {
     xywh {10 126 575 380} box THIN_UP_BOX
   } {}
   Fl_Group pagination_controls {open
@@ -95,7 +99,7 @@ widget_class FLTubeMainWindow {
 }
 
 widget_class VideoInfo {
-  xywh {0 0 577 91} visible position_relative
+  xywh {0 0 577 91} hide position_relative
 } {
   Fl_Button thumbnail {
     tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}

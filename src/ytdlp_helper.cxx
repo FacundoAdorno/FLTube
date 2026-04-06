@@ -127,6 +127,7 @@ yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Paginat
                 search_cache[search_text] = {};
                 search_data = search_cache.find(search_text);
                 start = 1; end = batch_search_size;
+                search_history.push_back(search_text);
             } else {
                 start = search_data->second.size();
                 end = search_data->second.size() + batch_search_size;
@@ -237,4 +238,20 @@ std::string* YtDlp_Helper::get_metric_abbreviation(int number) {
 bool YtDlp_Helper::isYoutubeURL(const char* url){
     std::string url_s(url);
     return ((url_s.rfind("https://www.youtube.com/", 0) == 0) || (url_s.rfind("https://youtube.com/", 0) == 0) || (url_s.rfind("https://youtu.be/", 0) == 0));
+}
+
+std::string YtDlp_Helper::getNextInSearchHistory() {
+    if (search_history.empty()) return "";
+    if (current_search_history_index + 1 <= search_history.size() - 1) {
+        current_search_history_index++;
+    }
+    return search_history.at(current_search_history_index);
+}
+
+std::string YtDlp_Helper::getPreviousInSearchHistory() {
+    if (search_history.empty()) return "";
+    if (current_search_history_index - 1 >= 0) {
+        current_search_history_index--;
+    }
+    return search_history.at(current_search_history_index);
 }

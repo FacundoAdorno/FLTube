@@ -86,6 +86,9 @@ class YtDlp_Helper {
          *      map <"search term / channel ID <map <"video_id", parsed metadata>>>"  */
         std::map<std::string, std::vector<std::pair<std::string, YTDLP_Video_Metadata*>>> search_cache;
 
+        std::vector<std::string> search_history;
+        int current_search_history_index;
+
         /* Method to define the specific search parameters for Youtube Extractor, and make the videos search.  */
         yt_metadata_arr do_youtube_search(const char* search_text, Pagination_Info page_info);
 
@@ -102,7 +105,7 @@ class YtDlp_Helper {
 
         YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache, std::string working_dir, unsigned int batch_size):
             is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache),
-            batch_search_size(batch_size), search_cache({})
+            batch_search_size(batch_size), search_cache({}), search_history({}), current_search_history_index(0)
             {
                 if (working_dir == "")
                     TEMP_WORKING_DIR = std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/";
@@ -159,6 +162,10 @@ class YtDlp_Helper {
         static std::string* get_metric_abbreviation(int number);
 
         static bool isYoutubeURL(const char* url);
+
+        std::string getNextInSearchHistory();
+
+        std::string getPreviousInSearchHistory();
 };
 
 #endif

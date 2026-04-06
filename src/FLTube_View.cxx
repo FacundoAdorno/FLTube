@@ -61,10 +61,19 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
       searchbox_tab->labelfont(1);
       searchbox_tab->user_data((void*)("SEARCHVIDEOS_TAB"));
       searchbox_tab->align(Fl_Align(FL_ALIGN_TOP_LEFT));
-      { search_term_or_url = new Fl_Input(110, 63, 460, 24, _("Term/URL  "));
-        search_term_or_url->tooltip(_("Enter a search term for search or a valid Youtube URL."));
+      { search_term_or_url = new SearchInput(110, 63, 460, 24, _("Term/URL  "));
+        search_term_or_url->tooltip(_("Enter a search term for search or a valid Youtube URL. TIP: use the Up and Do"
+"wn arrow keys to navigate previous search terms."));
+        search_term_or_url->box(FL_DOWN_BOX);
+        search_term_or_url->color(FL_BACKGROUND2_COLOR);
+        search_term_or_url->selection_color(FL_SELECTION_COLOR);
+        search_term_or_url->labeltype(FL_NORMAL_LABEL);
+        search_term_or_url->labelfont(0);
+        search_term_or_url->labelsize(14);
+        search_term_or_url->labelcolor(FL_FOREGROUND_COLOR);
         search_term_or_url->align(Fl_Align(132));
-      } // Fl_Input* search_term_or_url
+        search_term_or_url->when(FL_WHEN_RELEASE);
+      } // SearchInput* search_term_or_url
       { do_search_bttn = new Fl_Button(227, 90, 150, 22, _("Go &search!"));
         do_search_bttn->tooltip(_("If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."));
         do_search_bttn->user_data((void*)(search_term_or_url));

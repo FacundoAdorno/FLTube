@@ -78,7 +78,7 @@ ConfigurationManager* config = nullptr;
 
 UserDataManager* userdata = nullptr;
 
-YtDlp_Helper* ytdlp = nullptr;
+std::shared_ptr<YtDlp_Helper> ytdlp = nullptr;
 
 std::shared_ptr<PermanentDiskCache> cache = nullptr;
 
@@ -116,7 +116,6 @@ void exitApp(unsigned short int exitStatusCode = FLT_OK) {
     if (helpWin != nullptr) delete helpWin;
     if (message_window != nullptr) delete message_window;
     delete userdata;
-    delete ytdlp;
     cache->finish();
     delete page_manager;
     delete mainWin;
@@ -686,7 +685,7 @@ void pre_init() {
 
     bool enable_alt_stream = config->getBoolProperty("ENABLE_ALTERNATIVE_STREAM_METHOD", true);
     int batch_size = config->getIntProperty("PREFETCH_BATCH_RESULTS_SIZE", YtDlp_Helper::DEFAULT_MIN_BATCH_SIZE);
-    ytdlp = new YtDlp_Helper(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR, batch_size);
+    ytdlp = std::make_shared<YtDlp_Helper>(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR, batch_size);
 
     if (initial_win) {
         SHOWING_LOADING_SCREEN_F = false;
@@ -1066,6 +1065,7 @@ int main(int argc, char **argv) {
     mainWin->search_term_or_url->when(FL_WHEN_ENTER_KEY);
     mainWin->search_term_or_url->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->search_term_or_url->shortcut(config->getShortcutFor(SHORTCUTS::FOCUS_SEARCH));
+    mainWin->search_term_or_url->set_search_source(ytdlp);
     mainWin->do_search_bttn->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->callback((Fl_Callback*)getPreviousSearchResults_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->deactivate();
