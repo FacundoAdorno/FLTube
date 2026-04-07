@@ -11,7 +11,7 @@
  * more details.
  */
 
-#include "../include/custom_classes.h"
+#include "../include/custom_widgets.h"
 #include <FL/Enumerations.H>
 #include <FL/Fl.H>
 #include <cstdio>
@@ -23,13 +23,11 @@ int SearchInput::handle(int event) {
         switch (Fl::event_key()) {
             case FL_Up:
                 new_value = ytdlp_source->getNextInSearchHistory();
-                printf("Next value is: %s\n", new_value.c_str());
                 last_pressed_key = FL_Up;
                 if (!new_value.empty()) this->value(new_value.c_str());
                 return 1;
             case FL_Down:
                 new_value = ytdlp_source->getPreviousInSearchHistory();
-                printf("Previous value is: %s\n", new_value.c_str());
                 last_pressed_key = FL_Down;
                 if (!new_value.empty()) this->value(new_value.c_str());
                 return 1;

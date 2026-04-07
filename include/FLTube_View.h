@@ -15,7 +15,7 @@
 #ifndef FLTube_View_h
 #define FLTube_View_h
 #include <FL/Fl.H>
-#include "../include/custom_classes.h"
+#include "../include/custom_widgets.h"
 #ifndef GETTEXT_MACROS_H
 #define GETTEXT_MACROS_H
 #define _(String) gettext(String)

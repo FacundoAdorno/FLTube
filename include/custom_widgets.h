@@ -10,8 +10,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  */
-#ifndef CUSTOM_CLASSES_H
-#define CUSTOM_CLASSES_H
+#ifndef CUSTOM_WIDGETS_H
+#define CUSTOM_WIDGETS_H
 
 #include "ytdlp_helper.h"
 #include <FL/Fl_Input.H>
@@ -31,4 +31,4 @@ public:
     int handle(int event);
 };
 
-#endif  // CUSTOM_CLASSES_H
+#endif  // CUSTOM_WIDGETS_H
