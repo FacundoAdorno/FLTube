@@ -629,7 +629,9 @@ void pre_init() {
     //TODO Create properties defining if enable the use of cache and the TTL for every cache entry...
     initial_win->loading_about_data->label(_("Populating cache..."));
     cache = std::make_shared<PermanentDiskCache>(logger);
-    cache->set_save_directory_path(std::string(getHomePathOr("")) + "/.cache/fltube", "fltube_url_cache.txt");
+    std::string default_cache_path = std::string(getHomePathOr("")) + "/.cache/fltube";
+    cache->set_save_directory_path(
+        config->getProperty("CACHE_PATH", default_cache_path.c_str()), "fltube_url_cache.txt");
     cache->init();
     AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
 
