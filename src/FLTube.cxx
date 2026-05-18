@@ -646,15 +646,13 @@ void pre_init() {
     setup_gettext("", config->getProperty("LOCALE_PATH", default_locale_path().c_str()));
 
     initial_win->loading_about_data->label(_("Configuring the application..."));
-    media_player = new MediaPlayerInfo();
     if(config->existProperty("STREAM_PLAYER_PATH")) {
-        media_player->binary_path = config->getProperty("STREAM_PLAYER_PATH", "");
-        media_player->parameters = config->getProperty("STREAM_PLAYER_PARAMS", "");
-        media_player->extra_live_parameters = config->getProperty("STREAM_PLAYER_EXTRA_PARAMS_FOR_LIVE", "");
+        media_player = new MediaPlayerInfo(
+            config->getProperty("STREAM_PLAYER_PATH", ""),
+                                           config->getProperty("STREAM_PLAYER_PARAMS", ""),
+                                           config->getProperty("STREAM_PLAYER_EXTRA_PARAMS_FOR_LIVE", ""));
     } else {
-        media_player->binary_path = DEFAULT_STREAM_PLAYER;
-        media_player->parameters = DEFAULT_PLAYER_PARAMS;
-        media_player->extra_live_parameters = DEFAULT_PLAYER_EXTRAPARAMS_LIVE;
+        media_player = new MediaPlayerInfo(DEFAULT_STREAM_PLAYER, DEFAULT_PLAYER_PARAMS, DEFAULT_PLAYER_EXTRAPARAMS_LIVE);
     }
     if(config->existProperty("RESOURCES_PATH")) {
         RESOURCES_PATH = config->getProperty("RESOURCES_PATH", RESOURCES_PATH.c_str());

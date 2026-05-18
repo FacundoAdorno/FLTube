@@ -14,7 +14,6 @@
 #include "../include/custom_widgets.h"
 #include <FL/Enumerations.H>
 #include <FL/Fl.H>
-#include <cstdio>
 #include <string>
 
 int SearchInput::handle(int event) {

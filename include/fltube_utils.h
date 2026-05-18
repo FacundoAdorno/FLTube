@@ -170,13 +170,21 @@ public:
 
 };
 
-struct MediaPlayerInfo {
+class MediaPlayerInfo {
+private:
     // The name of the binary (or system path) of the media player.
     std::string binary_path;
     // Parameters to media playar (optional).
     std::string parameters;
     // Extra parameters for stream a live video (optional).
     std::string extra_live_parameters;
+public:
+    MediaPlayerInfo(std::string bin, std::string params, std::string extra_params):
+    binary_path(bin), parameters(params), extra_live_parameters(extra_params) {};
+
+    std::string getBinaryPath() {   return this->binary_path; }
+    std::string getParams() {   return this->parameters; }
+    std::string getExtraParams() {   return this->extra_live_parameters; }
 };
 
 std::string exec(const char* cmd);

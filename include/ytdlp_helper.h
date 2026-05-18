@@ -126,6 +126,7 @@ class YtDlp_Helper {
                 pair.second.clear();
             }
             search_cache.clear();
+            delete media_player;
         }
 
         /*  Search one or more videos. This will be determined according to the type of search is configured. */

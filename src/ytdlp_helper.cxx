@@ -169,7 +169,7 @@ void YtDlp_Helper::stream(const char* video_url) {
     snprintf(stream_format, sizeof(stream_format), "res:%d,+codec:avc1:m4a", this->video_resolution);
     if (this->is_live_flag) {
         snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                 "yt-dlp -S \"%s\" -o - \"%s\" | %s %s %s -", stream_format, video_url, this->media_player->binary_path.c_str(), this->media_player->parameters.c_str(), this->media_player->extra_live_parameters.c_str());
+                 "yt-dlp -S \"%s\" -o - \"%s\" | %s %s %s -", stream_format, video_url, this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str(), this->media_player->getExtraParams().c_str());
     } else {
         // If video is not live, 1rst try to obtain final video URL using default method...
         // 1rst: lookup final video URL if exists at cache...
@@ -184,7 +184,7 @@ void YtDlp_Helper::stream(const char* video_url) {
         if (final_url_result != "") {
             // Once final URL is obtained, then open at configured Media Player...
             snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                    "%s %s \"%s\"", this->media_player->binary_path.c_str(), this->media_player->parameters.c_str(), final_url_result.c_str());
+                    "%s %s \"%s\"", this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str(), final_url_result.c_str());
             cache->add_entry(video_url, final_url_result);
         } else {
             // If default method doesn't works, then try the alternative method (if configured this way)...
@@ -192,7 +192,7 @@ void YtDlp_Helper::stream(const char* video_url) {
                 logger->warn(_("The default stream command doesn't work. Fallback to the alternative method to get final video URL."));
                 snprintf(stream_format, sizeof(stream_format), "bv*[height<=%d][vcodec^=avc]+ba[acodec^=mp4a]", this->video_resolution);
                 snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                    "yt-dlp -f \"%s\" -o - --merge-output-format mkv \"%s\" | %s %s -", stream_format, video_url, this->media_player->binary_path.c_str(), this->media_player->parameters.c_str());
+                    "yt-dlp -f \"%s\" -o - --merge-output-format mkv \"%s\" | %s %s -", stream_format, video_url, this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str());
             } else {
                 logger->error(_("Cannot obtain URL for specified video, and alternative stream method is disabled."));
             }
