@@ -712,6 +712,15 @@ void pre_init() {
                 if (video_selected_for_stream != nullptr && video_selected_for_stream->thumbnail_overlay->visible()) {
                     video_selected_for_stream->thumbnail_overlay->image(nullptr);
                     video_selected_for_stream->thumbnail_overlay->hide();
+                    std::string* video_url = static_cast<std::string*>(video_selected_for_stream->thumbnail->user_data());
+                    if (video_url != nullptr && cache->is_cached(video_url->c_str())) {
+                        video_selected_for_stream->already_viewed_icon->show();
+                        char cache_tooltip[128];
+                        std::snprintf(cache_tooltip, sizeof(cache_tooltip), _("Video URL Cached (valid until %s). Click to remove from cache."),
+                            cache->get_cache_expiration_date(video_url->c_str()).c_str());
+                        video_selected_for_stream->cache_bttn->copy_tooltip(cache_tooltip);
+                        video_selected_for_stream->cache_bttn->show();
+                    }
                     video_selected_for_stream = nullptr;
                 }
             }
