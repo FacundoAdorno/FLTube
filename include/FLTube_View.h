@@ -38,6 +38,8 @@ public:
   Fl_Group *searchbox_tab;
   SearchInput *search_term_or_url;
   Fl_Button *do_search_bttn;
+  Fl_Button *next_search_term_bttn;
+  Fl_Button *prev_search_term_bttn;
   Fl_Group *videolists_tab;
   Fl_Choice *videolist_selector;
   Fl_Group *search_result_selectors;

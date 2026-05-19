@@ -61,7 +61,7 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
       searchbox_tab->labelfont(1);
       searchbox_tab->user_data((void*)("SEARCHVIDEOS_TAB"));
       searchbox_tab->align(Fl_Align(FL_ALIGN_TOP_LEFT));
-      { search_term_or_url = new SearchInput(110, 63, 460, 24, _("Term/URL  "));
+      { search_term_or_url = new SearchInput(110, 63, 450, 24, _("Term/URL  "));
         search_term_or_url->tooltip(_("Enter a search term for search or a valid Youtube URL. TIP: use the Up and Do"
 "wn arrow keys to navigate previous search terms."));
         search_term_or_url->box(FL_DOWN_BOX);
@@ -78,6 +78,16 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
         do_search_bttn->tooltip(_("If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."));
         do_search_bttn->user_data((void*)(search_term_or_url));
       } // Fl_Button* do_search_bttn
+      { next_search_term_bttn = new Fl_Button(561, 60, 18, 14, _("\341\220\203"));
+        next_search_term_bttn->tooltip(_("Navigate next search terms in history. Or use Up arrow key."));
+        next_search_term_bttn->down_box(FL_DOWN_BOX);
+        next_search_term_bttn->labelsize(11);
+      } // Fl_Button* next_search_term_bttn
+      { prev_search_term_bttn = new Fl_Button(561, 76, 18, 14, _("\341\220\201"));
+        prev_search_term_bttn->tooltip(_("Navigate previous search terms in history. Or use Down arrow key."));
+        prev_search_term_bttn->down_box(FL_DOWN_BOX);
+        prev_search_term_bttn->labelsize(11);
+      } // Fl_Button* prev_search_term_bttn
       searchbox_tab->end();
     } // Fl_Group* searchbox_tab
     { videolists_tab = new Fl_Group(9, 56, 576, 64, _("My Lists"));

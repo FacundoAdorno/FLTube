@@ -86,6 +86,7 @@ class YtDlp_Helper {
          *      map <"search term / channel ID <map <"video_id", parsed metadata>>>"  */
         std::map<std::string, std::vector<std::pair<std::string, YTDLP_Video_Metadata*>>> search_cache;
 
+        /* When doing a search, a inner search history is saved, in order to recall previous searches results... */
         std::vector<std::string> search_history;
         int current_search_history_index;
 
@@ -167,6 +168,8 @@ class YtDlp_Helper {
         std::string getNextInSearchHistory();
 
         std::string getPreviousInSearchHistory();
+
+        void resetSearchHistoryPos();
 };
 
 #endif

@@ -298,6 +298,8 @@ void lock_buttons(bool lock){
         mainWin->last_page_bttn->deactivate();
         mainWin->previous_results_bttn->deactivate();
         mainWin->first_page_bttn->deactivate();
+        mainWin->next_search_term_bttn->deactivate();
+        mainWin->prev_search_term_bttn->deactivate();
         for (int j=0; j < video_info_arr.size(); j++) {
             video_info_arr[j]->thumbnail->deactivate();
             video_info_arr[j]->userUploader->deactivate();
@@ -314,6 +316,8 @@ void lock_buttons(bool lock){
         mainWin->last_page_bttn->activate();
         mainWin->previous_results_bttn->activate();
         mainWin->first_page_bttn->activate();
+        mainWin->next_search_term_bttn->activate();
+        mainWin->prev_search_term_bttn->activate();
         for (int j=0; j < video_info_arr.size(); j++) {
             video_info_arr[j]->thumbnail->activate();
             video_info_arr[j]->userUploader->activate();
@@ -547,6 +551,7 @@ void selectCentralTab_cb(Fl_Choice* w, void* a){
         mainWin->first_page_bttn->deactivate();
         mainWin->next_results_bttn->deactivate();
         mainWin->last_page_bttn->deactivate();
+        ytdlp->resetSearchHistoryPos();
         page_manager->reset();
         clear_video_info();
     }
@@ -844,6 +849,18 @@ void doSearch(const char* input_text) {
     change_cursor();
 }
 
+// Callback for moving backward or forward the search value in history.
+void moveSearchValue(Fl_Widget* w, void* data) {
+    bool next = (data != nullptr);
+    std::string new_value;
+    if (next) {
+        new_value = ytdlp->getNextInSearchHistory();
+    } else {
+        new_value = ytdlp->getPreviousInSearchHistory();
+    }
+    if (!new_value.empty()) mainWin->search_term_or_url->value(new_value.c_str());
+}
+
 /*
  *  Callback to get videos from an specific Youtube channel.
  */
@@ -880,11 +897,6 @@ void getYTChannelVideo_cb(Fl_Button* bttn, void* channel_id_str){
  * Extract and return the search term value from the search input. Returns nullptr only if text if empty or some error happens...
  */
 const char* getSearchValue(Fl_Input *input){
-    if (input == nullptr) {
-        logger->error(_("The Fl_Input search widget inexistent!!!\n"));
-        return nullptr;
-    }
-
     const char* input_text = input->value();
     if (input_text == nullptr || input_text[0] == '\0') {
         showMessageWindow(_("Search input is empty. Please, retry and enter a valid text."));
@@ -1075,6 +1087,8 @@ int main(int argc, char **argv) {
     mainWin->search_term_or_url->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->search_term_or_url->shortcut(config->getShortcutFor(SHORTCUTS::FOCUS_SEARCH));
     mainWin->search_term_or_url->set_search_source(ytdlp);
+    mainWin->prev_search_term_bttn->callback((Fl_Callback*)moveSearchValue,(void*)0);
+    mainWin->next_search_term_bttn->callback((Fl_Callback*)moveSearchValue,(void*)1);
     mainWin->do_search_bttn->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->callback((Fl_Callback*)getPreviousSearchResults_cb, (void*)(mainWin->search_term_or_url));
     mainWin->previous_results_bttn->deactivate();

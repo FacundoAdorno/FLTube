@@ -255,3 +255,7 @@ std::string YtDlp_Helper::getPreviousInSearchHistory() {
     }
     return search_history.at(current_search_history_index);
 }
+
+void YtDlp_Helper::resetSearchHistoryPos() {
+    current_search_history_index = 0;
+}

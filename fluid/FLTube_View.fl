@@ -21,7 +21,7 @@ comment {/*
  */} {in_source in_header
 }
 
-decl {\#include "../include/custom_classes.h"} {public global
+decl {\#include "../include/custom_widgets.h"} {public global
 }
 
 declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
@@ -52,14 +52,22 @@ widget_class FLTubeMainWindow {
       tooltip {Search videos at this section.} xywh {9 56 576 64} box UP_FRAME selection_color 47 labelfont 1 align 5
     } {
       Fl_Input search_term_or_url {
-        label {Term/URL  } selected
-        tooltip {Enter a search term for search or a valid Youtube URL. TIP: use the Up and Down arrow keys to navigate previous search terms.} xywh {110 63 460 24} align 132
+        label {Term/URL  }
+        tooltip {Enter a search term for search or a valid Youtube URL. TIP: use the Up and Down arrow keys to navigate previous search terms.} xywh {110 63 450 24} align 132
         class SearchInput
       }
       Fl_Button do_search_bttn {
         label {Go &search!}
         user_data search_term_or_url
         tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 90 150 22}
+      }
+      Fl_Button next_search_term_bttn {
+        label {ᐃ}
+        tooltip {Navigate next search terms in history. Or use Up arrow key.} xywh {561 60 18 14} down_box DOWN_BOX labelsize 11
+      }
+      Fl_Button prev_search_term_bttn {
+        label {ᐁ} selected
+        tooltip {Navigate previous search terms in history. Or use Down arrow key.} xywh {561 76 18 14} down_box DOWN_BOX labelsize 11
       }
     }
     Fl_Group videolists_tab {
