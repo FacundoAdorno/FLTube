@@ -36,8 +36,8 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 
 widget_class FLTubeMainWindow {
   label FLTube open
-  xywh {0 0 593 540} hide
-  class Fl_Double_Window
+  xywh {0 0 593 540}
+  class Fl_Double_Window visible
 } {
   Fl_Button about_bttn {
     label Help
@@ -62,11 +62,9 @@ widget_class FLTubeMainWindow {
         tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 90 150 22}
       }
       Fl_Button next_search_term_bttn {
-        label {ᐃ}
         tooltip {Navigate next search terms in history. Or use Up arrow key.} xywh {561 60 18 14} down_box DOWN_BOX labelsize 11
       }
-      Fl_Button prev_search_term_bttn {
-        label {ᐁ} selected
+      Fl_Button prev_search_term_bttn {selected
         tooltip {Navigate previous search terms in history. Or use Down arrow key.} xywh {561 76 18 14} down_box DOWN_BOX labelsize 11
       }
     }

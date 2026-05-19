@@ -91,6 +91,8 @@ Fl_PNG_Image* like_red_icon_image = nullptr;
 Fl_PNG_Image* playicon_image = nullptr;
 Fl_PNG_Image* cached_icon_image = nullptr;
 Fl_PNG_Image* remove_video_icon_image = nullptr;
+Fl_PNG_Image* arrow_up = nullptr;
+Fl_PNG_Image* arrow_down = nullptr;
 
 /* Keep the current displayed cursor. FLTK doesn't have a way to know this. */
 Fl_Cursor current_displayed_cursor = FL_CURSOR_DEFAULT;
@@ -683,6 +685,8 @@ void pre_init() {
     playicon_image = load_resource_image("playicon.png");
     cached_icon_image = load_resource_image("cache_icon_18p.png");
     remove_video_icon_image = load_resource_image("remove_video_icon_14p.png");
+    arrow_up = load_resource_image("arrow_up.png");
+    arrow_down = load_resource_image("arrow_down.png");
 
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
@@ -767,6 +771,9 @@ void post_init() {
 
     mainWin->central_tabs->when(FL_WHEN_RELEASE_ALWAYS);
     mainWin->central_tabs->callback((Fl_Callback*)selectCentralTab_cb);
+
+    if (arrow_up != nullptr) mainWin->next_search_term_bttn->image(arrow_up);
+    if (arrow_down != nullptr) mainWin->prev_search_term_bttn->image(arrow_down);
 
     // Redraw the window to show the new button
     mainWin->redraw();
