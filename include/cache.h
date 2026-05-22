@@ -23,6 +23,8 @@
 #include <vector>
 #include "fltube_utils.h"
 
+enum CACHE_RECORD_STATUS {STOPPED, STARTED};
+
 /* This entity represents a general cache entry. It has a string value, a creation date, a time to live (expressed in seconds),
  *  and a "valid" flag. Once created, the cache entry values cannot be changed.
  *  A cache entry becames invalid automatically when reachs its invalidation date, it means: current_date >= (creation_date + ttl).
@@ -77,6 +79,8 @@ protected:
 
     unsigned int cache_entry_ttl;
 
+    CACHE_RECORD_STATUS current_status;
+
     /* Returns the @CacheEntry for a specified id. If not exists, a nullptr is returned. */
     CacheEntry* search(std::string id);
     /* Hook method used for Class Constructor to load data from the corresponding datasource. */
@@ -86,7 +90,7 @@ protected:
     virtual int save();
 public:
     GeneralCache(std::shared_ptr<TerminalLogger> const& lgg, unsigned int ttl = CacheEntry::DEFAULT_ENTRY_TTL):
-    logger(lgg), entries(std::make_unique<std::map<std::string, CacheEntry*>>()),
+    logger(lgg), entries(std::make_unique<std::map<std::string, CacheEntry*>>()), current_status(CACHE_RECORD_STATUS::STARTED),
     cache_entry_ttl(ttl) {};
 
     /* Destructor. */
@@ -106,6 +110,8 @@ public:
     /* Returns true if the entry exists and was deleted succesfully. Besides, the pointer to CacheEntry* is deleted.  */
     bool remove_entry(std::string id);
 
+    void remove_all_entries();
+
     /* Returns true if an "id" exists within cache entries and is valid. Otherwise, return false.  */
     bool is_cached(std::string id);
 
@@ -114,6 +120,10 @@ public:
 
     /* Iterate over every cache entry and mark as invalid those who reached its invalidation date. */
     void cleanup();
+
+    /* Update the current cache recording status. Returns @true if switching to the new status is allowed;
+     * switching to the same status returns @false. */
+    bool change_status(CACHE_RECORD_STATUS next_status);
 };
 
 /*  This is like a GeneralCache but save it at your disk for a permanent storage of its data. A cache entry mark as invalid, is not

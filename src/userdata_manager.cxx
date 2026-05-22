@@ -241,6 +241,16 @@ bool UserDataManager::deleteVideoList(std::string name) {
     return false;
 }
 
+bool UserDataManager::cleanVideoList(std::string name) {
+    InternalVideoList* vl = getInternalVideoList(name);
+    if (vl == nullptr) {
+        logger->error(_("Error on clean of an inexistent video list..."));
+        return false;
+    }
+    vl->removeAllVideos();
+    return true;
+}
+
 bool UserDataManager::existsVideoList(std::string name) {
     auto it = custom_lists->find(name);
     return (it != custom_lists->end());
@@ -248,7 +258,7 @@ bool UserDataManager::existsVideoList(std::string name) {
 
 bool UserDataManager::existsVideo(Video* v) {
     if (v == nullptr) {
-        logger->error(_("Video is a null pointer... Cannot proceed.\n"));
+        logger->error(_("Video is a null pointer... Cannot proceed."));
         return false;
     }
     auto it = videos->find(v->id);
@@ -406,4 +416,9 @@ void InternalVideoList::removeVideo(std::string id) {
             break;
         }
     }
+}
+
+/*  This method will remove all content saved/added in current video list. */
+void InternalVideoList::removeAllVideos() {
+    this->list->clear();
 }

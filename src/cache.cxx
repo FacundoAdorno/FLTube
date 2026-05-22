@@ -73,6 +73,9 @@ CacheEntry* GeneralCache::search(std::string id) {
 }
 
 void GeneralCache::add_entry(std::string id, const std::string value) {
+    // If the status is not "started", cancel adding the new entry.
+    if (current_status != CACHE_RECORD_STATUS::STARTED) return;
+
     // Sanitize the entry value...
     std::string sanit_value = value;
     trim(sanit_value);
@@ -111,6 +114,13 @@ bool GeneralCache::remove_entry(std::string id) {
     return (position != entries->end());
 }
 
+void GeneralCache::remove_all_entries() {
+    for (auto& pair : *entries) {
+        delete pair.second;
+    }
+    this->entries->clear();
+}
+
 std::string GeneralCache::get_entry_value(std::string id) {
     CacheEntry* ce = this->search(id);
     if (ce != nullptr && ce->is_valid()) {
@@ -121,10 +131,7 @@ std::string GeneralCache::get_entry_value(std::string id) {
 }
 
 GeneralCache::~GeneralCache() {
-    for (auto& pair : *entries) {
-        delete pair.second;
-    }
-    this->entries->clear();
+    this->remove_all_entries();
 }
 
 void GeneralCache::finish() {
@@ -146,6 +153,12 @@ std::string GeneralCache::get_cache_expiration_date(std::string id) {
         result = time_buffer;
     }
     return result;
+}
+
+bool GeneralCache::change_status(CACHE_RECORD_STATUS new_status) {
+    if (this->current_status == new_status) return false;
+    this->current_status = new_status;
+    return true;
 }
 
 int GeneralCache::load(){

@@ -110,6 +110,7 @@ class InternalVideoList: public VideoList {
             :VideoList(name, canBeManipulated) {};
         void addVideo(Video* v);
         void removeVideo(std::string id);
+        void removeAllVideos();
 };
 
 /**
@@ -208,6 +209,9 @@ class UserDataManager {
 
         // Delete a video list if exists (except for @HISTORY_LIST_NAME and @LIKED_LIST_NAME). Return true if all was OK.
         bool deleteVideoList(std::string name);
+
+        // Remove all videos saved in the specified video list, but not delete the video list. Returns true if al was OK.
+        bool cleanVideoList(std::string name);
 
         VideoList* getHistoryList();
 

@@ -20,6 +20,28 @@
 #ifndef GETTEXT_MACROS_H
 #endif
 
+Fl_Menu_Item FLTubeMainWindow::menu_options_menu[] = {
+ {gettext_noop("Options"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Navigation History"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Clear all"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Stop recording"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Start recording"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {0,0,0,0,0,0,0,0,0},
+ {gettext_noop("Cache"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Clear all"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Stop recording"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Start recording"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {0,0,0,0,0,0,0,0,0},
+ {0,0,0,0,0,0,0,0,0},
+ {0,0,0,0,0,0,0,0,0}
+};
+Fl_Menu_Item* FLTubeMainWindow::history_clearall_bttn = FLTubeMainWindow::menu_options_menu + 2;
+Fl_Menu_Item* FLTubeMainWindow::history_pause_bttn = FLTubeMainWindow::menu_options_menu + 3;
+Fl_Menu_Item* FLTubeMainWindow::history_unpause_bttn = FLTubeMainWindow::menu_options_menu + 4;
+Fl_Menu_Item* FLTubeMainWindow::cache_clearall_bttn = FLTubeMainWindow::menu_options_menu + 7;
+Fl_Menu_Item* FLTubeMainWindow::cache_pause_bttn = FLTubeMainWindow::menu_options_menu + 8;
+Fl_Menu_Item* FLTubeMainWindow::cache_unpause_bttn = FLTubeMainWindow::menu_options_menu + 9;
+
 FLTubeMainWindow::FLTubeMainWindow(int X, int Y, int W, int H, const char *L) :
   Fl_Double_Window(X, Y, W, H, L)
 {
@@ -53,6 +75,36 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
   { about_bttn = new Fl_Button(521, 6, 64, 22, _("Help"));
     about_bttn->tooltip(_("Show info about this application and some help of how to use it."));
   } // Fl_Button* about_bttn
+  { options_menu = new Fl_Menu_Bar(434, 6, 80, 22);
+    { Fl_Menu_Item* o = &menu_options_menu[0];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[1];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[2];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[3];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[4];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[6];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[7];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[8];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[9];
+      o->label(_(o->label()));
+    }
+    options_menu->menu(menu_options_menu);
+  } // Fl_Menu_Bar* options_menu
   { central_tabs = new Fl_Tabs(9, 28, 576, 92);
     { searchbox_tab = new Fl_Group(9, 56, 576, 64, _("Search box"));
       searchbox_tab->tooltip(_("Search videos at this section."));

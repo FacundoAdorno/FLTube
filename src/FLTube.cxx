@@ -19,6 +19,7 @@
 #include "../include/configuration_manager.h"
 #include "../include/userdata_manager.h"
 #include "../include/cache.h"
+#include <FL/fl_ask.H>
 #include <cstdio>
 
 /** Main Fltube window. */
@@ -65,6 +66,9 @@ bool DEBUG_ENABLED = false;
 
 //If value is 0, enable the initial verifications. Defaults to false (or 1).
 bool AVOID_INITIAL_CHECKS = 1;
+
+//If true, then video Navigation History is enabled.
+bool NAVIGATION_HISTORY_ENABLED = true;
 
 // This variable holds the configured video codec used when download a video.
 std::string DOWNLOAD_VIDEO_CODEC;
@@ -349,14 +353,16 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
         video_selected_for_stream = vi;
         video_selected_for_stream->thumbnail_overlay->image(playicon_image);
         video_selected_for_stream->thumbnail_overlay->show();
-        //Registering view of current video at History List...
-        std::string id = *url;
-        replace_all(id, std::string(YOUTUBE_URL_PREFIX), "");
-        for (YTDLP_Video_Metadata* ytv : video_metadata) {
-            if (ytv->id == id) {
-                Video* v = new Video(id, ytv->title, ytv->creators, ytv->channel_id, ytv->viewers_count, ytv->duration, ytv->thumbnail_url);
-                userdata->addVideo(v, UserDataManager::HISTORY_LIST_NAME);
-                break;
+        if (NAVIGATION_HISTORY_ENABLED) {
+            //Registering view of current video at History List...
+            std::string id = *url;
+            replace_all(id, std::string(YOUTUBE_URL_PREFIX), "");
+            for (YTDLP_Video_Metadata* ytv : video_metadata) {
+                if (ytv->id == id) {
+                    Video* v = new Video(id, ytv->title, ytv->creators, ytv->channel_id, ytv->viewers_count, ytv->duration, ytv->thumbnail_url);
+                    userdata->addVideo(v, UserDataManager::HISTORY_LIST_NAME);
+                    break;
+                }
             }
         }
         //Stream video section...
@@ -722,11 +728,15 @@ void pre_init() {
                     video_selected_for_stream->thumbnail_overlay->image(nullptr);
                     video_selected_for_stream->thumbnail_overlay->hide();
                     std::string* video_url = static_cast<std::string*>(video_selected_for_stream->thumbnail->user_data());
-                    if (video_url != nullptr && cache->is_cached(video_url->c_str())) {
+                    std::string id = *video_url;
+                    replace_all(id, std::string(YOUTUBE_URL_PREFIX), "");
+                    if (video_url != nullptr && userdata->getHistoryList()->findVideoById(id) != nullptr) {
                         video_selected_for_stream->already_viewed_icon->show();
+                    }
+                    if (video_url != nullptr && cache->is_cached(video_url->c_str())) {
                         char cache_tooltip[128];
                         std::snprintf(cache_tooltip, sizeof(cache_tooltip), _("Video URL Cached (valid until %s). Click to remove from cache."),
-                            cache->get_cache_expiration_date(video_url->c_str()).c_str());
+                                      cache->get_cache_expiration_date(video_url->c_str()).c_str());
                         video_selected_for_stream->cache_bttn->copy_tooltip(cache_tooltip);
                         video_selected_for_stream->cache_bttn->show();
                     }
@@ -775,6 +785,52 @@ void post_init() {
     if (arrow_up != nullptr) mainWin->next_search_term_bttn->image(arrow_up);
     if (arrow_down != nullptr) mainWin->prev_search_term_bttn->image(arrow_down);
 
+
+    mainWin->cache_unpause_bttn->hide();
+    mainWin->cache_clearall_bttn->callback([](Fl_Widget* w, void* data) {
+        cache->remove_all_entries();
+        logger->debug(_("All cache entries were deleted by user demand..."));
+    });
+    mainWin->cache_pause_bttn->callback([](Fl_Widget* w, void* data) {
+        if (cache->change_status(CACHE_RECORD_STATUS::STOPPED)) {
+            mainWin->cache_pause_bttn->hide();
+            mainWin->cache_unpause_bttn->show();
+            logger->debug(_("Cache recording was stopped by user demand..."));
+        }
+    });
+    mainWin->cache_unpause_bttn->callback([](Fl_Widget* w, void* data) {
+        if (cache->change_status(CACHE_RECORD_STATUS::STARTED)) {
+            mainWin->cache_unpause_bttn->hide();
+            mainWin->cache_pause_bttn->show();
+            logger->debug(_("Cache recording was started by user demand..."));
+        }
+    });
+    mainWin->history_unpause_bttn->hide();
+    mainWin->history_pause_bttn->callback([](Fl_Widget* w, void* data) {
+        if (NAVIGATION_HISTORY_ENABLED) {
+            NAVIGATION_HISTORY_ENABLED = false;
+            mainWin->history_unpause_bttn->show();
+            mainWin->history_pause_bttn->hide();
+            logger->debug(_("Navigation History recording was stopped by user demand..."));
+        }
+    });
+    mainWin->history_unpause_bttn->callback([](Fl_Widget* w, void* data) {
+        if (!NAVIGATION_HISTORY_ENABLED) {
+            NAVIGATION_HISTORY_ENABLED = true;
+            mainWin->history_pause_bttn->show();
+            mainWin->history_unpause_bttn->hide();
+            logger->debug(_("Navigation History recording was started by user demand..."));
+        }
+    });
+    mainWin->history_clearall_bttn->callback([](Fl_Widget* w, void* data) {
+        bool dummyFlag;
+        bool continue_clearall = showChoiceWindow(_("This action cannot be undone. Do you want to clean all Navigation History?"), dummyFlag);
+        if (continue_clearall) {
+            if (userdata->cleanVideoList(UserDataManager::HISTORY_LIST_NAME)){
+                logger->debug(_("Navigation History content was cleaned by user demand..."));
+            }
+        }
+    });
     // Redraw the window to show the new button
     mainWin->redraw();
 }

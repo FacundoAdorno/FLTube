@@ -23,6 +23,7 @@
 #endif
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Choice.H>
@@ -34,6 +35,14 @@ public:
   FLTubeMainWindow(int W, int H, const char *L = 0);
   FLTubeMainWindow();
   Fl_Button *about_bttn;
+  Fl_Menu_Bar *options_menu;
+  static Fl_Menu_Item menu_options_menu[];
+  static Fl_Menu_Item *history_clearall_bttn;
+  static Fl_Menu_Item *history_pause_bttn;
+  static Fl_Menu_Item *history_unpause_bttn;
+  static Fl_Menu_Item *cache_clearall_bttn;
+  static Fl_Menu_Item *cache_pause_bttn;
+  static Fl_Menu_Item *cache_unpause_bttn;
   Fl_Tabs *central_tabs;
   Fl_Group *searchbox_tab;
   SearchInput *search_term_or_url;

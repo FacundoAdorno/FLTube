@@ -43,7 +43,50 @@ widget_class FLTubeMainWindow {
     label Help
     tooltip {Show info about this application and some help of how to use it.} xywh {521 6 64 22}
   }
-  Fl_Tabs central_tabs {open
+  Fl_Menu_Bar options_menu {open
+    xywh {434 6 80 22}
+  } {
+    Submenu {} {
+      label Options open selected
+      xywh {0 0 100 20}
+    } {
+      Submenu {} {
+        label {Navigation History}
+        xywh {0 0 100 20}
+      } {
+        MenuItem history_clearall_bttn {
+          label {Clear all}
+          xywh {0 0 100 20}
+        }
+        MenuItem history_pause_bttn {
+          label {Stop recording}
+          xywh {0 0 100 20}
+        }
+        MenuItem history_unpause_bttn {
+          label {Start recording}
+          xywh {0 0 100 20}
+        }
+      }
+      Submenu {} {
+        label Cache
+        xywh {0 0 100 20}
+      } {
+        MenuItem cache_clearall_bttn {
+          label {Clear all}
+          tooltip {Clear all data saved in cache.} xywh {0 0 100 20}
+        }
+        MenuItem cache_pause_bttn {
+          label {Stop recording}
+          tooltip aaaaaaaaaaaaaaaa xywh {0 0 100 20}
+        }
+        MenuItem cache_unpause_bttn {
+          label {Start recording}
+          tooltip aaaaaaaaaaaaaaaa xywh {0 0 100 20}
+        }
+      }
+    }
+  }
+  Fl_Tabs central_tabs {
     xywh {9 28 576 92}
   } {
     Fl_Group searchbox_tab {
@@ -64,7 +107,7 @@ widget_class FLTubeMainWindow {
       Fl_Button next_search_term_bttn {
         tooltip {Navigate next search terms in history. Or use Up arrow key.} xywh {561 60 18 14} down_box DOWN_BOX labelsize 11
       }
-      Fl_Button prev_search_term_bttn {selected
+      Fl_Button prev_search_term_bttn {
         tooltip {Navigate previous search terms in history. Or use Down arrow key.} xywh {561 76 18 14} down_box DOWN_BOX labelsize 11
       }
     }
@@ -82,7 +125,7 @@ widget_class FLTubeMainWindow {
   Fl_Group search_result_selectors {
     xywh {10 126 575 380} box THIN_UP_BOX
   } {}
-  Fl_Group pagination_controls {open
+  Fl_Group pagination_controls {
     xywh {9 508 577 30}
   } {
     Fl_Button first_page_bttn {
