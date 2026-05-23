@@ -35,9 +35,9 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 }
 
 widget_class FLTubeMainWindow {
-  label FLTube open
-  xywh {0 0 593 540}
-  class Fl_Double_Window visible
+  label FLTube open selected
+  xywh {0 0 593 540} hide
+  class Fl_Double_Window
 } {
   Fl_Button about_bttn {
     label Help
@@ -47,7 +47,7 @@ widget_class FLTubeMainWindow {
     xywh {434 6 80 22}
   } {
     Submenu {} {
-      label Options open selected
+      label Options open
       xywh {0 0 100 20}
     } {
       Submenu {} {
@@ -83,6 +83,10 @@ widget_class FLTubeMainWindow {
           label {Start recording}
           tooltip aaaaaaaaaaaaaaaa xywh {0 0 100 20}
         }
+      }
+      MenuItem check_update_bttn {
+        label {Check for updates}
+        xywh {0 0 100 20}
       }
     }
   }

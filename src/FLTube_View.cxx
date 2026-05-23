@@ -32,6 +32,7 @@ Fl_Menu_Item FLTubeMainWindow::menu_options_menu[] = {
  {gettext_noop("Stop recording"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Start recording"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
+ {gettext_noop("Check for updates"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {0,0,0,0,0,0,0,0,0}
 };
@@ -41,6 +42,7 @@ Fl_Menu_Item* FLTubeMainWindow::history_unpause_bttn = FLTubeMainWindow::menu_op
 Fl_Menu_Item* FLTubeMainWindow::cache_clearall_bttn = FLTubeMainWindow::menu_options_menu + 7;
 Fl_Menu_Item* FLTubeMainWindow::cache_pause_bttn = FLTubeMainWindow::menu_options_menu + 8;
 Fl_Menu_Item* FLTubeMainWindow::cache_unpause_bttn = FLTubeMainWindow::menu_options_menu + 9;
+Fl_Menu_Item* FLTubeMainWindow::check_update_bttn = FLTubeMainWindow::menu_options_menu + 11;
 
 FLTubeMainWindow::FLTubeMainWindow(int X, int Y, int W, int H, const char *L) :
   Fl_Double_Window(X, Y, W, H, L)
@@ -101,6 +103,9 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
       o->label(_(o->label()));
     }
     { Fl_Menu_Item* o = &menu_options_menu[9];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[11];
       o->label(_(o->label()));
     }
     options_menu->menu(menu_options_menu);

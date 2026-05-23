@@ -19,7 +19,6 @@
 #include "../include/configuration_manager.h"
 #include "../include/userdata_manager.h"
 #include "../include/cache.h"
-#include <FL/fl_ask.H>
 #include <cstdio>
 
 /** Main Fltube window. */
@@ -75,6 +74,9 @@ std::string DOWNLOAD_VIDEO_CODEC;
 
 const std::string TAB_SEARCH_NAME = "SEARCHVIDEOS_TAB";
 const std::string TAB_VIDEOLIST_NAME = "VIDEOLISTS_TABS";
+
+// This URL always known the last version released of this program.
+const std::string FLTUBE_UPSTREAM_VERSION_URL = "https://gitlab.com/facuA/fltube/-/raw/master/VERSION";
 
 MediaPlayerInfo* media_player;
 
@@ -140,13 +142,14 @@ void closeWindow_cb(Fl_Widget*, Fl_Window *targetWindow) {
 /**
  * Show a tiny window with a message.
  */
-void showMessageWindow(const char* message){
+void showMessageWindow(const char* message, const char *title){
     if (message_window == nullptr) {
         message_window = new TinyMessageWindow();
         message_window->close_bttn->callback((Fl_Callback*)closeWindow_cb, (void*)(message_window));
         message_window->set_modal();
     }
     center_window(message_window);
+    if (title != nullptr)  message_window->label(title);
     message_window->show();
     message_window->error_label->label(message);
 
@@ -625,6 +628,31 @@ void removeFromVideoList_cb(Fl_Widget *wdg) {
     updateVideoMetadataFromVideoList();
 }
 
+/* Notify if a new version of FLTube is available for download... */
+void check_fltube_update_cb (Fl_Widget* w, void* data) {
+    change_cursor(FL_CURSOR_WAIT);
+    std::string version_filename = "VERSION";
+    if (!std::filesystem::exists(FLTUBE_TEMPORAL_DIR + version_filename)) {
+        int result = download_file(FLTUBE_UPSTREAM_VERSION_URL, FLTUBE_TEMPORAL_DIR, version_filename);
+        if (result != 0) {
+            logger->error(_("For some reason, FLTUBE VERSION file for update verification cannot be downloaded."));
+            return;
+        }
+    }
+    std::string upstream_version;
+    std::ifstream infile(FLTUBE_TEMPORAL_DIR + version_filename);
+    std::getline(infile, upstream_version);
+    trim(upstream_version);
+    change_cursor();
+    if (getIntVersion(upstream_version) > getIntVersion(VERSION)) {
+        char message[256];
+        snprintf(message, sizeof(message), _("FLTube has available a new version to download.\nNew version available: %s."), upstream_version.c_str());
+        showMessageWindow(message, _("New version available!"));
+    } else {
+        showMessageWindow(_("You have the last version available."), _("You're up to date."));
+    }
+}
+
 /**
  * Hook: Actions to execute before main window is drawn...
  */
@@ -831,6 +859,8 @@ void post_init() {
             }
         }
     });
+
+    mainWin->check_update_bttn->callback((Fl_Callback*) check_fltube_update_cb);
     // Redraw the window to show the new button
     mainWin->redraw();
 }

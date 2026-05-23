@@ -48,7 +48,7 @@ struct DownloadVideoCBData {
 
 void exitApp(unsigned short int exitStatusCode);
 static void closeWindow_cb(Fl_Widget*, Fl_Window *targetWindow);
-static void showMessageWindow(const char* message);
+static void showMessageWindow(const char* message, const char *title = nullptr);
 static void lock_buttons(bool lock);
 static void preview_video_cb(Fl_Button* widget, void* video_url);
 static void add_video_group(int posx, int posy);
