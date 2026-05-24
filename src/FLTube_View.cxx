@@ -22,6 +22,13 @@
 
 Fl_Menu_Item FLTubeMainWindow::menu_options_menu[] = {
  {gettext_noop("Options"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Quality"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("240p"), 0,  0, (void*)(240), 8, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("360p"), 0,  0, (void*)(360), 8, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("480p"), 0,  0, (void*)(480), 8, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("720p"), 0,  0, (void*)(720), 8, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("1080p"), 0,  0, (void*)(1080), 8, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {0,0,0,0,0,0,0,0,0},
  {gettext_noop("Navigation History"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Clear all"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Stop recording"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
@@ -36,13 +43,18 @@ Fl_Menu_Item FLTubeMainWindow::menu_options_menu[] = {
  {0,0,0,0,0,0,0,0,0},
  {0,0,0,0,0,0,0,0,0}
 };
-Fl_Menu_Item* FLTubeMainWindow::history_clearall_bttn = FLTubeMainWindow::menu_options_menu + 2;
-Fl_Menu_Item* FLTubeMainWindow::history_pause_bttn = FLTubeMainWindow::menu_options_menu + 3;
-Fl_Menu_Item* FLTubeMainWindow::history_unpause_bttn = FLTubeMainWindow::menu_options_menu + 4;
-Fl_Menu_Item* FLTubeMainWindow::cache_clearall_bttn = FLTubeMainWindow::menu_options_menu + 7;
-Fl_Menu_Item* FLTubeMainWindow::cache_pause_bttn = FLTubeMainWindow::menu_options_menu + 8;
-Fl_Menu_Item* FLTubeMainWindow::cache_unpause_bttn = FLTubeMainWindow::menu_options_menu + 9;
-Fl_Menu_Item* FLTubeMainWindow::check_update_bttn = FLTubeMainWindow::menu_options_menu + 11;
+Fl_Menu_Item* FLTubeMainWindow::quality_240_bttn = FLTubeMainWindow::menu_options_menu + 2;
+Fl_Menu_Item* FLTubeMainWindow::quality_360_bttn = FLTubeMainWindow::menu_options_menu + 3;
+Fl_Menu_Item* FLTubeMainWindow::quality_480_bttn = FLTubeMainWindow::menu_options_menu + 4;
+Fl_Menu_Item* FLTubeMainWindow::quality_720_bttn = FLTubeMainWindow::menu_options_menu + 5;
+Fl_Menu_Item* FLTubeMainWindow::quality_1080_bttn = FLTubeMainWindow::menu_options_menu + 6;
+Fl_Menu_Item* FLTubeMainWindow::history_clearall_bttn = FLTubeMainWindow::menu_options_menu + 9;
+Fl_Menu_Item* FLTubeMainWindow::history_pause_bttn = FLTubeMainWindow::menu_options_menu + 10;
+Fl_Menu_Item* FLTubeMainWindow::history_unpause_bttn = FLTubeMainWindow::menu_options_menu + 11;
+Fl_Menu_Item* FLTubeMainWindow::cache_clearall_bttn = FLTubeMainWindow::menu_options_menu + 14;
+Fl_Menu_Item* FLTubeMainWindow::cache_pause_bttn = FLTubeMainWindow::menu_options_menu + 15;
+Fl_Menu_Item* FLTubeMainWindow::cache_unpause_bttn = FLTubeMainWindow::menu_options_menu + 16;
+Fl_Menu_Item* FLTubeMainWindow::check_update_bttn = FLTubeMainWindow::menu_options_menu + 18;
 
 FLTubeMainWindow::FLTubeMainWindow(int X, int Y, int W, int H, const char *L) :
   Fl_Double_Window(X, Y, W, H, L)
@@ -93,10 +105,10 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     { Fl_Menu_Item* o = &menu_options_menu[4];
       o->label(_(o->label()));
     }
-    { Fl_Menu_Item* o = &menu_options_menu[6];
+    { Fl_Menu_Item* o = &menu_options_menu[5];
       o->label(_(o->label()));
     }
-    { Fl_Menu_Item* o = &menu_options_menu[7];
+    { Fl_Menu_Item* o = &menu_options_menu[6];
       o->label(_(o->label()));
     }
     { Fl_Menu_Item* o = &menu_options_menu[8];
@@ -105,7 +117,25 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     { Fl_Menu_Item* o = &menu_options_menu[9];
       o->label(_(o->label()));
     }
+    { Fl_Menu_Item* o = &menu_options_menu[10];
+      o->label(_(o->label()));
+    }
     { Fl_Menu_Item* o = &menu_options_menu[11];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[13];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[14];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[15];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[16];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[18];
       o->label(_(o->label()));
     }
     options_menu->menu(menu_options_menu);

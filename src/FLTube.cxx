@@ -20,6 +20,7 @@
 #include "../include/userdata_manager.h"
 #include "../include/cache.h"
 #include <cstdio>
+#include <string>
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -68,6 +69,9 @@ bool AVOID_INITIAL_CHECKS = 1;
 
 //If true, then video Navigation History is enabled.
 bool NAVIGATION_HISTORY_ENABLED = true;
+
+//If true, ask every time the resolution is changed.
+bool KEEP_ASKING_FOR_RESOLUTION_CHANGE = true;
 
 // This variable holds the configured video codec used when download a video.
 std::string DOWNLOAD_VIDEO_CODEC;
@@ -653,6 +657,38 @@ void check_fltube_update_cb (Fl_Widget* w, void* data) {
     }
 }
 
+void change_stream_resolution_cb (Fl_Widget* w, void* data) {
+    intptr_t new_resolution = reinterpret_cast<intptr_t>(data);
+    int old_resolution = STREAM_VIDEO_RESOLUTION;
+    bool has_changed = false;
+    if (new_resolution == old_resolution) return;
+    if (new_resolution > 360 && KEEP_ASKING_FOR_RESOLUTION_CHANGE) {
+        bool proceed = showChoiceWindow(_("Changing the video stream resolution to higher than 360p may cause older laptops to freeze. Do you want to proceed?"), KEEP_ASKING_FOR_RESOLUTION_CHANGE);
+        if (!proceed) {
+            // Select again the previous resolution radio button...
+            switch (old_resolution) {
+                case R240p:   mainWin->quality_240_bttn->setonly(); break;
+                case R360p:   mainWin->quality_360_bttn->setonly(); break;
+                case R480p:   mainWin->quality_480_bttn->setonly(); break;
+                case R720p:   mainWin->quality_720_bttn->setonly(); break;
+                case R1080p:   mainWin->quality_1080_bttn->setonly(); break;
+            }
+            return;
+        }
+    }
+    switch (new_resolution) {
+        case R240p:   STREAM_VIDEO_RESOLUTION=R240p; has_changed=true; break;
+        case R360p:   STREAM_VIDEO_RESOLUTION=R360p; has_changed=true; break;
+        case R480p:   STREAM_VIDEO_RESOLUTION=R480p; has_changed=true; break;
+        case R720p:   STREAM_VIDEO_RESOLUTION=R720p; has_changed=true; break;
+        case R1080p:  STREAM_VIDEO_RESOLUTION=R1080p; has_changed=true; break;
+    }
+    if (has_changed) {
+        ytdlp->set_resolution(STREAM_VIDEO_RESOLUTION);
+        logger->debug(_("Stream video resolution updated by user to ") + std::to_string(new_resolution));
+    }
+}
+
 /**
  * Hook: Actions to execute before main window is drawn...
  */
@@ -861,6 +897,20 @@ void post_init() {
     });
 
     mainWin->check_update_bttn->callback((Fl_Callback*) check_fltube_update_cb);
+
+    mainWin->quality_240_bttn->callback((Fl_Callback*) change_stream_resolution_cb);
+    mainWin->quality_360_bttn->callback((Fl_Callback*) change_stream_resolution_cb);
+    mainWin->quality_480_bttn->callback((Fl_Callback*) change_stream_resolution_cb);
+    mainWin->quality_720_bttn->callback((Fl_Callback*) change_stream_resolution_cb);
+    mainWin->quality_1080_bttn->callback((Fl_Callback*) change_stream_resolution_cb);
+
+    switch (STREAM_VIDEO_RESOLUTION) {
+        case R240p:   mainWin->quality_240_bttn->setonly(); break;
+        case R360p:   mainWin->quality_360_bttn->setonly(); break;
+        case R480p:   mainWin->quality_480_bttn->setonly(); break;
+        case R720p:   mainWin->quality_720_bttn->setonly(); break;
+        case R1080p:   mainWin->quality_1080_bttn->setonly(); break;
+    }
     // Redraw the window to show the new button
     mainWin->redraw();
 }

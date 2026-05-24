@@ -37,6 +37,11 @@ public:
   Fl_Button *about_bttn;
   Fl_Menu_Bar *options_menu;
   static Fl_Menu_Item menu_options_menu[];
+  static Fl_Menu_Item *quality_240_bttn;
+  static Fl_Menu_Item *quality_360_bttn;
+  static Fl_Menu_Item *quality_480_bttn;
+  static Fl_Menu_Item *quality_720_bttn;
+  static Fl_Menu_Item *quality_1080_bttn;
   static Fl_Menu_Item *history_clearall_bttn;
   static Fl_Menu_Item *history_pause_bttn;
   static Fl_Menu_Item *history_unpause_bttn;
