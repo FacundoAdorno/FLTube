@@ -16,6 +16,7 @@
 
 std::string UserDataManager::HISTORY_LIST_NAME = "Navigation History";
 std::string UserDataManager::LIKED_LIST_NAME = "Liked";
+std::string UserDataManager::WATCHLATER_LIST_NAME = "Watch Later";
 std::string UserDataManager::VIDEOS_TXT_SEPARATOR = "===VIDEOS===";
 std::string UserDataManager::LISTS_TXT_SEPARATOR = "===LISTS===";
 
@@ -26,9 +27,10 @@ UserDataManager::UserDataManager(std::string userdata_filepath, int current_vers
         custom_lists(std::make_unique<std::map<std::string, InternalVideoList*>>()),
         logger(logger_)
     {
-        //Ensuring create at least the two empty default lists (HISTORY and LIKED).
+        //Ensuring create at least the three empty default lists (HISTORY, LIKED and WATCHLATER).
         (*custom_lists)[UserDataManager::HISTORY_LIST_NAME] = new InternalVideoList(UserDataManager::HISTORY_LIST_NAME, false);
         (*custom_lists)[UserDataManager::LIKED_LIST_NAME] = new InternalVideoList(UserDataManager::LIKED_LIST_NAME, false);
+        (*custom_lists)[UserDataManager::WATCHLATER_LIST_NAME] = new InternalVideoList(UserDataManager::WATCHLATER_LIST_NAME, false);
 
         char message_bffr[1024];
         if (logger_ == nullptr) this->logger = std::make_shared<TerminalLogger>(false);
@@ -127,12 +129,13 @@ UserDataManager::UserDataManager(std::string userdata_filepath, int current_vers
                             continue;   // A list must have at least a name, otherwise avoid current line processing...
                         std::string list_name = list_elements.at(0);
                         InternalVideoList* vl;
-                        if (existsVideoList(list_name) && list_name != UserDataManager::HISTORY_LIST_NAME && list_name != UserDataManager::LIKED_LIST_NAME) {
+                        if (existsVideoList(list_name) && list_name != UserDataManager::HISTORY_LIST_NAME && list_name != UserDataManager::LIKED_LIST_NAME && list_name != UserDataManager::WATCHLATER_LIST_NAME) {
                             snprintf(message_bffr, sizeof(message_bffr),_("List '%s' is duplicated at userdata file. Avoiding to add duplication...\n"), list_name.c_str());
                             logger->warn(message_bffr);
                             continue;
                         }
-                        if (list_name != UserDataManager::HISTORY_LIST_NAME && list_name != UserDataManager::LIKED_LIST_NAME)
+                        if (list_name != UserDataManager::HISTORY_LIST_NAME && list_name != UserDataManager::LIKED_LIST_NAME
+                                && list_name != UserDataManager::WATCHLATER_LIST_NAME)
                             vl = new InternalVideoList(list_name, true);
                         else
                             vl = (*custom_lists)[list_name];
@@ -290,6 +293,10 @@ VideoList* UserDataManager::getHistoryList() {
 
 VideoList* UserDataManager::getLikedVideosList() {
     return this->getVideoList(UserDataManager::LIKED_LIST_NAME);
+}
+
+VideoList* UserDataManager::getWatchLaterVideoList() {
+    return this->getVideoList(UserDataManager::WATCHLATER_LIST_NAME);
 }
 
 int UserDataManager::getVersion() {

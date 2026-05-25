@@ -75,6 +75,7 @@ public:
   Fl_Box *is_live_image;
   Fl_Box *already_viewed_icon;
   Fl_Button *like_icon_bttn;
+  Fl_Button *watch_later_bttn;
   Fl_Button *cache_bttn;
   Fl_Box *title;
   Fl_Button *remove_bttn;

@@ -241,6 +241,11 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
     like_icon_bttn->box(FL_NO_BOX);
     like_icon_bttn->down_box(FL_THIN_UP_FRAME);
   } // Fl_Button* like_icon_bttn
+  { watch_later_bttn = new Fl_Button(322, 43, 20, 20);
+    watch_later_bttn->tooltip(_("Add this video to the \"Watch later\" video list."));
+    watch_later_bttn->box(FL_NO_BOX);
+    watch_later_bttn->down_box(FL_THIN_UP_FRAME);
+  } // Fl_Button* watch_later_bttn
   { cache_bttn = new Fl_Button(535, 43, 20, 20);
     cache_bttn->box(FL_NO_BOX);
     cache_bttn->down_box(FL_THIN_UP_FRAME);

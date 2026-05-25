@@ -127,7 +127,7 @@ class InternalVideoList: public VideoList {
  *      id>title>creator>channel_id>views>duration>thumbnail_url
  *
  *  ===LISTS=== [separador]
- *  Siguen las listas de IDs de videos. Existen 2 listas creadas por defecto: la @UserDataManager::HISTORY_LIST_NAME y la @UserDataManager::LIKED_LIST_NAME.
+ *  Siguen las listas de IDs de videos. Existen 3 listas creadas por defecto: la @UserDataManager::HISTORY_LIST_NAME, la @UserDataManager::LIKED_LIST_NAME y la @UserDataManager::WATCHLATER_LIST_NAME.
  */
 class UserDataManager {
     //TODO this must be a base class, and create a subclass TXTUserDataManager for this case
@@ -175,6 +175,7 @@ class UserDataManager {
 
         static std::string HISTORY_LIST_NAME;
         static std::string LIKED_LIST_NAME;
+        static std::string WATCHLATER_LIST_NAME;
 
         static std::string VIDEOS_TXT_SEPARATOR;
         static std::string LISTS_TXT_SEPARATOR;
@@ -207,7 +208,7 @@ class UserDataManager {
         // If video list already exists, return false.
         bool createVideoList(std::string name);
 
-        // Delete a video list if exists (except for @HISTORY_LIST_NAME and @LIKED_LIST_NAME). Return true if all was OK.
+        // Delete a video list if exists (except for @HISTORY_LIST_NAME, @LIKED_LIST_NAME and @WATCHLATER_LIST_NAME). Return true if all was OK.
         bool deleteVideoList(std::string name);
 
         // Remove all videos saved in the specified video list, but not delete the video list. Returns true if al was OK.
@@ -216,6 +217,8 @@ class UserDataManager {
         VideoList* getHistoryList();
 
         VideoList* getLikedVideosList();
+
+        VideoList* getWatchLaterVideoList();
 
         // Return true if Video was saved previously saved in ANY existing VideoList.
         bool existsVideo(Video* v);

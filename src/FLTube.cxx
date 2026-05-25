@@ -101,6 +101,8 @@ Fl_PNG_Image* like_red_icon_image = nullptr;
 Fl_PNG_Image* playicon_image = nullptr;
 Fl_PNG_Image* cached_icon_image = nullptr;
 Fl_PNG_Image* remove_video_icon_image = nullptr;
+Fl_PNG_Image* watchlater_icon_image = nullptr;
+Fl_PNG_Image* watchlater_filled_icon_image = nullptr;
 Fl_PNG_Image* arrow_up = nullptr;
 Fl_PNG_Image* arrow_down = nullptr;
 
@@ -439,6 +441,13 @@ void update_video_info() {
                 video_info_arr[j]->like_icon_bttn->image(like_icon_image);
             }
             video_info_arr[j]->like_icon_bttn->redraw();
+            // Update Watch Later icon...
+            if (userdata->getWatchLaterVideoList()->existAtList(video_metadata[j]->id)) {
+                video_info_arr[j]->watch_later_bttn->image(watchlater_filled_icon_image);
+            } else {
+                video_info_arr[j]->watch_later_bttn->image(watchlater_icon_image);
+            }
+            video_info_arr[j]->watch_later_bttn->redraw();
             // Update Cache icon
             if (cache->is_cached(ytdlp->getIdFor(video_metadata[j]->url))) {
                 char cache_tooltip[128];
@@ -582,7 +591,7 @@ std::string getActiveTabName() {
 
 void markLikedVideo_cb(Fl_Widget *wdg) {
     VideoInfo* vi = static_cast<VideoInfo*>(wdg->parent());
-    //Registering view of current video at History List...
+    //Add current video to Liked List...
     std::string id = *static_cast<std::string*>(vi->thumbnail->user_data());
     replace_all(id, std::string(YOUTUBE_URL_PREFIX), "");
     for (YTDLP_Video_Metadata* ytv : video_metadata) {
@@ -594,6 +603,25 @@ void markLikedVideo_cb(Fl_Widget *wdg) {
                 Video* v = new Video(id, ytv->title, ytv->creators, ytv->channel_id, ytv->viewers_count, ytv->duration, ytv->thumbnail_url);
                 userdata->addVideo(v, UserDataManager::LIKED_LIST_NAME);
                 vi->like_icon_bttn->image(like_red_icon_image);
+            }
+            break;
+        }
+    }
+}
+
+void add_to_watch_later(Fl_Widget *wdg) {
+    VideoInfo* vi = static_cast<VideoInfo*>(wdg->parent());
+    std::string id = *static_cast<std::string*>(vi->thumbnail->user_data());
+    replace_all(id, std::string(YOUTUBE_URL_PREFIX), "");
+    for (YTDLP_Video_Metadata* ytv : video_metadata) {
+        if (ytv->id == id) {
+            if ( userdata->getWatchLaterVideoList()->existAtList(ytv->id)) {
+                userdata->removeVideoFromList(ytv->id, UserDataManager::WATCHLATER_LIST_NAME);
+                vi->watch_later_bttn->image(watchlater_icon_image);
+            } else {
+                Video* v = new Video(id, ytv->title, ytv->creators, ytv->channel_id, ytv->viewers_count, ytv->duration, ytv->thumbnail_url);
+                userdata->addVideo(v, UserDataManager::WATCHLATER_LIST_NAME);
+                vi->watch_later_bttn->image(watchlater_filled_icon_image);
             }
             break;
         }
@@ -755,6 +783,8 @@ void pre_init() {
     playicon_image = load_resource_image("playicon.png");
     cached_icon_image = load_resource_image("cache_icon_18p.png");
     remove_video_icon_image = load_resource_image("remove_video_icon_14p.png");
+    watchlater_icon_image = load_resource_image("watch_later.png");
+    watchlater_filled_icon_image = load_resource_image("watch_later_filled.png");
     arrow_up = load_resource_image("arrow_up.png");
     arrow_down = load_resource_image("arrow_down.png");
 
@@ -926,6 +956,8 @@ VideoInfo* create_video_group(int posx, int posy) {
     if (already_viewed_image != nullptr) video_info->already_viewed_icon->image(already_viewed_image);
     if (like_icon_image != nullptr) video_info->like_icon_bttn->image(like_icon_image);
     video_info->like_icon_bttn->callback((Fl_Callback*)markLikedVideo_cb);
+    if (watchlater_icon_image != nullptr) video_info->watch_later_bttn->image(watchlater_icon_image);
+    video_info->watch_later_bttn->callback((Fl_Callback*)add_to_watch_later);
     if (cached_icon_image != nullptr) video_info->cache_bttn->image(cached_icon_image);
     video_info->cache_bttn->callback((Fl_Callback*)removeFromCache_cb);
     if (remove_video_icon_image != nullptr) video_info->remove_bttn->image(remove_video_icon_image);

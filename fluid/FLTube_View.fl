@@ -35,15 +35,15 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 }
 
 widget_class FLTubeMainWindow {
-  label FLTube open
-  xywh {0 0 593 540} hide
-  class Fl_Double_Window
+  label FLTube open selected
+  xywh {0 0 593 540}
+  class Fl_Double_Window visible
 } {
   Fl_Button about_bttn {
     label Help
     tooltip {Show info about this application and some help of how to use it.} xywh {521 6 64 22}
   }
-  Fl_Menu_Bar options_menu {open
+  Fl_Menu_Bar options_menu {
     xywh {434 6 80 22}
   } {
     Submenu {} {
@@ -76,7 +76,7 @@ widget_class FLTubeMainWindow {
         }
         MenuItem quality_1080_bttn {
           label 1080p
-          user_data 1080 selected
+          user_data 1080
           xywh {0 0 100 20} type Radio
         }
       }
@@ -181,7 +181,7 @@ widget_class FLTubeMainWindow {
   }
 }
 
-widget_class VideoInfo {
+widget_class VideoInfo {open
   xywh {0 0 577 91} hide position_relative
 } {
   Fl_Button thumbnail {
@@ -201,6 +201,9 @@ widget_class VideoInfo {
   }
   Fl_Button like_icon_bttn {
     tooltip {Press to mark the video as "Liked".} xywh {295 43 20 20} box NO_BOX down_box THIN_UP_FRAME
+  }
+  Fl_Button watch_later_bttn {
+    tooltip {Add this video to the "Watch Later" video list.} xywh {322 43 20 20} box NO_BOX down_box THIN_UP_FRAME
   }
   Fl_Button cache_bttn {
     xywh {535 43 20 20} box NO_BOX down_box THIN_UP_FRAME hide
