@@ -159,6 +159,9 @@ class YtDlp_Helper {
 
         static YTDLP_Video_Metadata* parse_metadata(const char ytdlp_video_metadata[512]);
 
+        /* Returns a unique ID for the specified URL, taking into account the resolution configured for this instance of YtDlp_Helper. */
+        std::string getIdFor(std::string video_url);
+
         void download_video(const char* video_url, const char* download_path, VCODEC_RESOLUTIONS v_resolution, const char* vcodec);
 
         static std::string* get_metric_abbreviation(int number);

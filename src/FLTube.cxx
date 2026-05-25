@@ -440,10 +440,10 @@ void update_video_info() {
             }
             video_info_arr[j]->like_icon_bttn->redraw();
             // Update Cache icon
-            if (cache->is_cached(video_metadata[j]->url)) {
+            if (cache->is_cached(ytdlp->getIdFor(video_metadata[j]->url))) {
                 char cache_tooltip[128];
                 std::snprintf(cache_tooltip, sizeof(cache_tooltip), _("Video URL Cached (valid until %s). Click to remove from cache."),
-                              cache->get_cache_expiration_date(video_metadata[j]->url).c_str());
+                              cache->get_cache_expiration_date(ytdlp->getIdFor(video_metadata[j]->url)).c_str());
                 video_info_arr[j]->cache_bttn->copy_tooltip(cache_tooltip);
                 video_info_arr[j]->cache_bttn->show();
             } else {
@@ -604,10 +604,10 @@ void removeFromCache_cb(Fl_Widget *wdg) {
     VideoInfo* vi = static_cast<VideoInfo*>(wdg->parent());
     //Registering view of current video at History List...
     std::string video_url = *static_cast<std::string*>(vi->thumbnail->user_data());
-    if (cache->is_cached(video_url)) {
+    if (cache->is_cached(ytdlp->getIdFor(video_url))) {
         char mssg[256];
-        snprintf(mssg, sizeof(mssg), _("The following cache was invalidated by user request: id=%s; expiration_date=%s."), video_url.c_str(), cache->get_cache_expiration_date(video_url).c_str());
-        if (cache->remove_entry(video_url)) logger->debug(mssg);
+        snprintf(mssg, sizeof(mssg), _("The following cache was invalidated by user request: id=%s; expiration_date=%s."), ytdlp->getIdFor(video_url).c_str(), cache->get_cache_expiration_date(ytdlp->getIdFor(video_url)).c_str());
+        if (cache->remove_entry(ytdlp->getIdFor(video_url))) logger->debug(mssg);
     }
     wdg->hide();
 }
@@ -797,10 +797,10 @@ void pre_init() {
                     if (video_url != nullptr && userdata->getHistoryList()->findVideoById(id) != nullptr) {
                         video_selected_for_stream->already_viewed_icon->show();
                     }
-                    if (video_url != nullptr && cache->is_cached(video_url->c_str())) {
+                    if (video_url != nullptr && cache->is_cached(ytdlp->getIdFor(video_url->c_str()))) {
                         char cache_tooltip[128];
                         std::snprintf(cache_tooltip, sizeof(cache_tooltip), _("Video URL Cached (valid until %s). Click to remove from cache."),
-                                      cache->get_cache_expiration_date(video_url->c_str()).c_str());
+                                      cache->get_cache_expiration_date(ytdlp->getIdFor(video_url->c_str())).c_str());
                         video_selected_for_stream->cache_bttn->copy_tooltip(cache_tooltip);
                         video_selected_for_stream->cache_bttn->show();
                     }

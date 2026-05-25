@@ -13,6 +13,7 @@
 
 #include "../include/ytdlp_helper.h"
 #include <cstdio>
+#include <string>
 
 const std::string YtDlp_Helper::PRINT_METADATA_TEMPLATE = "title=\\\"%(title)s\\\">>thumbnail=\\\"%(thumbnails.0.url)s" \
 "\\\">>creators=\\\"%(uploader,playlist_channel)s\\\">>video_id=\\\"%(id)s\\\">>upload_date=\\\"%(upload_date>%Y-%m-%d)s" \
@@ -59,6 +60,10 @@ YTDLP_Video_Metadata* YtDlp_Helper::parse_metadata(const char ytdlp_video_metada
     }
     metadata->url =  YOUTUBE_URL_PREFIX + metadata->id;
     return metadata;
+}
+
+std::string YtDlp_Helper::getIdFor(std::string video_url) {
+    return video_url + ":" + std::to_string(this->video_resolution);
 }
 
 std::vector<YTDLP_Video_Metadata*> YtDlp_Helper::retrieve_metadata(const char* ytdlp_cmd) {
@@ -173,7 +178,7 @@ void YtDlp_Helper::stream(const char* video_url) {
     } else {
         // If video is not live, 1rst try to obtain final video URL using default method...
         // 1rst: lookup final video URL if exists at cache...
-        final_url_result = cache->get_entry_value(video_url);
+        final_url_result = cache->get_entry_value(getIdFor(video_url));
         if (final_url_result == CacheEntry::EMPTY_VALUE) {
             // 2nd: if final video url is not cached, then obtain it using yt-dlp.
             snprintf(get_final_url_cmd, sizeof(get_final_url_cmd), "yt-dlp -S \"%s\" -g \"%s\" 2> %s/ytdlp_errors.log", stream_format, video_url, this->TEMP_WORKING_DIR.c_str());
@@ -185,7 +190,7 @@ void YtDlp_Helper::stream(const char* video_url) {
             // Once final URL is obtained, then open at configured Media Player...
             snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
                     "%s %s \"%s\"", this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str(), final_url_result.c_str());
-            cache->add_entry(video_url, final_url_result);
+            cache->add_entry(getIdFor(video_url), final_url_result);
         } else {
             // If default method doesn't works, then try the alternative method (if configured this way)...
             if (this->enable_alternative_stream_method) {
