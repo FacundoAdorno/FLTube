@@ -27,6 +27,7 @@
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Choice.H>
+#include <FL/Fl_Box.H>
 
 class FLTubeMainWindow : public Fl_Double_Window {
   void _FLTubeMainWindow();
@@ -63,8 +64,8 @@ public:
   Fl_Button *previous_results_bttn;
   Fl_Button *next_results_bttn;
   Fl_Button *last_page_bttn;
+  Fl_Box *pagination_status_info;
 };
-#include <FL/Fl_Box.H>
 
 class VideoInfo : public Fl_Group {
 public:

@@ -12,6 +12,7 @@
  */
 
 #include "../include/fltube_utils.h"
+#include <string>
 
 /** Mapping FS_PERMISSION_NAMES to corresponding std::filesystem::perms. */
 static const std::map<SIMPLE_FS_PERMISSION, std::map<std::string, std::filesystem::perms>> perms_map = {
@@ -446,6 +447,17 @@ void PaginationManager::reset() {
     search_page_index = 0;
     count_of_results = SEARCH_PAGE_SIZE;
     limit_results_count = false;
+}
+
+std::string PaginationManager::print_pagination_info() {
+    unsigned int total_pages;
+    if (count_of_results == 0) {
+        total_pages = 1;
+    } else {
+        total_pages = (((int)count_of_results - 1) / SEARCH_PAGE_SIZE) + 1;
+    }
+    std::string status = std::to_string(this->search_page_index + 1) + "/" + std::to_string(total_pages);
+    return status;
 }
 
 bool PaginationManager::exists_next() {

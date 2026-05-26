@@ -208,6 +208,9 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     { last_page_bttn = new Fl_Button(567, 510, 18, 23, _("l>"));
       last_page_bttn->tooltip(_("Go to the last loaded page."));
     } // Fl_Button* last_page_bttn
+    { pagination_status_info = new Fl_Box(240, 512, 115, 23);
+      pagination_status_info->tooltip(_("Current page / Total of pages."));
+    } // Fl_Box* pagination_status_info
     pagination_controls->end();
   } // Fl_Group* pagination_controls
   end();
@@ -242,7 +245,7 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
     like_icon_bttn->down_box(FL_THIN_UP_FRAME);
   } // Fl_Button* like_icon_bttn
   { watch_later_bttn = new Fl_Button(322, 43, 20, 20);
-    watch_later_bttn->tooltip(_("Add this video to the \"Watch later\" video list."));
+    watch_later_bttn->tooltip(_("Add this video to the \"Watch Later\" video list."));
     watch_later_bttn->box(FL_NO_BOX);
     watch_later_bttn->down_box(FL_THIN_UP_FRAME);
   } // Fl_Button* watch_later_bttn

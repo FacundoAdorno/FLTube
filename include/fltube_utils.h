@@ -161,6 +161,9 @@ public:
         return count_of_results;
     }
 
+    /* Returns a string representing the following information [A]/[X], where A=currentPage and X=totalOfPages. */
+    std::string print_pagination_info();
+
     /* Returns true if exists a next page to lookup. */
     bool exists_next();
     /* Returns true if exists a previous page to lookup. */

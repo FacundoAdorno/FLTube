@@ -35,7 +35,7 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 }
 
 widget_class FLTubeMainWindow {
-  label FLTube open selected
+  label FLTube open
   xywh {0 0 593 540}
   class Fl_Double_Window visible
 } {
@@ -159,7 +159,7 @@ widget_class FLTubeMainWindow {
   Fl_Group search_result_selectors {
     xywh {10 126 575 380} box THIN_UP_BOX
   } {}
-  Fl_Group pagination_controls {
+  Fl_Group pagination_controls {open
     xywh {9 508 577 30}
   } {
     Fl_Button first_page_bttn {
@@ -177,6 +177,9 @@ widget_class FLTubeMainWindow {
     Fl_Button last_page_bttn {
       label {l>}
       tooltip {Go to the last loaded page.} xywh {567 510 18 23}
+    }
+    Fl_Box pagination_status_info {selected
+      tooltip {Current page / Total of pages.} xywh {240 512 115 23}
     }
   }
 }

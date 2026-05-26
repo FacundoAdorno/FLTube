@@ -531,6 +531,10 @@ bool updateVideoMetadataFromVideoList() {
 
     update_video_info();
 
+    // Update the displaying pagination info...
+    std::string page_status = page_manager->print_pagination_info();
+    mainWin->pagination_status_info->copy_label(page_status.c_str());
+
     if (next_video_position < vlist->getLength()) {
         mainWin->next_results_bttn->activate();
         mainWin->last_page_bttn->activate();
@@ -566,6 +570,7 @@ void selectCentralTab_cb(Fl_Choice* w, void* a){
     char* tabname = static_cast<char*>(mainWin->central_tabs->value()->user_data());
     if (tabname == TAB_VIDEOLIST_NAME) {
         mainWin->videolist_selector->value(mainWin->videolist_selector->find_index(UserDataManager::HISTORY_LIST_NAME.c_str()));
+        mainWin->pagination_status_info->show();
         mainWin->videolist_selector->set_changed();
         mainWin->videolist_selector->do_callback();
     }
@@ -575,6 +580,8 @@ void selectCentralTab_cb(Fl_Choice* w, void* a){
         mainWin->first_page_bttn->deactivate();
         mainWin->next_results_bttn->deactivate();
         mainWin->last_page_bttn->deactivate();
+        mainWin->pagination_status_info->label("");
+        mainWin->pagination_status_info->hide();
         ytdlp->resetSearchHistoryPos();
         page_manager->reset();
         clear_video_info();
@@ -713,6 +720,7 @@ void change_stream_resolution_cb (Fl_Widget* w, void* data) {
     }
     if (has_changed) {
         ytdlp->set_resolution(STREAM_VIDEO_RESOLUTION);
+        update_video_info();
         logger->debug(_("Stream video resolution updated by user to ") + std::to_string(new_resolution));
     }
 }
