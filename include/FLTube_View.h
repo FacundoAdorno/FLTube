@@ -59,6 +59,7 @@ public:
   Fl_Group *videolists_tab;
   Fl_Choice *videolist_selector;
   Fl_Group *search_result_selectors;
+  Fl_Box *no_videos_list_warn;
   Fl_Group *pagination_controls;
   Fl_Button *first_page_bttn;
   Fl_Button *previous_results_bttn;

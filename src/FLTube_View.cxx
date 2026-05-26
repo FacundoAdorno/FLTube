@@ -191,8 +191,12 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     } // Fl_Group* videolists_tab
     central_tabs->end();
   } // Fl_Tabs* central_tabs
-  { search_result_selectors = new Fl_Group(10, 126, 575, 380);
+  { search_result_selectors = new Fl_Group(10, 126, 578, 380);
     search_result_selectors->box(FL_THIN_UP_BOX);
+    { no_videos_list_warn = new Fl_Box(40, 280, 518, 72, _("This list currently has no videos."));
+      no_videos_list_warn->labelfont(3);
+      no_videos_list_warn->hide();
+    } // Fl_Box* no_videos_list_warn
     search_result_selectors->end();
   } // Fl_Group* search_result_selectors
   { pagination_controls = new Fl_Group(9, 508, 577, 30);

@@ -156,9 +156,14 @@ widget_class FLTubeMainWindow {
       } {}
     }
   }
-  Fl_Group search_result_selectors {
-    xywh {10 126 575 380} box THIN_UP_BOX
-  } {}
+  Fl_Group search_result_selectors {open
+    xywh {10 126 578 380} box THIN_UP_BOX
+  } {
+    Fl_Box no_videos_list_warn {
+      label {This list currently has no videos.} selected
+      xywh {40 280 518 72} labelfont 3 hide
+    }
+  }
   Fl_Group pagination_controls {open
     xywh {9 508 577 30}
   } {
@@ -178,7 +183,7 @@ widget_class FLTubeMainWindow {
       label {l>}
       tooltip {Go to the last loaded page.} xywh {567 510 18 23}
     }
-    Fl_Box pagination_status_info {selected
+    Fl_Box pagination_status_info {
       tooltip {Current page / Total of pages.} xywh {240 512 115 23}
     }
   }

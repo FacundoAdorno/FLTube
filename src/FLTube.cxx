@@ -520,6 +520,11 @@ bool updateVideoMetadataFromVideoList() {
     VideoList* vlist = userdata->getVideoList(selected_list);
     Pagination_Info current_page = page_manager->current();
     int next_video_position = (current_page.index * current_page.size);
+    // If list is empty...
+    if (vlist->getLength() == 0)    mainWin->no_videos_list_warn->show();
+    else    mainWin->no_videos_list_warn->hide();
+
+
     for (int i=0; i < PaginationManager::SEARCH_PAGE_SIZE; i++) {
         if (next_video_position < vlist->getLength()) {
             video_metadata[i] = vlist->toYTDLPVideo(vlist->getVideoAt(next_video_position));
@@ -582,6 +587,7 @@ void selectCentralTab_cb(Fl_Choice* w, void* a){
         mainWin->last_page_bttn->deactivate();
         mainWin->pagination_status_info->label("");
         mainWin->pagination_status_info->hide();
+        mainWin->no_videos_list_warn->hide();
         ytdlp->resetSearchHistoryPos();
         page_manager->reset();
         clear_video_info();
