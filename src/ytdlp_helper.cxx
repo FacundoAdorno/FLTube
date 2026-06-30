@@ -15,13 +15,9 @@
 #include <cstdio>
 #include <string>
 
-const std::string YtDlp_Helper::PRINT_METADATA_TEMPLATE = "title=\\\"%(title)s\\\">>thumbnail=\\\"%(thumbnails.0.url)s" \
-"\\\">>creators=\\\"%(uploader,playlist_channel)s\\\">>video_id=\\\"%(id)s\\\">>upload_date=\\\"%(upload_date>%Y-%m-%d)s" \
-"\\\">>duration=\\\"%(duration>%H:%M:%S)s\\\">>channel_id=\\\"%(playlist_channel_id,channel_id)s\\\">>live_status=\\\"%(live_status)s\\\">>viewers_count=\\\"%(view_count,concurrent_view_count)s\\\">>";
 
-
-/** Parse the metadata as define in @PRINT_METADATA_TEMPLATE. Returns a YTDLP_Video_Metadata struct. */
-YTDLP_Video_Metadata* YtDlp_Helper::parse_metadata(const char ytdlp_video_metadata[512]){
+/** Parse the metadata printed by the exec of a yt-dlp command. Returns a YTDLP_Video_Metadata struct. */
+YTDLP_Video_Metadata* YtDlp_Helper::parse_metadata(const char ytdlp_video_metadata[1024]){
     std::stringstream lineStream(ytdlp_video_metadata);
     YTDLP_Video_Metadata* metadata = new YTDLP_Video_Metadata();
     std::string keyvalue;
@@ -52,8 +48,33 @@ YTDLP_Video_Metadata* YtDlp_Helper::parse_metadata(const char ytdlp_video_metada
                     metadata->channel_id = value;
                 } else if (key == "live_status"){
                     metadata->live_status = value;
+                } else if (key == "is_live"){
+                    std::string lw_val = value;
+                    std::transform(lw_val.begin(), lw_val.end(), lw_val.begin(), ::tolower);    //lowercase
+                    metadata->is_live = (lw_val == "true") ? true : false;
                 } else if (key == "viewers_count"){
                     metadata->viewers_count = value;
+                } else if (key == "concurrent_viewers_count"){
+                    metadata->concurrent_viewers_count = value;
+                } else if (key == "followers"){
+                    metadata->channel_follower_count = value;
+                } else if (key == "like_count"){
+                    metadata->like_count = value;
+                }  else if (key == "timestamp"){
+                    metadata->timestamp = value;
+                }  else if (key == "timestamp_text"){
+                    metadata->timestamp_text = value;
+                }  else if (key == "media_type"){
+                    if (value == "video")   metadata->media_type = YT_VIDEO_TYPE::VIDEO;
+                    else if (value == "short")    metadata->media_type = YT_VIDEO_TYPE::SHORT;
+                    else if (value == "livestream")    metadata->media_type = YT_VIDEO_TYPE::LIVESTREAM;
+                    else metadata->media_type = YT_VIDEO_TYPE::UNKNONW;
+                }  else if (key == "category"){
+                    metadata->category = value;
+                }   else if (key == "description"){
+                    metadata->description = value;
+                }   else if (key == "tags"){
+                    if (value != "") metadata->tags = tokenize(value, ',');
                 }
             }
         }
@@ -74,12 +95,16 @@ std::vector<YTDLP_Video_Metadata*> YtDlp_Helper::retrieve_metadata(const char* y
     // Read input lines until an empty line is encountered
     std::istringstream result_sstream(result);
     std::string line;
-
-    getline(result_sstream, line);
-    while (!line.empty()) {
-        //Set the video metadata at the array...
+    if (this->metadata_profile == YT_METADATA_PROFILE::DETAILED) {
+        line = result_sstream.str();
         metadata.push_back(YtDlp_Helper::parse_metadata(line.c_str()));
+    } else {
         getline(result_sstream, line);
+        while (!line.empty()) {
+            //Set the video metadata at the array...
+            metadata.push_back(YtDlp_Helper::parse_metadata(line.c_str()));
+            getline(result_sstream, line);
+        }
     }
     return metadata;
 }
@@ -117,8 +142,8 @@ yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Paginat
             // Else, do a normal search by term.
             break;
     }
-    char ytdlp_cmd[512];
-    char cmd_format[512] = "yt-dlp \"%s\" -I %d-%d --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date";
+    char ytdlp_cmd[1024];
+    char cmd_format[1024] = "yt-dlp \"%s\" -I %d-%d --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date";
 
     // Check if exists cached results for this type of search...
     if (search_type != SEARCH_BY_TYPE::VIDEO_URL) {
@@ -141,7 +166,7 @@ yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Paginat
             if ( search_type == SEARCH_BY_TYPE::TERM) {
                 snprintf(search_component, sizeof(search_component), "ytsearch%d:%s", end, search_text);
             }
-            snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, search_component, start, end, YtDlp_Helper::PRINT_METADATA_TEMPLATE.c_str());
+            snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, search_component, start, end, get_metadata_template().c_str());
             mtd = retrieve_metadata(ytdlp_cmd);
 
             for ( YTDLP_Video_Metadata* video_m: mtd) {
@@ -159,7 +184,7 @@ yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Paginat
     } else {
         // If search only one video (SEARCH_BY_TYPE::VIDEO_URL), then get its metadata...
         snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, search_component,
-                 page_info_.lower_end(), page_info_.upper_end(), YtDlp_Helper::PRINT_METADATA_TEMPLATE.c_str());
+                 page_info_.lower_end(), page_info_.upper_end(), get_metadata_template().c_str());
         mtd = retrieve_metadata(ytdlp_cmd);
         if (!mtd.empty()) result_yt_metadata[0] = mtd[0];
     }
@@ -263,4 +288,13 @@ std::string YtDlp_Helper::getPreviousInSearchHistory() {
 
 void YtDlp_Helper::resetSearchHistoryPos() {
     current_search_history_index = 0;
+}
+
+const std::string YtDlp_Helper::get_metadata_template() {
+    switch (this->metadata_profile) {
+        case YT_METADATA_PROFILE::SIMPLE:
+            return YtDlp_Helper::PRINT_SEARCH_METADATA_TEMPLATE;
+        case YT_METADATA_PROFILE::DETAILED:
+            return YtDlp_Helper::PRINT_DETAILED_METADATA_TEMPLATE;
+    }
 }

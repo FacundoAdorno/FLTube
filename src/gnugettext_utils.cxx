@@ -45,3 +45,23 @@ void setup_gettext(const std::string& locale = "", const std::string& locale_pat
     std::cout << "Locale set to: " << (locale.empty() ? "system locale" : locale) << std::endl;
 }
 
+
+
+//////     FREE SECTION TO ADD TEXT FOR TRANSLATIONS...     ////////
+void free_translations_texts() {
+    _("Autos & Vehicles");
+    _("Comedy");
+    _("Education");
+    _("Entertainment");
+    _("Film & Animation");
+    _("Gaming");
+    _("Howto & Style");
+    _("Music");
+    _("News & Politics");
+    _("Nonprofits & Activism");
+    _("People & Blogs");
+    _("Pets & Animals");
+    _("Science & Technology");
+    _("Sports");
+    _("Travel & Events");
+}

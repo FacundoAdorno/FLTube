@@ -19,6 +19,10 @@
 #include "fltube_utils.h"
 #include "cache.h"
 
+
+/* Specify if the video is a normal video, a short video or a livestream video. */
+enum YT_VIDEO_TYPE { UNKNONW, VIDEO, SHORT, LIVESTREAM };
+
 /** Youtube video metadata. */
 struct YTDLP_Video_Metadata{
     std::string id;
@@ -31,9 +35,27 @@ struct YTDLP_Video_Metadata{
     std::string thumbnail_url;
     std::string live_status;
     std::string viewers_count;
+    // For a more detailed metadata....
+    std::string description = "NA";
+    std::string like_count = "NA";
+    std::string channel_follower_count = "NA";
+    bool is_live = false;   // A livestream that has ended is now a regular video.
+    std::string concurrent_viewers_count;  // Concurrent viewers of a livestream, use only for DETAILED METADATA...
+    std::string timestamp = "NA";      //UTC Epoch time
+    std::string timestamp_text = "NA";
+    YT_VIDEO_TYPE media_type = YT_VIDEO_TYPE::UNKNONW;     // Options are: video | short | livestream
+    std::string category = "NA";
+    std::vector<std::string> tags;
 };
 
 typedef std::array<YTDLP_Video_Metadata*, PaginationManager::SEARCH_PAGE_SIZE> yt_metadata_arr;
+
+/* This profile define the metadata printed when make a video metadata search. */
+enum YT_METADATA_PROFILE {
+    // When search videos by a search term, channel's videos, or a single video result, only a few metadata are required.
+    SIMPLE,
+    // Used when is required a detailed metadata view for a specific video.
+    DETAILED };
 
 enum YTDLP_EXTRACTOR { YOUTUBE };
 
@@ -75,6 +97,8 @@ class YtDlp_Helper {
         /*  If true, the video for stream is at live. This implies the use of custom parameters on yt-dlp for stream. */
         bool is_live_flag;
 
+        YT_METADATA_PROFILE metadata_profile;
+
         std::shared_ptr<TerminalLogger> logger;
 
         std::shared_ptr<PermanentDiskCache> cache;
@@ -97,7 +121,10 @@ class YtDlp_Helper {
 
     public:
         /** Metadata print template for youtube search videos.  **/
-        const static std::string PRINT_METADATA_TEMPLATE;
+        std::string PRINT_SEARCH_METADATA_TEMPLATE;
+        /** Metadata print template for a detailed view of a specific youtube video.  **/
+        std::string PRINT_DETAILED_METADATA_TEMPLATE;
+
         VCODEC_RESOLUTIONS video_resolution;
         YTDLP_EXTRACTOR extractor;
         const static int DEFAULT_MIN_BATCH_SIZE = 40;
@@ -106,7 +133,8 @@ class YtDlp_Helper {
 
         YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache, std::string working_dir, unsigned int batch_size):
             is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache),
-            batch_search_size(batch_size), search_cache({}), search_history({}), current_search_history_index(0)
+            batch_search_size(batch_size), search_cache({}), search_history({}), current_search_history_index(0),
+            metadata_profile(YT_METADATA_PROFILE::SIMPLE)
             {
                 if (working_dir == "")
                     TEMP_WORKING_DIR = std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/";
@@ -117,6 +145,21 @@ class YtDlp_Helper {
                     logger->warn(_("Fallbacks to default minimun batch size for yt-dlp search. Check property 'PREFETCH_BATCH_RESULTS_SIZE' at fltube.conf file. Configured value cannot be greater than ") + DEFAULT_MAX_BATCH_SIZE);
                     batch_search_size = DEFAULT_MIN_BATCH_SIZE;
                 }
+
+                std::string dateFormat = _("%Y-%m-%d");
+                std::string fullDateFormat = _("%Y-%m-%d %H:%M:%S");
+                PRINT_SEARCH_METADATA_TEMPLATE = std::string("title=\\\"%(title)s\\\">>thumbnail=\\\"%(thumbnails.0.url)s" \
+                "\\\">>creators=\\\"%(uploader,playlist_channel)s\\\">>video_id=\\\"%(id)s\\\">>upload_date=\\\"%(upload_date>")
+                + dateFormat +
+                ")s\\\">>duration=\\\"%(duration>%H:%M:%S)s\\\">>channel_id=\\\"%(playlist_channel_id,channel_id)s\\\">>live_status=\\\"%(live_status)s\\\">>viewers_count=\\\"%(view_count,concurrent_view_count)s\\\">>";
+
+                PRINT_DETAILED_METADATA_TEMPLATE =
+                std::string("title=\\\"%(title)s\\\">>thumbnail=\\\"%(thumbnails.0.url)s" \
+                "\\\">>creators=\\\"%(uploader,playlist_channel)s\\\">>video_id=\\\"%(id)s\\\">>upload_date=\\\"%(upload_date>")
+                + dateFormat + ")s\\\">>duration=\\\"%(duration>%H:%M:%S)s\\\">>channel_id=\\\"%(playlist_channel_id,channel_id)s\\\">>is_live=\\\"%(is_live)s\\\">>viewers_count=\\\"%(view_count)s\\\">>concurrent_viewers_count=\\\"%(concurrent_view_count)s\\\">>timestamp=\\\"%(timestamp)s\\\">>timestamp_text=\\\"%(timestamp>"
+                + fullDateFormat +
+                ")s\\\">>media_type=\\\"%(media_type)s\\\">>followers=\\\"%(channel_follower_count)s\\\">>like_count=\\\"%(like_count)s\\\">>description=\\\"%(description)s\\\">>tags=\\\"%(tags)l\\\">>category=\\\"%(categories.0)s\\\">>";
+
             };
 
         ~YtDlp_Helper() {
@@ -156,8 +199,17 @@ class YtDlp_Helper {
             this->video_resolution = res;
         }
 
+        /* Set the @YT_METADATA_PROFILE used in next video search. */
+        void set_metadata_profile(YT_METADATA_PROFILE profile) {
+            this->metadata_profile = profile;
+        }
 
-        static YTDLP_Video_Metadata* parse_metadata(const char ytdlp_video_metadata[512]);
+        /* Returns the metadata template used when printing video metadata... Values available are:
+            @PRINT_SEARCH_METADATA_TEMPLATE and @PRINT_DETAILED_METADATA_TEMPLATE.    */
+        const std::string get_metadata_template();
+
+
+        static YTDLP_Video_Metadata* parse_metadata(const char ytdlp_video_metadata[1024]);
 
         /* Returns a unique ID for the specified URL, taking into account the resolution configured for this instance of YtDlp_Helper. */
         std::string getIdFor(std::string video_url);

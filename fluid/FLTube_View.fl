@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0404
+version 1.0405
 i18n_type 1
 i18n_include {<libintl.h>}
 i18n_conditional {}
@@ -21,7 +21,8 @@ comment {/*
  */} {in_source in_header
 }
 
-decl {\#include "../include/custom_widgets.h"} {public global
+decl {\#include "../include/custom_widgets.h"
+\#include <FL/Fl_Scroll.H>} {public global
 }
 
 declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
@@ -35,9 +36,9 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
 }
 
 widget_class FLTubeMainWindow {
-  label FLTube open
-  xywh {0 0 593 540}
-  class Fl_Double_Window visible
+  label FLTube
+  xywh {0 0 593 540} hide
+  class Fl_Double_Window
 } {
   Fl_Button about_bttn {
     label Help
@@ -160,11 +161,11 @@ widget_class FLTubeMainWindow {
     xywh {10 126 578 380} box THIN_UP_BOX
   } {
     Fl_Box no_videos_list_warn {
-      label {This list currently has no videos.} selected
+      label {This list currently has no videos.}
       xywh {40 280 518 72} labelfont 3 hide
     }
   }
-  Fl_Group pagination_controls {open
+  Fl_Group pagination_controls {
     xywh {9 508 577 30}
   } {
     Fl_Button first_page_bttn {
@@ -189,7 +190,7 @@ widget_class FLTubeMainWindow {
   }
 }
 
-widget_class VideoInfo {open
+widget_class VideoInfo {
   xywh {0 0 577 91} hide position_relative
 } {
   Fl_Button thumbnail {
@@ -214,7 +215,10 @@ widget_class VideoInfo {open
     tooltip {Add this video to the "Watch Later" video list.} xywh {322 43 20 20} box NO_BOX down_box THIN_UP_FRAME
   }
   Fl_Button cache_bttn {
-    xywh {535 43 20 20} box NO_BOX down_box THIN_UP_FRAME hide
+    xywh {508 43 20 20} box NO_BOX down_box THIN_UP_FRAME hide
+  }
+  Fl_Button moreinfo_bttn {
+    tooltip {Show more information about this video.} xywh {535 43 20 20} box NO_BOX down_box THIN_UP_FRAME
   }
   Fl_Box title {
     xywh {105 6 435 37} labelfont 1 align 213
@@ -235,7 +239,7 @@ widget_class VideoInfo {open
 
 widget_class TinyMessageWindow {
   label Error
-  xywh {632 398 649 100} hide
+  xywh {0 0 649 100} hide
   class Fl_Double_Window modal
 } {
   Fl_Box error_label {
@@ -271,10 +275,10 @@ widget_class TinyChoiceWindow {
 
 widget_class HelpFLTubeWindow {
   label {FLTube Help}
-  xywh {560 288 480 352} hide
+  xywh {0 0 480 352} hide
   class Fl_Double_Window modal
 } {
-  Fl_Group {} {
+  Fl_Group {} {open
     xywh {15 14 448 144}
   } {
     Fl_Box hlp_fltube_img {
@@ -326,7 +330,7 @@ widget_class HelpFLTubeWindow {
   } {
     Fl_Group howtouse_tab {
       label {How to use} open
-      xywh {15 183 450 158} selection_color 47 labelfont 1
+      xywh {15 183 450 158} selection_color 47 labelfont 1 hide
     } {
       Fl_Text_Display howtouse_txt {
         xywh {19 189 442 148} box NO_BOX color 49 align 129
@@ -334,7 +338,7 @@ widget_class HelpFLTubeWindow {
     }
     Fl_Group shortcuts_tab {
       label Shortcuts open
-      xywh {15 183 450 158} selection_color 47 labelfont 1 hide
+      xywh {15 183 450 158} selection_color 47 labelfont 1
     } {
       Fl_Text_Display shortcuts_txt {
         xywh {19 189 442 148} box NO_BOX color 49 align 129
@@ -370,5 +374,75 @@ widget_class InitialLoadingWindow {
   }
   Fl_Box loading_about_data {
     xywh {10 145 220 30} labelfont 2 labelsize 12
+  }
+}
+
+widget_class MoreVideoInfo {open selected
+  xywh {0 0 547 466}
+  code0 {this->label(_("Detailed Video Metadata"));}
+  class Fl_Double_Window modal visible
+} {
+  Fl_Box vm_thumbnail {
+    xywh {108 8 330 190} box UP_FRAME
+  }
+  Fl_Group vm_scroll {open
+    xywh {0 200 547 266} align 65
+    code0 {vm_scroll->type(Fl_Scroll::VERTICAL);}
+    code1 {vm_scroll->scrollbar.align(FL_ALIGN_RIGHT | FL_ALIGN_TOP);}
+    class Fl_Scroll
+  } {}
+  Fl_Box vm_retrieving_info {
+    label {Retrieving video metadata...}
+    xywh {22 218 503 30} labelfont 3 hide
+  }
+  decl {struct video_metadata {
+    std::string key;
+    std::string value;
+};
+
+std::vector<video_metadata> metadata_list;} {private local
+  }
+  Function {delete_all_metadata()} {
+    comment {Clear all video metadata added to this window.} open return_type void
+  } {
+    code {metadata_list.clear();
+vm_scroll->clear();} {}
+  }
+  Function {add_metadata(std::string k, std::string v)} {
+    comment {Add a new metadata struct. Key is the "metadata title". Does not check if previously was added...} open return_type void
+  } {
+    code {if (k != "") {
+    video_metadata vm;
+    vm.key = k;
+    vm.value = v;
+    metadata_list.push_back(vm);
+}} {}
+  }
+  Function {print_metadata()} {
+    comment {Print metadata on screen.} open return_type void
+  } {
+    code {const int fixed_box_width = this->vm_scroll->w() - 20;
+    int dyn_box_height = 0;
+    int box_x = this->vm_scroll->x() + 10;
+    int box_y = this->vm_scroll->y() + 10;
+
+    for (video_metadata mtd: metadata_list) {
+        //std::cout << mtd.key << " + " << mtd.value << "\\n";
+        //std::cout << "X: " << box_x << " Y: " << box_y << "\\n";
+        Fl_Box* box_key = new Fl_Box(box_x, box_y, fixed_box_width, 20);
+        box_key->labelfont(FL_HELVETICA_BOLD);
+        box_key->copy_label(mtd.key.c_str());
+        box_key->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+        fl_font(this->vm_scroll->labelfont(), this->vm_scroll->labelsize());
+        int box_width = fixed_box_width;
+        fl_measure(mtd.value.c_str(), box_width, dyn_box_height, 1);
+        //std::cout << "X: " << box_x << " Y: " << box_y + box_key->h() << " Box WIDTH: " << fixed_box_width << " HEIGHT: " << dyn_box_height <<"\\n";
+        Fl_Box* box_value = new Fl_Box(box_x, box_y + box_key->h(), fixed_box_width, dyn_box_height);
+        box_value->copy_label(mtd.value.c_str());
+        box_value->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+        box_y = box_y + 20 + dyn_box_height + 10;
+        this->vm_scroll->add(box_key);
+        this->vm_scroll->add(box_value);
+    }} {}
   }
 }

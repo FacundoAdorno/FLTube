@@ -33,6 +33,8 @@ TinyMessageWindow* message_window = (TinyMessageWindow *)0;
 
 InitialLoadingWindow* initial_win = (InitialLoadingWindow*)0;
 
+MoreVideoInfo* detailed_metadata_win = (MoreVideoInfo*)0;
+
 // Default resolution for video streaming
 VCODEC_RESOLUTIONS STREAM_VIDEO_RESOLUTION = R360p;
 
@@ -100,6 +102,7 @@ Fl_PNG_Image* like_icon_image = nullptr;
 Fl_PNG_Image* like_red_icon_image = nullptr;
 Fl_PNG_Image* playicon_image = nullptr;
 Fl_PNG_Image* cached_icon_image = nullptr;
+Fl_PNG_Image* moreinfo_icon_image = nullptr;
 Fl_PNG_Image* remove_video_icon_image = nullptr;
 Fl_PNG_Image* watchlater_icon_image = nullptr;
 Fl_PNG_Image* watchlater_filled_icon_image = nullptr;
@@ -115,6 +118,7 @@ std::atomic<bool> ytdlp_action_in_progress(false);
 
 std::atomic<bool> SHOWING_LOADING_SCREEN_F(false);
 
+std::atomic<bool> SHOWING_LOADING_DETAILED_METADATA_F(false);
 /**
  * Callback for main window close action. By default, exit app with success status code (0).
  */
@@ -731,6 +735,97 @@ void change_stream_resolution_cb (Fl_Widget* w, void* data) {
     }
 }
 
+void show_video_metadata_cb(Fl_Widget* w, void* data) {
+    if (detailed_metadata_win == nullptr) {
+        detailed_metadata_win = new MoreVideoInfo();
+    }
+    VideoInfo *vi = static_cast<VideoInfo *>(w->parent());
+    std::string v_url = *static_cast<std::string*>(vi->thumbnail->user_data());
+    std::string v_id = v_url;
+    replace_all(v_id, std::string(YOUTUBE_URL_PREFIX), "");
+    std::string thumbn_name = "th_" + v_id + ".jpg";
+    int targetWidth = detailed_metadata_win->vm_thumbnail->w();
+    Fl_Image* resized_thumbnail = create_resized_image_from_jpg(FLTUBE_TEMPORAL_DIR + thumbn_name, targetWidth);
+    delete detailed_metadata_win->vm_thumbnail->image();
+    if (resized_thumbnail != nullptr) {
+        detailed_metadata_win->vm_thumbnail->image(resized_thumbnail);
+    }
+    detailed_metadata_win->vm_thumbnail->redraw();
+    detailed_metadata_win->delete_all_metadata();
+    detailed_metadata_win->vm_retrieving_info->show();
+    detailed_metadata_win->show();
+
+    ytdlp->set_search_type(SEARCH_BY_TYPE::VIDEO_URL);
+    ytdlp->set_metadata_profile(YT_METADATA_PROFILE::DETAILED);
+
+    SHOWING_LOADING_DETAILED_METADATA_F = true;
+    auto stream_lambda = [&]() {
+        ytdlp_action_in_progress = true;
+        video_metadata = ytdlp->search(v_url.c_str(), Pagination_Info(1,0));
+        ytdlp_action_in_progress = false;
+        SHOWING_LOADING_DETAILED_METADATA_F = false;
+
+    };
+    std::thread worker(stream_lambda);
+    worker.detach();
+
+    while (SHOWING_LOADING_DETAILED_METADATA_F) {
+        Fl::check();
+    }
+
+    detailed_metadata_win->vm_retrieving_info->hide();
+    YTDLP_Video_Metadata* vm = video_metadata[0];
+    if (vm == nullptr) {
+        logger->warn(_("No metadata available for video with ID: ") + v_id);
+        return;
+    }
+
+    char tiny_buffer[128];
+    detailed_metadata_win->add_metadata(_("Title"), vm->title);
+    int follower_counts = isNumber(vm->channel_follower_count) ? std::stoi(vm->channel_follower_count) : 0;
+    detailed_metadata_win->add_metadata(_("Creator"), vm->creators + " (" + YtDlp_Helper::get_metric_abbreviation(follower_counts)->c_str() + " " + _("followers") + ")");
+    detailed_metadata_win->add_metadata(_("Upload Date"), vm->timestamp_text);  //TODO create a localized datetime from the original timestamp
+    std::string media_type_str;
+    switch (vm->media_type) {
+        case (YT_VIDEO_TYPE::VIDEO):
+            media_type_str = _("Long Format Video");
+            break;
+        case (YT_VIDEO_TYPE::SHORT):
+            media_type_str = _("Short Format Video");
+            break;
+        case (YT_VIDEO_TYPE::LIVESTREAM):
+            media_type_str = _("Livestream");
+            if ( !vm->is_live )  media_type_str = media_type_str + " (" + _("This was previously live") + ").";
+            break;
+        default:
+            media_type_str = _("Undefined Video Format");
+            break;
+    }
+    detailed_metadata_win->add_metadata(_("Video Type"), media_type_str);
+    detailed_metadata_win->add_metadata(_("Category"), _(vm->category.c_str()));
+    if (vm->media_type != YT_VIDEO_TYPE::LIVESTREAM ||
+        (vm->media_type == YT_VIDEO_TYPE::LIVESTREAM && !vm->is_live)) detailed_metadata_win->add_metadata(_("Duration"), vm->duration);
+    if (vm->media_type == YT_VIDEO_TYPE::LIVESTREAM && vm->is_live) {
+        snprintf(tiny_buffer, sizeof(tiny_buffer), "%s %s", YtDlp_Helper::get_metric_abbreviation(std::stoi(vm->concurrent_viewers_count))->c_str(), _("viewers"));
+    } else {
+        snprintf(tiny_buffer, sizeof(tiny_buffer), "%s %s", YtDlp_Helper::get_metric_abbreviation(std::stoi(vm->viewers_count))->c_str(), _("views"));
+    }
+    detailed_metadata_win->add_metadata(_("Views Count"), tiny_buffer);
+    int like_count = isNumber(vm->like_count) ? std::stoi(vm->like_count) : 0;
+    detailed_metadata_win->add_metadata(_("Like Count"), YtDlp_Helper::get_metric_abbreviation(like_count)->c_str());
+
+    detailed_metadata_win->add_metadata(_("Original URL"), vm->url);
+    if (! vm->description.empty()) detailed_metadata_win->add_metadata(_("Description"), vm->description);
+    if (! vm->tags.empty()) {
+        std::string tags = "";
+        for (std::string tag: vm->tags) {
+            tags = tags + tag + " | ";
+        }
+        detailed_metadata_win->add_metadata(_("Tags"), tags);
+    }
+    detailed_metadata_win->print_metadata();
+}
+
 /**
  * Hook: Actions to execute before main window is drawn...
  */
@@ -796,6 +891,7 @@ void pre_init() {
     like_red_icon_image = load_resource_image("heart_18p_red.png");
     playicon_image = load_resource_image("playicon.png");
     cached_icon_image = load_resource_image("cache_icon_18p.png");
+    moreinfo_icon_image = load_resource_image("more_info.png");
     remove_video_icon_image = load_resource_image("remove_video_icon_14p.png");
     watchlater_icon_image = load_resource_image("watch_later.png");
     watchlater_filled_icon_image = load_resource_image("watch_later_filled.png");
@@ -976,6 +1072,8 @@ VideoInfo* create_video_group(int posx, int posy) {
     video_info->cache_bttn->callback((Fl_Callback*)removeFromCache_cb);
     if (remove_video_icon_image != nullptr) video_info->remove_bttn->image(remove_video_icon_image);
     video_info->remove_bttn->callback((Fl_Callback*)removeFromVideoList_cb);
+    if (moreinfo_icon_image != nullptr) video_info->moreinfo_bttn->image(moreinfo_icon_image);
+    video_info->moreinfo_bttn->callback((Fl_Callback*)show_video_metadata_cb);
     return video_info;
 }
 
@@ -1021,6 +1119,7 @@ void doSearch(const char* input_text) {
         }
         ytdlp->set_search_type( (SEARCH_BY_CHANNEL_F) ? SEARCH_BY_TYPE::CHANNEL_URL : SEARCH_BY_TYPE::TERM);
     }
+    ytdlp->set_metadata_profile(YT_METADATA_PROFILE::SIMPLE);
     video_metadata = ytdlp->search(input_text, page_manager->current());
     bool is_empty_metadata = std::all_of(video_metadata.begin(), video_metadata.end(),
                                          [](YTDLP_Video_Metadata* ptr) { return ptr == nullptr; });
