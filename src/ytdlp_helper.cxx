@@ -239,6 +239,7 @@ void YtDlp_Helper::stream(const char* video_url) {
                     "yt-dlp -f \"%s\" -o - --merge-output-format mkv \"%s\" | %s %s -", stream_format, video_url, this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str());
             } else {
                 logger->error(_("Cannot obtain URL for specified video, and alternative stream method is disabled."));
+                return;
             }
         }
     }
