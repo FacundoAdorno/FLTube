@@ -328,7 +328,7 @@ std::vector<std::string> tokenize(std::string s, const char delimiter) {
     while (!ss.eof()) {
         getline(ss, word, delimiter);
         trim(word);
-        tokens.push_back(word);
+        if ( !word.empty() ) tokens.push_back(word);
     }
     return tokens;
 }

@@ -209,6 +209,20 @@ void YtDlp_Helper::stream(const char* video_url) {
             snprintf(get_final_url_cmd, sizeof(get_final_url_cmd), "yt-dlp -S \"%s\" -g \"%s\" 2> %s/ytdlp_errors.log", stream_format, video_url, this->TEMP_WORKING_DIR.c_str());
             this->logger->debug("EXEC COMMAND = " + std::string(get_final_url_cmd) + "\n");
             final_url_result = exec(get_final_url_cmd);
+            std::vector<std::string> urls = tokenize(final_url_result, '\n');
+            if (urls.size() > 1) {
+                // Verify if yt-dlp returns a Progressive format (video+audio in one URL) or DASH (video and audio in differents URLs).
+                // Progressive format is desired for Old PC's, but if no available for required format, then try with alternative method...
+                if (urls.size() == 2) {
+                    logger->debug(_("No progressive format is available for the requested resolution. Instead, yt-dlp returned a DASH format. Resolution: ") + std::to_string(this->video_resolution));
+                    // Modify final_url_result to be emtpy, so forcing to fallback to alternative stream method.
+                    final_url_result = "";
+                } else {
+                    logger->error(_("yt-dlp returns more than 2 URLS. Aborting stream operation for unknown response format."));
+                    logger->debug(_("Unkonwn URL Format response: ") + final_url_result);
+                    return;
+                }
+            }
             replace_all(final_url_result, "\n", "");
         }
         if (final_url_result != "") {
