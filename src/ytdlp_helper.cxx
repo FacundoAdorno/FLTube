@@ -193,7 +193,7 @@ yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Paginat
 
 void YtDlp_Helper::stream(const char* video_url) {
     char get_final_url_cmd[2048];
-    char stream_videoplayer_cmd[2048];
+    char stream_videoplayer_cmd[3072];
     char stream_format[100];
     std::string final_url_result;
     snprintf(stream_format, sizeof(stream_format), "res:%d,+codec:avc1:m4a", this->video_resolution);
@@ -204,31 +204,50 @@ void YtDlp_Helper::stream(const char* video_url) {
         // If video is not live, 1rst try to obtain final video URL using default method...
         // 1rst: lookup final video URL if exists at cache...
         final_url_result = cache->get_entry_value(getIdFor(video_url));
+        std::vector<std::string> urls;
         if (final_url_result == CacheEntry::EMPTY_VALUE) {
             // 2nd: if final video url is not cached, then obtain it using yt-dlp.
             snprintf(get_final_url_cmd, sizeof(get_final_url_cmd), "yt-dlp -S \"%s\" -g \"%s\" 2> %s/ytdlp_errors.log", stream_format, video_url, this->TEMP_WORKING_DIR.c_str());
             this->logger->debug("EXEC COMMAND = " + std::string(get_final_url_cmd) + "\n");
             final_url_result = exec(get_final_url_cmd);
-            std::vector<std::string> urls = tokenize(final_url_result, '\n');
-            if (urls.size() > 1) {
-                // Verify if yt-dlp returns a Progressive format (video+audio in one URL) or DASH (video and audio in differents URLs).
-                // Progressive format is desired for Old PC's, but if no available for required format, then try with alternative method...
-                if (urls.size() == 2) {
-                    logger->debug(_("No progressive format is available for the requested resolution. Instead, yt-dlp returned a DASH format. Resolution: ") + std::to_string(this->video_resolution));
-                    // Modify final_url_result to be emtpy, so forcing to fallback to alternative stream method.
-                    final_url_result = "";
-                } else {
-                    logger->error(_("yt-dlp returns more than 2 URLS. Aborting stream operation for unknown response format."));
-                    logger->debug(_("Unkonwn URL Format response: ") + final_url_result);
-                    return;
-                }
+            urls = tokenize(final_url_result, '\n');
+        } else {
+            urls = tokenize(final_url_result, DASH_URL_CACHE_SEPARATOR);
+        }
+
+        // Check if yt-dlp result is at DASH format...
+        bool is_dash_format = false;
+        if (urls.size() > 1) {
+            // Verify if yt-dlp returns a Progressive format (video+audio in one URL) or DASH (video and audio in differents URLs).
+            // Progressive format is desired for older PC's, but if no available for required format, then multiplex DASH urls using FFmpeg...
+            if (urls.size() == 2) {
+                logger->debug(_("No progressive format is available for the requested resolution. Instead, yt-dlp returned a DASH format. Resolution: ") + std::to_string(this->video_resolution));
+                is_dash_format = true;
+            } else {
+                logger->error(_("yt-dlp returns more than 2 URLS. Aborting stream operation for unknown response format."));
+                logger->debug(_("Unkonwn URL Format response: ") + final_url_result);
+                return;
             }
+        }
+
+        if (is_dash_format) {
+            final_url_result = urls.at(0) + DASH_URL_CACHE_SEPARATOR + urls.at(1);
+        } else {
+            // Sanitize URL if not in DASH format...
             replace_all(final_url_result, "\n", "");
         }
+
         if (final_url_result != "") {
             // Once final URL is obtained, then open at configured Media Player...
-            snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                    "%s %s \"%s\"", this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str(), final_url_result.c_str());
+            if (is_dash_format) {
+                snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
+                    "ffmpeg -i \"%s\" -i \"%s\" -c copy -f nut - | %s %s -", urls.at(0).c_str(), urls.at(1).c_str(),
+                            this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str());
+            } else {
+                snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
+                        "%s %s \"%s\"", this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str(), final_url_result.c_str());
+            }
+
             cache->add_entry(getIdFor(video_url), final_url_result);
         } else {
             // If default method doesn't works, then try the alternative method (if configured this way)...

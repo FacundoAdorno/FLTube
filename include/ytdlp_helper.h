@@ -72,6 +72,9 @@ static std::array<const char*,2> VCODEC_IMPL_NAMES = {"avc1", "av01"};
 // The default resolution used to streaming videos.
 const int DEFAULT_STREAM_VIDEO_RESOLUTION = VCODEC_RESOLUTIONS::R360p;
 
+// Separator for cache value when multiple URLs are saved for DASH format (for example, audio_URL<video_URL).
+static const char DASH_URL_CACHE_SEPARATOR = '<';
+
 /* Use this class for search and streams videos using "yt-dlp" commandline tool.
  * Search a video/videos using a single URL, a Channel URL or a search term.
  * Stream a video from its URL using the configured multimedia player at @DEFAULT_STREAM_PLAYER.
