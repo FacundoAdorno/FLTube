@@ -28,8 +28,9 @@ static const std::map<SIMPLE_FS_PERMISSION, std::map<std::string, std::filesyste
  * Execute a system command and returns its output.
  */
 std::string exec(const char* cmd) {
-    std::array<char, 128> buffer;
+    std::array<char, 4 * 1024> buffer;  // Buffer for reading up to 4096 characters per fgets() call.
     std::string result;
+    result.reserve(8 * 1024);           // Pre-allocates 8KB to reduce reallocations as result grows.
     std::unique_ptr<FILE, int(*)(FILE*)> pipe(popen(cmd, "r"), pclose);
 
     if (!pipe) {
@@ -40,7 +41,7 @@ std::string exec(const char* cmd) {
 
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
         //printf("%s", buffer.data());
-        result += buffer.data();
+        result.append(buffer.data());
     }
 
     return result;
