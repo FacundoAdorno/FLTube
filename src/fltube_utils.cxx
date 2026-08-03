@@ -26,12 +26,20 @@ static const std::map<SIMPLE_FS_PERMISSION, std::map<std::string, std::filesyste
 
 /**
  * Execute a system command and returns its output.
+ * Also, the variable @exitStatus keep the exit status code for the command execution. If command's pipe
+ * cannot be closed, then @exitStatus holds a -1 value.
  */
-std::string exec(const char* cmd) {
+std::string exec(const char* cmd, int& exitStatus) {
     std::array<char, 4 * 1024> buffer;  // Buffer for reading up to 4096 characters per fgets() call.
     std::string result;
     result.reserve(8 * 1024);           // Pre-allocates 8KB to reduce reallocations as result grows.
-    std::unique_ptr<FILE, int(*)(FILE*)> pipe(popen(cmd, "r"), pclose);
+
+    int pclose_status;
+    auto deleter = [&pclose_status](FILE* p) {
+        if (p) { pclose_status = pclose(p); }
+    };
+
+    std::unique_ptr<FILE, decltype(deleter)> pipe(popen(cmd, "r"), deleter);
 
     if (!pipe) {
         printf(_("There was an error executing the following command: %s \n"), cmd);
@@ -40,11 +48,28 @@ std::string exec(const char* cmd) {
     }
 
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        //printf("%s", buffer.data());
         result.append(buffer.data());
     }
 
+    // Close pipe and get exit status of executed command.
+    pipe.reset();
+    exitStatus = -1;
+    if (pclose_status != -1) {
+        if (WIFEXITED(pclose_status)) {
+            exitStatus = WEXITSTATUS(pclose_status);
+        }
+    }
+
     return result;
+}
+
+/**
+ * Execute a system command and returns its output. Use this overload function
+ * if you don't care to ignore the command's exit status.
+ */
+std::string exec(const char* cmd) {
+    int exitStatus = -10;
+    return exec(cmd, exitStatus);
 }
 
 /** Attempts to make a SIMPLE check if a text is an URL. */
@@ -147,20 +172,6 @@ bool checkDirectoryPermissions(const char* target_directory, std::array<SIMPLE_F
 bool canWriteOnDir(const char* directory){
     return checkDirectoryPermissions(directory, {CAN_WRITE});
 }
-
-/**
- * Returns true if yt-dlp exists on system path...
- */
-bool isInstalledYTDLP() {
-    int yt_dlp_version_status = system ("yt-dlp --version");
-    if ( yt_dlp_version_status != 0 ) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-
 
 /**
  *  Create a CURL handle, for an specific URL (not null) and an optional output_file;

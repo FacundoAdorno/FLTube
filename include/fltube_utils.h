@@ -190,6 +190,8 @@ public:
     std::string getExtraParams() {   return this->extra_live_parameters; }
 };
 
+std::string exec(const char* cmd, int& exitStatus);
+
 std::string exec(const char* cmd);
 
 bool isUrl(const char* user_input);
@@ -203,8 +205,6 @@ std::vector<int> getUserGroupsIds(int uid);
 bool checkDirectoryPermissions(const char* directory, std::array<SIMPLE_FS_PERMISSION,3> target_perms);
 
 bool canWriteOnDir(const char* directory);
-
-bool isInstalledYTDLP();
 
 static CURL* get_curl_handle(const char* forURL, FILE* output_file = nullptr);
 

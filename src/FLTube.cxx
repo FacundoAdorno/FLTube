@@ -66,9 +66,6 @@ std::string RESOURCES_PATH = "/usr/local/share/fltube/resources";
 //If value is true, enable the debug mode. Defaults to false.
 bool DEBUG_ENABLED = false;
 
-//If value is 0, enable the initial verifications. Defaults to false (or 1).
-bool AVOID_INITIAL_CHECKS = 1;
-
 //If true, then video Navigation History is enabled.
 bool NAVIGATION_HISTORY_ENABLED = true;
 
@@ -736,6 +733,14 @@ void change_stream_resolution_cb (Fl_Widget* w, void* data) {
 }
 
 void show_video_metadata_cb(Fl_Widget* w, void* data) {
+    // Check if there is Internet connectivity before do a search...
+    if (! verify_network_connection()) {
+        logger->warn(_("Your device is offline. Check your internet connection."));
+        showMessageWindow( _("There seems that you don't have access to the Internet. "
+        "Please, verify you network connection before proceed..."));
+        return;
+    }
+
     if (detailed_metadata_win == nullptr) {
         detailed_metadata_win = new MoreVideoInfo();
     }
@@ -847,15 +852,6 @@ void pre_init() {
     cache->set_save_directory_path(
         config->getProperty("CACHE_PATH", default_cache_path.c_str()), "fltube_url_cache.txt");
     cache->init();
-    AVOID_INITIAL_CHECKS = config->getBoolProperty("AVOID_INITIAL_VERIFICATIONS", false);
-
-    initial_win->loading_about_data->label(_("Checking 'yt-dlp' installation..."));
-    logger->info(_("Cheking if yt-dlp is at your system PATH..."));
-    if ( !AVOID_INITIAL_CHECKS && !isInstalledYTDLP() ) {
-        showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run in a terminal the 'install_yt-dlp' script."));
-        logger->error(_("yt-dlp is not installed. Closing app...\n"));
-        exitApp(FLT_GENERAL_FAILED);
-    }
     //Init Localization. Use locale path specified at config, or custom config default_locale_path().
     setup_gettext("", config->getProperty("LOCALE_PATH", default_locale_path().c_str()));
 
@@ -884,6 +880,18 @@ void pre_init() {
             logger->debug(_("Default streaming resolution (360p) changed at configuration to this new resolution: ") + std::to_string(STREAM_VIDEO_RESOLUTION));
     }
 
+    initial_win->loading_about_data->label(_("Checking 'yt-dlp' installation..."));
+    logger->info(_("Cheking if yt-dlp is at your system PATH..."));
+    bool enable_alt_stream = config->getBoolProperty("ENABLE_ALTERNATIVE_STREAM_METHOD", true);
+    int batch_size = config->getIntProperty("PREFETCH_BATCH_RESULTS_SIZE", YtDlp_Helper::DEFAULT_MIN_BATCH_SIZE);
+    try {
+        ytdlp = std::make_shared<YtDlp_Helper>(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR, batch_size);
+        logger->debug("yt-dlp version detected at your system: " + ytdlp->installed_version);
+    } catch (const YtDlpInitException& e) {
+        logger->error(e.what());
+        return;
+    }
+
     initial_win->loading_about_data->label(_("Loading resources files..."));
     live_image = load_resource_image("livebutton_18p.png");
     already_viewed_image = load_resource_image("clock_18p.png");
@@ -901,14 +909,6 @@ void pre_init() {
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
     std::filesystem::current_path(FLTUBE_TEMPORAL_DIR);
-
-    bool enable_alt_stream = config->getBoolProperty("ENABLE_ALTERNATIVE_STREAM_METHOD", true);
-    int batch_size = config->getIntProperty("PREFETCH_BATCH_RESULTS_SIZE", YtDlp_Helper::DEFAULT_MIN_BATCH_SIZE);
-    ytdlp = std::make_shared<YtDlp_Helper>(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR, batch_size);
-
-    if (initial_win) {
-        SHOWING_LOADING_SCREEN_F = false;
-    }
 
     // Add a custom FLTK event dispatcher
     Fl::event_dispatch([](int event, Fl_Window* w) -> int{
@@ -1352,7 +1352,13 @@ int main(int argc, char **argv) {
     parseOptions(argc, argv);
     logger = std::make_shared<TerminalLogger>(DEBUG_ENABLED);
     showInitialWindow();
-    std::thread worker(pre_init);
+    auto preinit_f = [&]() {
+        pre_init();
+        if (initial_win) {
+            SHOWING_LOADING_SCREEN_F = false;
+        }
+    };
+    std::thread worker(preinit_f);
     worker.detach();
     while (initial_win->shown()) {
         Fl::check();
@@ -1362,6 +1368,11 @@ int main(int argc, char **argv) {
     }
     initial_win->hide();
     delete initial_win;
+
+    if (ytdlp == nullptr) {
+        showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run in a terminal the 'install_yt-dlp' script."));
+        exitApp(FLT_GENERAL_FAILED);
+    }
 
     char message[64];
     snprintf(message, sizeof(message), _("Starting FLTube v.%s\n"), VERSION);

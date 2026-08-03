@@ -16,6 +16,7 @@
 
 #include <string>
 #include <array>
+#include <exception>
 #include "fltube_utils.h"
 #include "cache.h"
 
@@ -46,6 +47,23 @@ struct YTDLP_Video_Metadata{
     YT_VIDEO_TYPE media_type = YT_VIDEO_TYPE::UNKNONW;     // Options are: video | short | livestream
     std::string category = "NA";
     std::vector<std::string> tags;
+};
+
+/**
+ * Use this Exception when the process of initializing the YT-DLP object cannot be completed.
+ * In example, when yt-dlp is not installed at your system.
+ */
+class YtDlpInitException : public std::exception {
+private:
+    std::string message;
+public:
+
+    YtDlpInitException(const char* msg) :
+    message(msg) {}
+
+    const char* what() const noexcept {
+        return message.c_str();
+    }
 };
 
 typedef std::array<YTDLP_Video_Metadata*, PaginationManager::SEARCH_PAGE_SIZE> yt_metadata_arr;
@@ -123,6 +141,8 @@ class YtDlp_Helper {
         std::vector<YTDLP_Video_Metadata*> retrieve_metadata(const char* search_text);
 
     public:
+        /** Current version of yt-dlp installed at the running system. If its value is -1, no version was detected... **/
+        std::string installed_version;
         /** Metadata print template for youtube search videos.  **/
         std::string PRINT_SEARCH_METADATA_TEMPLATE;
         /** Metadata print template for a detailed view of a specific youtube video.  **/
@@ -139,6 +159,15 @@ class YtDlp_Helper {
             batch_search_size(batch_size), search_cache({}), search_history({}), current_search_history_index(0),
             metadata_profile(YT_METADATA_PROFILE::SIMPLE)
             {
+                int exitStatus = 0;
+                this->installed_version = exec("yt-dlp --version", exitStatus);
+                if ( exitStatus == -1 ) {
+                    throw YtDlpInitException(_("Cannot execute yt-dlp command for some reason. Aborting..."));
+                } else if (exitStatus > 0) {
+                    throw YtDlpInitException(_("Check your yt-dlp installation. The 'yt-dlp' command is not found. Aborting..."));
+                }
+
+
                 if (working_dir == "")
                     TEMP_WORKING_DIR = std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/";
                 else
