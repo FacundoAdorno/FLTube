@@ -884,8 +884,9 @@ void pre_init() {
     logger->info(_("Cheking if yt-dlp is at your system PATH..."));
     bool enable_alt_stream = config->getBoolProperty("ENABLE_ALTERNATIVE_STREAM_METHOD", true);
     int batch_size = config->getIntProperty("PREFETCH_BATCH_RESULTS_SIZE", YtDlp_Helper::DEFAULT_MIN_BATCH_SIZE);
+    std::string ytdlp_path = config->getProperty("YTDLP_PATH", YtDlp_Helper::DEFAULT_YTDLP_PATH.c_str());
     try {
-        ytdlp = std::make_shared<YtDlp_Helper>(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR, batch_size);
+        ytdlp = std::make_shared<YtDlp_Helper>(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR, batch_size, ytdlp_path);
         logger->debug("yt-dlp version detected at your system: " + ytdlp->installed_version);
     } catch (const YtDlpInitException& e) {
         logger->error(e.what());

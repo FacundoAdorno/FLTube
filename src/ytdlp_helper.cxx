@@ -15,6 +15,7 @@
 #include <cstdio>
 #include <string>
 
+const std::string YtDlp_Helper::DEFAULT_YTDLP_PATH = "yt-dlp";
 
 /** Parse the metadata printed by the exec of a yt-dlp command. Returns a YTDLP_Video_Metadata struct. */
 YTDLP_Video_Metadata* YtDlp_Helper::parse_metadata(const char ytdlp_video_metadata[1024]){
@@ -143,7 +144,7 @@ yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Paginat
             break;
     }
     char ytdlp_cmd[1024];
-    char cmd_format[1024] = "yt-dlp \"%s\" -I %d-%d --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date";
+    char cmd_format[1024] = "%s \"%s\" -I %d-%d --flat-playlist --print \"%s\" --extractor-args youtubetab:approximate_date";
 
     // Check if exists cached results for this type of search...
     if (search_type != SEARCH_BY_TYPE::VIDEO_URL) {
@@ -166,7 +167,7 @@ yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Paginat
             if ( search_type == SEARCH_BY_TYPE::TERM) {
                 snprintf(search_component, sizeof(search_component), "ytsearch%d:%s", end, search_text);
             }
-            snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, search_component, start, end, get_metadata_template().c_str());
+            snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, YTDLP_BIN_PATH.c_str(), search_component, start, end, get_metadata_template().c_str());
             mtd = retrieve_metadata(ytdlp_cmd);
 
             for ( YTDLP_Video_Metadata* video_m: mtd) {
@@ -183,7 +184,7 @@ yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Paginat
         }
     } else {
         // If search only one video (SEARCH_BY_TYPE::VIDEO_URL), then get its metadata...
-        snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, search_component,
+        snprintf(ytdlp_cmd, sizeof(ytdlp_cmd), cmd_format, YTDLP_BIN_PATH.c_str(), search_component,
                  page_info_.lower_end(), page_info_.upper_end(), get_metadata_template().c_str());
         mtd = retrieve_metadata(ytdlp_cmd);
         if (!mtd.empty()) result_yt_metadata[0] = mtd[0];
@@ -199,7 +200,7 @@ void YtDlp_Helper::stream(const char* video_url) {
     snprintf(stream_format, sizeof(stream_format), "res:%d,+codec:avc1:m4a", this->video_resolution);
     if (this->is_live_flag) {
         snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                 "yt-dlp -S \"%s\" -o - \"%s\" | %s %s %s -", stream_format, video_url, this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str(), this->media_player->getExtraParams().c_str());
+                 "%s -S \"%s\" -o - \"%s\" | %s %s %s -", YTDLP_BIN_PATH.c_str(), stream_format, video_url, this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str(), this->media_player->getExtraParams().c_str());
     } else {
         // If video is not live, 1rst try to obtain final video URL using default method...
         // 1rst: lookup final video URL if exists at cache...
@@ -207,7 +208,7 @@ void YtDlp_Helper::stream(const char* video_url) {
         std::vector<std::string> urls;
         if (final_url_result == CacheEntry::EMPTY_VALUE) {
             // 2nd: if final video url is not cached, then obtain it using yt-dlp.
-            snprintf(get_final_url_cmd, sizeof(get_final_url_cmd), "yt-dlp -S \"%s\" -g \"%s\" 2> %s/ytdlp_errors.log", stream_format, video_url, this->TEMP_WORKING_DIR.c_str());
+            snprintf(get_final_url_cmd, sizeof(get_final_url_cmd), "%s -S \"%s\" -g \"%s\" 2> %s/ytdlp_errors.log", YTDLP_BIN_PATH.c_str(), stream_format, video_url, this->TEMP_WORKING_DIR.c_str());
             this->logger->debug("EXEC COMMAND = " + std::string(get_final_url_cmd) + "\n");
             final_url_result = exec(get_final_url_cmd);
             urls = tokenize(final_url_result, '\n');
@@ -255,7 +256,7 @@ void YtDlp_Helper::stream(const char* video_url) {
                 logger->warn(_("The default stream command doesn't work. Fallback to the alternative method to get final video URL."));
                 snprintf(stream_format, sizeof(stream_format), "bv*[height<=%d][vcodec^=avc]+ba[acodec^=mp4a]", this->video_resolution);
                 snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
-                    "yt-dlp -f \"%s\" -o - --merge-output-format mkv \"%s\" | %s %s -", stream_format, video_url, this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str());
+                    "%s -f \"%s\" -o - --merge-output-format mkv \"%s\" | %s %s -", YTDLP_BIN_PATH.c_str(), stream_format, video_url, this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str());
             } else {
                 logger->error(_("Cannot obtain URL for specified video, and alternative stream method is disabled."));
                 return;
@@ -277,7 +278,7 @@ void YtDlp_Helper::download_video(const char* video_url, const char* download_pa
     snprintf(s_dwl_data, sizeof(s_dwl_data), download_data_format, v_resolution, vcodec);
     snprintf(s_dwl_dir, sizeof(s_dwl_dir), download_dir_format, download_path, DOWNLOAD_VIDEO_PREFERRED_EXT.c_str());
     snprintf(download_cmd, sizeof(download_cmd),
-             "yt-dlp -f \"%s\" \"%s\" -o \"%s\"", s_dwl_data, video_url, s_dwl_dir);
+             "%s -f \"%s\" \"%s\" -o \"%s\"", YTDLP_BIN_PATH.c_str(), s_dwl_data, video_url, s_dwl_dir);
     printf("%s\n", download_cmd);
     system(download_cmd);
 }

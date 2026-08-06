@@ -17,6 +17,7 @@
 #include <string>
 #include <array>
 #include <exception>
+#include <stdio.h>
 #include "fltube_utils.h"
 #include "cache.h"
 
@@ -126,6 +127,8 @@ class YtDlp_Helper {
 
         unsigned int batch_search_size;
 
+        std::string YTDLP_BIN_PATH;
+
         // TODO: in the future, this must be a template T @GeneralCache, when implemented...
         /* This is a simple results cache, with the following semantics:
          *      map <"search term / channel ID <map <"video_id", parsed metadata>>>"  */
@@ -152,21 +155,29 @@ class YtDlp_Helper {
         YTDLP_EXTRACTOR extractor;
         const static int DEFAULT_MIN_BATCH_SIZE = 40;
         const static int DEFAULT_MAX_BATCH_SIZE = 200;
+        const static std::string DEFAULT_YTDLP_PATH;
 
 
-        YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache, std::string working_dir, unsigned int batch_size):
+        YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache, std::string working_dir, unsigned int batch_size, std::string ytdlp_path):
             is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache),
             batch_search_size(batch_size), search_cache({}), search_history({}), current_search_history_index(0),
             metadata_profile(YT_METADATA_PROFILE::SIMPLE)
             {
+                if (ytdlp_path == "") {
+                    YTDLP_BIN_PATH = DEFAULT_YTDLP_PATH;
+                } else {
+                    YTDLP_BIN_PATH = ytdlp_path;
+                }
+
                 int exitStatus = 0;
-                this->installed_version = exec("yt-dlp --version", exitStatus);
+                char cmd[256];
+                snprintf(cmd, sizeof(cmd), "%s --version", YTDLP_BIN_PATH.c_str());
+                this->installed_version = exec(cmd, exitStatus);
                 if ( exitStatus == -1 ) {
                     throw YtDlpInitException(_("Cannot execute yt-dlp command for some reason. Aborting..."));
                 } else if (exitStatus > 0) {
                     throw YtDlpInitException(_("Check your yt-dlp installation. The 'yt-dlp' command is not found. Aborting..."));
                 }
-
 
                 if (working_dir == "")
                     TEMP_WORKING_DIR = std::filesystem::temp_directory_path().generic_string() + "/fltube_tmp_files/";
