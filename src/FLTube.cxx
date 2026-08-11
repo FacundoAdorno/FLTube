@@ -19,6 +19,7 @@
 #include "../include/configuration_manager.h"
 #include "../include/userdata_manager.h"
 #include "../include/cache.h"
+#include <FL/Enumerations.H>
 #include <cstdio>
 #include <string>
 
@@ -58,6 +59,9 @@ std::string USERDATA_FILE_PATH = std::string(getHomePathOr("")) + "/.local/share
 
 std::string SYSTEM_CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
 
+// Keep the current selected color theme
+ColorTheme CURRENT_COLOR_THEME = ColorTheme::DEFAULT;
+
 std::string CONFIGFILE_PATH = "";
 
 // Path to fltube resources, like images, sounds, etc. Can be modified at fltube.conf file.
@@ -92,6 +96,19 @@ std::shared_ptr<YtDlp_Helper> ytdlp = nullptr;
 std::shared_ptr<PermanentDiskCache> cache = nullptr;
 
 PaginationManager* page_manager = nullptr;
+
+// First position keeps the "light" image version. Second position, the "dark" image version.
+const int LIGHT_ICON_POS = 0; const int DARK_ICON_POS = 1;
+std::array<Fl_PNG_Image*,2> already_viewed_alts {nullptr, nullptr};
+std::array<Fl_PNG_Image*,2> like_icon_alts {nullptr, nullptr};
+std::array<Fl_PNG_Image*,2> like_red_icon_alts {nullptr, nullptr};
+std::array<Fl_PNG_Image*,2> cached_icon_alts {nullptr, nullptr};
+std::array<Fl_PNG_Image*,2> moreinfo_icon_alts {nullptr, nullptr};
+std::array<Fl_PNG_Image*,2> remove_video_icon_alts {nullptr, nullptr};
+std::array<Fl_PNG_Image*,2> watchlater_icon_alts {nullptr, nullptr};
+std::array<Fl_PNG_Image*,2> watchlater_filled_icon_alts {nullptr, nullptr};
+std::array<Fl_PNG_Image*,2> arrow_up_alts {nullptr, nullptr};
+std::array<Fl_PNG_Image*,2> arrow_down_alts {nullptr, nullptr};
 
 Fl_PNG_Image* live_image = nullptr;
 Fl_PNG_Image* already_viewed_image = nullptr;
@@ -732,6 +749,101 @@ void change_stream_resolution_cb (Fl_Widget* w, void* data) {
     }
 }
 
+void switch_color_theme(ColorTheme ct, bool force_reload = false) {
+    char mssg[128];
+    std::string new_theme_name;
+    ColorTheme old_theme = CURRENT_COLOR_THEME;
+    bool reload_icons = false;  // Reload icons from theme from a dark theme to a light, and visceversa.
+
+    if (CURRENT_COLOR_THEME == ct && !force_reload)  return;
+    else CURRENT_COLOR_THEME = ct;
+    switch (ct) {
+        case ColorTheme::DEFAULT:
+            new_theme_name=_("Default Theme");
+            Fl::set_color(FL_BACKGROUND_COLOR, 192, 192, 192);
+            Fl::set_color(FL_BACKGROUND2_COLOR, 255, 255, 255);
+            Fl::set_color(FL_FOREGROUND_COLOR, 0, 0, 0);
+            // Fl::set_color(FL_SELECTION_COLOR, 0, 0, 128);
+            Fl::set_color(FL_SELECTION_COLOR, 30, 90, 156);
+            Fl::set_color(FL_INACTIVE_COLOR, 85, 85, 85);
+            reload_icons = (old_theme == ColorTheme::DARK);
+            break;
+        case ColorTheme::LIGHT:
+            new_theme_name=_("Light Theme");
+            Fl::set_color(FL_BACKGROUND_COLOR, 240, 240, 240);
+            Fl::set_color(FL_BACKGROUND2_COLOR, 224, 224, 224);
+            Fl::set_color(FL_FOREGROUND_COLOR, 0, 0, 0);
+            Fl::set_color(FL_SELECTION_COLOR, 140, 59, 27);
+            Fl::set_color(FL_INACTIVE_COLOR, 96, 96, 96);
+            reload_icons = (old_theme == ColorTheme::DARK);
+            break;
+        case ColorTheme::DARK:
+            new_theme_name=_("Dark Theme");
+            Fl::set_color(FL_BACKGROUND_COLOR, 30, 30, 30);
+            Fl::set_color(FL_BACKGROUND2_COLOR, 45, 45, 45);
+            Fl::set_color(FL_FOREGROUND_COLOR, 230, 230, 230);
+            Fl::set_color(FL_SELECTION_COLOR, 236, 205, 106);
+            Fl::set_color(FL_INACTIVE_COLOR, 120, 120, 120);
+            reload_icons = (old_theme == ColorTheme::DEFAULT || old_theme == ColorTheme::LIGHT);
+            break;
+    }
+
+    //Reload icon images from Video Info if necessary...
+    if (reload_icons || force_reload) {
+        int pos;
+        if (ct == ColorTheme::DARK) pos = DARK_ICON_POS;
+        else                        pos = LIGHT_ICON_POS;
+
+        already_viewed_image = already_viewed_alts.at(pos);
+        like_icon_image = like_icon_alts.at(pos);
+        like_red_icon_image = like_red_icon_alts.at(pos);
+        cached_icon_image = cached_icon_alts.at(pos);
+        moreinfo_icon_image = moreinfo_icon_alts.at(pos);
+        remove_video_icon_image = remove_video_icon_alts.at(pos);
+        watchlater_icon_image = watchlater_icon_alts.at(pos);
+        watchlater_filled_icon_image = watchlater_filled_icon_alts.at(pos);
+        arrow_up = arrow_up_alts.at(pos);
+        arrow_down = arrow_down_alts.at(pos);
+
+        mainWin->prev_search_term_bttn->image(arrow_down);
+        mainWin->next_search_term_bttn->image(arrow_up);
+
+        for (int j=0; j < video_info_arr.size(); j++) {
+            if (video_info_arr[j] != nullptr) {
+                video_info_arr[j]->already_viewed_icon->image(already_viewed_image);
+                video_info_arr[j]->cache_bttn->image(cached_icon_image);
+                video_info_arr[j]->moreinfo_bttn->image(moreinfo_icon_image);
+                video_info_arr[j]->remove_bttn->image(remove_video_icon_image);
+                if (video_metadata[j] != nullptr) {
+                    // Update Liked icon...
+                    if (userdata->getLikedVideosList()->existAtList(video_metadata[j]->id)) {
+                        video_info_arr[j]->like_icon_bttn->image(like_red_icon_image);
+                    } else {
+                        video_info_arr[j]->like_icon_bttn->image(like_icon_image);
+                    }
+
+                    // Update Watch Later icon...
+                    if (userdata->getWatchLaterVideoList()->existAtList(video_metadata[j]->id)) {
+                        video_info_arr[j]->watch_later_bttn->image(watchlater_filled_icon_image);
+                    } else {
+                        video_info_arr[j]->watch_later_bttn->image(watchlater_icon_image);
+                    }
+                }
+            }
+        }
+    }
+
+
+    snprintf(mssg, sizeof(mssg), _("New color theme applied/reloaded: %s"), new_theme_name.c_str());
+    logger->debug(mssg);
+    mainWin->redraw();
+}
+
+void change_color_theme_cb(Fl_Widget* w, void* data) {
+    ColorTheme selected_theme = static_cast<ColorTheme>(reinterpret_cast<std::intptr_t>(data));
+    switch_color_theme(selected_theme);
+}
+
 void show_video_metadata_cb(Fl_Widget* w, void* data) {
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
@@ -895,17 +1007,27 @@ void pre_init() {
 
     initial_win->loading_about_data->label(_("Loading resources files..."));
     live_image = load_resource_image("livebutton_18p.png");
-    already_viewed_image = load_resource_image("clock_18p.png");
-    like_icon_image = load_resource_image("heart_18p.png");
-    like_red_icon_image = load_resource_image("heart_18p_red.png");
     playicon_image = load_resource_image("playicon.png");
-    cached_icon_image = load_resource_image("cache_icon_18p.png");
-    moreinfo_icon_image = load_resource_image("more_info.png");
-    remove_video_icon_image = load_resource_image("remove_video_icon_14p.png");
-    watchlater_icon_image = load_resource_image("watch_later.png");
-    watchlater_filled_icon_image = load_resource_image("watch_later_filled.png");
-    arrow_up = load_resource_image("arrow_up.png");
-    arrow_down = load_resource_image("arrow_down.png");
+    already_viewed_alts.at(LIGHT_ICON_POS) = load_resource_image("clock_18p.png");
+    already_viewed_alts.at(DARK_ICON_POS) = load_resource_image("clock_dark_18p.png");
+    like_icon_alts.at(LIGHT_ICON_POS) = load_resource_image("heart_18p.png");
+    like_icon_alts.at(DARK_ICON_POS) = load_resource_image("heart_dark_18p.png");
+    like_red_icon_alts.at(LIGHT_ICON_POS) = load_resource_image("heart_18p_red.png");
+    like_red_icon_alts.at(DARK_ICON_POS) = load_resource_image("heart_18p_red_dark.png");
+    cached_icon_alts.at(LIGHT_ICON_POS) = load_resource_image("cache_icon_18p.png");
+    cached_icon_alts.at(DARK_ICON_POS) = load_resource_image("cache_icon_dark_18p.png");
+    moreinfo_icon_alts.at(LIGHT_ICON_POS) = load_resource_image("more_info.png");
+    moreinfo_icon_alts.at(DARK_ICON_POS) = load_resource_image("more_info_dark.png");
+    remove_video_icon_alts.at(LIGHT_ICON_POS) = load_resource_image("remove_video_icon_14p.png");
+    remove_video_icon_alts.at(DARK_ICON_POS) = load_resource_image("remove_video_icon_dark_14p.png");
+    watchlater_icon_alts.at(LIGHT_ICON_POS) = load_resource_image("watch_later.png");
+    watchlater_icon_alts.at(DARK_ICON_POS) = load_resource_image("watch_later_dark.png");
+    watchlater_filled_icon_alts.at(LIGHT_ICON_POS) = load_resource_image("watch_later_filled.png");
+    watchlater_filled_icon_alts.at(DARK_ICON_POS) = load_resource_image("watch_later_filled_dark.png");
+    arrow_up_alts.at(LIGHT_ICON_POS) = load_resource_image("arrow_up.png");
+    arrow_up_alts.at(DARK_ICON_POS) = load_resource_image("arrow_up_dark.png");
+    arrow_down_alts.at(LIGHT_ICON_POS) = load_resource_image("arrow_down.png");
+    arrow_down_alts.at(DARK_ICON_POS) = load_resource_image("arrow_down_dark.png");
 
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
@@ -958,6 +1080,9 @@ void pre_init() {
  * Hook: Actions to execute after main window is drawed...
  */
 void post_init() {
+    //Apply the initial theme
+    switch_color_theme(ColorTheme::DEFAULT, true);
+
     int y_refernce_pos = mainWin->search_result_selectors->y() + 10;
 
     for (int i = 0; i < video_info_arr.size(); i++) {
@@ -1052,6 +1177,11 @@ void post_init() {
         case R720p:   mainWin->quality_720_bttn->setonly(); break;
         case R1080p:   mainWin->quality_1080_bttn->setonly(); break;
     }
+
+    mainWin->default_theme_bttn->callback((Fl_Callback*) change_color_theme_cb);
+    mainWin->light_theme_bttn->callback((Fl_Callback*) change_color_theme_cb);
+    mainWin->dark_theme_bttn->callback((Fl_Callback*) change_color_theme_cb);
+
     // Redraw the window to show the new button
     mainWin->redraw();
 }

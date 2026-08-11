@@ -29,6 +29,11 @@ Fl_Menu_Item FLTubeMainWindow::menu_options_menu[] = {
  {gettext_noop("720p"), 0,  0, (void*)(720), 8, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("1080p"), 0,  0, (void*)(1080), 8, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
+ {gettext_noop("Color Theme"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Default Theme"), 0,  0, (void*)(ColorTheme::DEFAULT), 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Light Theme"), 0,  0, (void*)(ColorTheme::LIGHT), 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Dark Theme"), 0,  0, (void*)(ColorTheme::DARK), 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {0,0,0,0,0,0,0,0,0},
  {gettext_noop("Navigation History"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Clear all"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Stop recording"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
@@ -48,13 +53,16 @@ Fl_Menu_Item* FLTubeMainWindow::quality_360_bttn = FLTubeMainWindow::menu_option
 Fl_Menu_Item* FLTubeMainWindow::quality_480_bttn = FLTubeMainWindow::menu_options_menu + 4;
 Fl_Menu_Item* FLTubeMainWindow::quality_720_bttn = FLTubeMainWindow::menu_options_menu + 5;
 Fl_Menu_Item* FLTubeMainWindow::quality_1080_bttn = FLTubeMainWindow::menu_options_menu + 6;
-Fl_Menu_Item* FLTubeMainWindow::history_clearall_bttn = FLTubeMainWindow::menu_options_menu + 9;
-Fl_Menu_Item* FLTubeMainWindow::history_pause_bttn = FLTubeMainWindow::menu_options_menu + 10;
-Fl_Menu_Item* FLTubeMainWindow::history_unpause_bttn = FLTubeMainWindow::menu_options_menu + 11;
-Fl_Menu_Item* FLTubeMainWindow::cache_clearall_bttn = FLTubeMainWindow::menu_options_menu + 14;
-Fl_Menu_Item* FLTubeMainWindow::cache_pause_bttn = FLTubeMainWindow::menu_options_menu + 15;
-Fl_Menu_Item* FLTubeMainWindow::cache_unpause_bttn = FLTubeMainWindow::menu_options_menu + 16;
-Fl_Menu_Item* FLTubeMainWindow::check_update_bttn = FLTubeMainWindow::menu_options_menu + 18;
+Fl_Menu_Item* FLTubeMainWindow::default_theme_bttn = FLTubeMainWindow::menu_options_menu + 9;
+Fl_Menu_Item* FLTubeMainWindow::light_theme_bttn = FLTubeMainWindow::menu_options_menu + 10;
+Fl_Menu_Item* FLTubeMainWindow::dark_theme_bttn = FLTubeMainWindow::menu_options_menu + 11;
+Fl_Menu_Item* FLTubeMainWindow::history_clearall_bttn = FLTubeMainWindow::menu_options_menu + 14;
+Fl_Menu_Item* FLTubeMainWindow::history_pause_bttn = FLTubeMainWindow::menu_options_menu + 15;
+Fl_Menu_Item* FLTubeMainWindow::history_unpause_bttn = FLTubeMainWindow::menu_options_menu + 16;
+Fl_Menu_Item* FLTubeMainWindow::cache_clearall_bttn = FLTubeMainWindow::menu_options_menu + 19;
+Fl_Menu_Item* FLTubeMainWindow::cache_pause_bttn = FLTubeMainWindow::menu_options_menu + 20;
+Fl_Menu_Item* FLTubeMainWindow::cache_unpause_bttn = FLTubeMainWindow::menu_options_menu + 21;
+Fl_Menu_Item* FLTubeMainWindow::check_update_bttn = FLTubeMainWindow::menu_options_menu + 23;
 
 FLTubeMainWindow::FLTubeMainWindow(int X, int Y, int W, int H, const char *L) :
   Fl_Double_Window(X, Y, W, H, L)
@@ -138,14 +146,26 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     { Fl_Menu_Item* o = &menu_options_menu[18];
       o->label(_(o->label()));
     }
+    { Fl_Menu_Item* o = &menu_options_menu[19];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[20];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[21];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[23];
+      o->label(_(o->label()));
+    }
     options_menu->menu(menu_options_menu);
   } // Fl_Menu_Bar* options_menu
-  { central_tabs = new Fl_Tabs(9, 28, 576, 92);
-    { searchbox_tab = new Fl_Group(9, 56, 576, 64, _("Search box"));
+  { central_tabs = new Fl_Tabs(10, 28, 578, 92);
+    { searchbox_tab = new Fl_Group(10, 56, 578, 64, _("Search box"));
       searchbox_tab->tooltip(_("Search videos at this section."));
       searchbox_tab->box(FL_UP_FRAME);
-      searchbox_tab->selection_color(FL_DARK1);
       searchbox_tab->labelfont(1);
+      searchbox_tab->labelcolor(FL_INACTIVE_COLOR);
       searchbox_tab->user_data((void*)("SEARCHVIDEOS_TAB"));
       searchbox_tab->align(Fl_Align(FL_ALIGN_TOP_LEFT));
       { search_term_or_url = new SearchInput(110, 63, 450, 24, _("Term/URL  "));
@@ -163,25 +183,31 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
       } // SearchInput* search_term_or_url
       { do_search_bttn = new Fl_Button(227, 90, 150, 22, _("Go &search!"));
         do_search_bttn->tooltip(_("If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."));
+        do_search_bttn->box(FL_BORDER_FRAME);
+        do_search_bttn->color(FL_INACTIVE_COLOR);
         do_search_bttn->user_data((void*)(search_term_or_url));
       } // Fl_Button* do_search_bttn
       { next_search_term_bttn = new Fl_Button(561, 60, 18, 14);
         next_search_term_bttn->tooltip(_("Navigate next search terms in history. Or use Up arrow key."));
+        next_search_term_bttn->box(FL_ROUNDED_FRAME);
         next_search_term_bttn->down_box(FL_DOWN_BOX);
+        next_search_term_bttn->color(FL_INACTIVE_COLOR);
         next_search_term_bttn->labelsize(11);
       } // Fl_Button* next_search_term_bttn
       { prev_search_term_bttn = new Fl_Button(561, 76, 18, 14);
         prev_search_term_bttn->tooltip(_("Navigate previous search terms in history. Or use Down arrow key."));
+        prev_search_term_bttn->box(FL_ROUNDED_FRAME);
         prev_search_term_bttn->down_box(FL_DOWN_BOX);
+        prev_search_term_bttn->color(FL_INACTIVE_COLOR);
         prev_search_term_bttn->labelsize(11);
       } // Fl_Button* prev_search_term_bttn
       searchbox_tab->end();
     } // Fl_Group* searchbox_tab
-    { videolists_tab = new Fl_Group(9, 56, 576, 64, _("My Lists"));
+    { videolists_tab = new Fl_Group(10, 56, 577, 64, _("My Lists"));
       videolists_tab->tooltip(_("Lookup your lists of videos at this section (History, Liked, etc...)."));
       videolists_tab->box(FL_UP_FRAME);
-      videolists_tab->selection_color(FL_DARK1);
       videolists_tab->labelfont(1);
+      videolists_tab->labelcolor(FL_INACTIVE_COLOR);
       videolists_tab->user_data((void*)("VIDEOLISTS_TABS"));
       videolists_tab->hide();
       { videolist_selector = new Fl_Choice(89, 63, 480, 24, _("Lists  "));
@@ -192,7 +218,8 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     central_tabs->end();
   } // Fl_Tabs* central_tabs
   { search_result_selectors = new Fl_Group(10, 126, 578, 380);
-    search_result_selectors->box(FL_THIN_UP_BOX);
+    search_result_selectors->box(FL_BORDER_FRAME);
+    search_result_selectors->color(FL_INACTIVE_COLOR);
     { no_videos_list_warn = new Fl_Box(40, 280, 518, 72, _("This list currently has no videos."));
       no_videos_list_warn->labelfont(3);
       no_videos_list_warn->hide();
@@ -202,15 +229,23 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
   { pagination_controls = new Fl_Group(9, 508, 577, 30);
     { first_page_bttn = new Fl_Button(10, 510, 18, 23, _("<l"));
       first_page_bttn->tooltip(_("Go to the first page."));
+      first_page_bttn->box(FL_BORDER_FRAME);
+      first_page_bttn->color(FL_INACTIVE_COLOR);
     } // Fl_Button* first_page_bttn
     { previous_results_bttn = new Fl_Button(30, 510, 115, 23, _("<&Previous"));
       previous_results_bttn->tooltip(_("Get previous results of current search results set."));
+      previous_results_bttn->box(FL_BORDER_FRAME);
+      previous_results_bttn->color(FL_INACTIVE_COLOR);
     } // Fl_Button* previous_results_bttn
     { next_results_bttn = new Fl_Button(450, 510, 115, 23, _("&Next>"));
       next_results_bttn->tooltip(_("Get following results of current search results set."));
+      next_results_bttn->box(FL_BORDER_FRAME);
+      next_results_bttn->color(FL_INACTIVE_COLOR);
     } // Fl_Button* next_results_bttn
     { last_page_bttn = new Fl_Button(567, 510, 18, 23, _("l>"));
       last_page_bttn->tooltip(_("Go to the last loaded page."));
+      last_page_bttn->box(FL_BORDER_FRAME);
+      last_page_bttn->color(FL_INACTIVE_COLOR);
     } // Fl_Button* last_page_bttn
     { pagination_status_info = new Fl_Box(240, 512, 115, 23);
       pagination_status_info->tooltip(_("Current page / Total of pages."));
@@ -225,6 +260,9 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
 {
   { thumbnail = new Fl_Button(6, 5, 95, 80);
     thumbnail->tooltip(_("Click to stream the video (preview it)..."));
+    thumbnail->box(FL_BORDER_FRAME);
+    thumbnail->color(FL_INACTIVE_COLOR);
+    thumbnail->selection_color(FL_INACTIVE_COLOR);
   } // Fl_Button* thumbnail
   { thumbnail_overlay = new Fl_Box(6, 5, 95, 80);
     thumbnail_overlay->tooltip(_("This video is currently played..."));
@@ -269,7 +307,9 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
   } // Fl_Box* title
   { remove_bttn = new Fl_Button(538, 7, 16, 16);
     remove_bttn->tooltip(_("Click to remove video from current list."));
+    remove_bttn->box(FL_BORDER_FRAME);
     remove_bttn->down_box(FL_DOWN_BOX);
+    remove_bttn->color(FL_INACTIVE_COLOR);
     remove_bttn->hide();
     remove_bttn->deactivate();
   } // Fl_Button* remove_bttn
@@ -285,6 +325,9 @@ VideoInfo::VideoInfo(int X, int Y, int W, int H, const char *L) :
   } // Fl_Box* uploadDate
   { userUploader = new Fl_Button(295, 65, 260, 20);
     userUploader->tooltip(_("Click to list all channel\'s video."));
+    userUploader->box(FL_BORDER_FRAME);
+    userUploader->color(FL_INACTIVE_COLOR);
+    userUploader->selection_color(FL_BACKGROUND2_COLOR);
     userUploader->labelfont(2);
     userUploader->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
   } // Fl_Button* userUploader
@@ -417,7 +460,6 @@ void HelpFLTubeWindow::_HelpFLTubeWindow() {
     { hlp_app_name = new Fl_Box(153, 14, 310, 24, _("FLTube"));
       hlp_app_name->labelfont(1);
       hlp_app_name->labelsize(20);
-      hlp_app_name->labelcolor(FL_GRAY0);
       hlp_app_name->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
     } // Fl_Box* hlp_app_name
     { about_version = new Fl_Box(153, 38, 302, 19, _("Version x.y.z"));
@@ -441,35 +483,35 @@ void HelpFLTubeWindow::_HelpFLTubeWindow() {
       hlp_fltk_link->tooltip(_("Click to open FLTK official website."));
       hlp_fltk_link->box(FL_NO_BOX);
       hlp_fltk_link->color(FL_LIGHT1);
-      hlp_fltk_link->labelcolor((Fl_Color)137);
+      hlp_fltk_link->labelcolor(FL_SELECTION_COLOR);
       hlp_fltk_link->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
     } // Fl_Button* hlp_fltk_link
     { hlp_source_code = new Fl_Button(269, 110, 180, 19, _("gitlab.com/facuA/fltube"));
       hlp_source_code->tooltip(_("Click to open FLTube repository."));
       hlp_source_code->box(FL_NO_BOX);
       hlp_source_code->color(FL_LIGHT1);
-      hlp_source_code->labelcolor((Fl_Color)137);
+      hlp_source_code->labelcolor(FL_SELECTION_COLOR);
       hlp_source_code->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
     } // Fl_Button* hlp_source_code
     { hlp_ytdlp_link = new Fl_Button(333, 88, 52, 22, _("yt-dlp"));
       hlp_ytdlp_link->tooltip(_("Click to open yt-dlp official website."));
       hlp_ytdlp_link->box(FL_NO_BOX);
-      hlp_ytdlp_link->labelcolor((Fl_Color)137);
+      hlp_ytdlp_link->labelcolor(FL_SELECTION_COLOR);
       hlp_ytdlp_link->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
     } // Fl_Button* hlp_ytdlp_link
     { hlp_cpp_link = new Fl_Button(399, 87, 38, 23, _("C++"));
       hlp_cpp_link->tooltip(_("Click to open C++ official website."));
       hlp_cpp_link->box(FL_NO_BOX);
-      hlp_cpp_link->labelcolor((Fl_Color)137);
+      hlp_cpp_link->labelcolor(FL_SELECTION_COLOR);
       hlp_cpp_link->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT|FL_ALIGN_INSIDE));
     } // Fl_Button* hlp_cpp_link
     o->end();
   } // Fl_Group* o
   { help_info_tabs = new Fl_Tabs(15, 158, 450, 183);
+    help_info_tabs->labelcolor(FL_SELECTION_COLOR);
     { howtouse_tab = new Fl_Group(15, 183, 450, 158, _("How to use"));
-      howtouse_tab->selection_color(FL_DARK1);
       howtouse_tab->labelfont(1);
-      howtouse_tab->hide();
+      howtouse_tab->labelcolor(FL_INACTIVE_COLOR);
       { howtouse_txt = new Fl_Text_Display(19, 189, 442, 148);
         howtouse_txt->box(FL_NO_BOX);
         howtouse_txt->color(FL_BACKGROUND_COLOR);
@@ -478,8 +520,9 @@ void HelpFLTubeWindow::_HelpFLTubeWindow() {
       howtouse_tab->end();
     } // Fl_Group* howtouse_tab
     { shortcuts_tab = new Fl_Group(15, 183, 450, 158, _("Shortcuts"));
-      shortcuts_tab->selection_color(FL_DARK1);
       shortcuts_tab->labelfont(1);
+      shortcuts_tab->labelcolor(FL_INACTIVE_COLOR);
+      shortcuts_tab->hide();
       { shortcuts_txt = new Fl_Text_Display(19, 189, 442, 148);
         shortcuts_txt->box(FL_NO_BOX);
         shortcuts_txt->color(FL_BACKGROUND_COLOR);
@@ -488,8 +531,8 @@ void HelpFLTubeWindow::_HelpFLTubeWindow() {
       shortcuts_tab->end();
     } // Fl_Group* shortcuts_tab
     { config_tab = new Fl_Group(15, 183, 450, 158, _("Configuration"));
-      config_tab->selection_color(FL_DARK1);
       config_tab->labelfont(1);
+      config_tab->labelcolor(FL_INACTIVE_COLOR);
       config_tab->hide();
       { config_txt = new Fl_Text_Display(19, 189, 442, 148);
         config_txt->box(FL_NO_BOX);
@@ -499,8 +542,8 @@ void HelpFLTubeWindow::_HelpFLTubeWindow() {
       config_tab->end();
     } // Fl_Group* config_tab
     { authors_tab = new Fl_Group(15, 183, 450, 158, _("Authors"));
-      authors_tab->selection_color(FL_DARK1);
       authors_tab->labelfont(1);
+      authors_tab->labelcolor(FL_INACTIVE_COLOR);
       authors_tab->hide();
       { authors_txt = new Fl_Text_Display(19, 189, 442, 148);
         authors_txt->box(FL_NO_BOX);

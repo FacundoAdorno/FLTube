@@ -35,16 +35,24 @@ declblock {\#ifndef GETTEXT_MACROS_H} {open public map 3 after {\#endif}
   }
 }
 
+decl {enum ColorTheme {
+    DEFAULT,
+    LIGHT,
+    DARK
+};} {
+  comment {Color themes defined at FLTube application.} public global
+}
+
 widget_class FLTubeMainWindow {
-  label FLTube
-  xywh {0 0 593 540} hide
-  class Fl_Double_Window
+  label FLTube selected
+  xywh {0 0 593 540}
+  class Fl_Double_Window visible
 } {
   Fl_Button about_bttn {
     label Help
     tooltip {Show info about this application and some help of how to use it.} xywh {521 6 64 22}
   }
-  Fl_Menu_Bar options_menu {
+  Fl_Menu_Bar options_menu {open
     xywh {434 6 80 22}
   } {
     Submenu {} {
@@ -79,6 +87,26 @@ widget_class FLTubeMainWindow {
           label 1080p
           user_data 1080
           xywh {0 0 100 20} type Radio
+        }
+      }
+      Submenu {} {
+        label {Color Theme} open
+        xywh {0 0 100 20}
+      } {
+        MenuItem default_theme_bttn {
+          label {Default Theme}
+          user_data {ColorTheme::DEFAULT}
+          xywh {0 0 100 20}
+        }
+        MenuItem light_theme_bttn {
+          label {Light Theme}
+          user_data {ColorTheme::LIGHT}
+          xywh {0 0 100 20}
+        }
+        MenuItem dark_theme_bttn {
+          label {Dark Theme}
+          user_data {ColorTheme::DARK}
+          xywh {0 0 100 20}
         }
       }
       Submenu {} {
@@ -121,13 +149,13 @@ widget_class FLTubeMainWindow {
       }
     }
   }
-  Fl_Tabs central_tabs {
-    xywh {9 28 576 92}
+  Fl_Tabs central_tabs {open
+    xywh {10 28 578 92}
   } {
     Fl_Group searchbox_tab {
       label {Search box}
       user_data {"SEARCHVIDEOS_TAB"} open
-      tooltip {Search videos at this section.} xywh {9 56 576 64} box UP_FRAME selection_color 47 labelfont 1 align 5
+      tooltip {Search videos at this section.} xywh {10 56 578 64} box UP_FRAME labelfont 1 labelcolor 8 align 5
     } {
       Fl_Input search_term_or_url {
         label {Term/URL  }
@@ -137,19 +165,19 @@ widget_class FLTubeMainWindow {
       Fl_Button do_search_bttn {
         label {Go &search!}
         user_data search_term_or_url
-        tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 90 150 22}
+        tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 90 150 22} box BORDER_FRAME color 8
       }
       Fl_Button next_search_term_bttn {
-        tooltip {Navigate next search terms in history. Or use Up arrow key.} xywh {561 60 18 14} down_box DOWN_BOX labelsize 11
+        tooltip {Navigate next search terms in history. Or use Up arrow key.} xywh {561 60 18 14} box ROUNDED_FRAME down_box DOWN_BOX color 8 labelsize 11
       }
       Fl_Button prev_search_term_bttn {
-        tooltip {Navigate previous search terms in history. Or use Down arrow key.} xywh {561 76 18 14} down_box DOWN_BOX labelsize 11
+        tooltip {Navigate previous search terms in history. Or use Down arrow key.} xywh {561 76 18 14} box ROUNDED_FRAME down_box DOWN_BOX color 8 labelsize 11
       }
     }
     Fl_Group videolists_tab {
       label {My Lists}
       user_data {"VIDEOLISTS_TABS"} open
-      tooltip {Lookup your lists of videos at this section (History, Liked, etc...).} xywh {9 56 576 64} box UP_FRAME selection_color 47 labelfont 1 hide
+      tooltip {Lookup your lists of videos at this section (History, Liked, etc...).} xywh {10 56 577 64} box UP_FRAME labelfont 1 labelcolor 8 hide
     } {
       Fl_Choice videolist_selector {
         label {Lists  } open
@@ -158,31 +186,31 @@ widget_class FLTubeMainWindow {
     }
   }
   Fl_Group search_result_selectors {open
-    xywh {10 126 578 380} box THIN_UP_BOX
+    xywh {10 126 578 380} box BORDER_FRAME color 8
   } {
     Fl_Box no_videos_list_warn {
       label {This list currently has no videos.}
       xywh {40 280 518 72} labelfont 3 hide
     }
   }
-  Fl_Group pagination_controls {
+  Fl_Group pagination_controls {open
     xywh {9 508 577 30}
   } {
     Fl_Button first_page_bttn {
       label {<l}
-      tooltip {Go to the first page.} xywh {10 510 18 23}
+      tooltip {Go to the first page.} xywh {10 510 18 23} box BORDER_FRAME color 8
     }
     Fl_Button previous_results_bttn {
       label {<&Previous}
-      tooltip {Get previous results of current search results set.} xywh {30 510 115 23}
+      tooltip {Get previous results of current search results set.} xywh {30 510 115 23} box BORDER_FRAME color 8
     }
     Fl_Button next_results_bttn {
       label {&Next>}
-      tooltip {Get following results of current search results set.} xywh {450 510 115 23}
+      tooltip {Get following results of current search results set.} xywh {450 510 115 23} box BORDER_FRAME color 8
     }
     Fl_Button last_page_bttn {
       label {l>}
-      tooltip {Go to the last loaded page.} xywh {567 510 18 23}
+      tooltip {Go to the last loaded page.} xywh {567 510 18 23} box BORDER_FRAME color 8
     }
     Fl_Box pagination_status_info {
       tooltip {Current page / Total of pages.} xywh {240 512 115 23}
@@ -194,7 +222,7 @@ widget_class VideoInfo {
   xywh {0 0 577 91} hide position_relative
 } {
   Fl_Button thumbnail {
-    tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80}
+    tooltip {Click to stream the video (preview it)...} xywh {6 5 95 80} box BORDER_FRAME color 8 selection_color 8
   }
   Fl_Box thumbnail_overlay {
     tooltip {This video is currently played...} xywh {6 5 95 80} hide
@@ -224,7 +252,7 @@ widget_class VideoInfo {
     xywh {105 6 435 37} labelfont 1 align 213
   }
   Fl_Button remove_bttn {
-    tooltip {Click to remove video from current list.} xywh {538 7 16 16} down_box DOWN_BOX hide deactivate
+    tooltip {Click to remove video from current list.} xywh {538 7 16 16} box BORDER_FRAME down_box DOWN_BOX color 8 hide deactivate
   }
   Fl_Box duration {
     tooltip {Duration expressed as H:MM:SS.} xywh {105 65 70 20} labelfont 2 align 20
@@ -233,7 +261,7 @@ widget_class VideoInfo {
     tooltip {Video upload date.} xywh {190 65 95 20} labelfont 2 align 20
   }
   Fl_Button userUploader {
-    tooltip {Click to list all channel's video.} xywh {295 65 260 20} labelfont 2 align 20
+    tooltip {Click to list all channel's video.} xywh {295 65 260 20} box BORDER_FRAME color 8 selection_color 7 labelfont 2 align 20
   }
 }
 
@@ -253,7 +281,7 @@ widget_class TinyMessageWindow {
 
 widget_class TinyChoiceWindow {
   label Warn
-  xywh {620 599 649 118} hide
+  xywh {0 0 649 118} hide
   class Fl_Double_Window modal
 } {
   Fl_Box choice_label {
@@ -274,7 +302,7 @@ widget_class TinyChoiceWindow {
 }
 
 widget_class HelpFLTubeWindow {
-  label {FLTube Help}
+  label {FLTube Help} open
   xywh {0 0 480 352} hide
   class Fl_Double_Window modal
 } {
@@ -286,7 +314,7 @@ widget_class HelpFLTubeWindow {
     }
     Fl_Box hlp_app_name {
       label FLTube
-      xywh {153 14 310 24} labelfont 1 labelsize 20 labelcolor 32 align 21
+      xywh {153 14 310 24} labelfont 1 labelsize 20 align 21
     }
     Fl_Box about_version {
       label {Version x.y.z}
@@ -310,27 +338,27 @@ widget_class HelpFLTubeWindow {
     }
     Fl_Button hlp_fltk_link {
       label FLTK
-      tooltip {Click to open FLTK official website.} xywh {271 87 48 23} box NO_BOX color 50 labelcolor 137 align 22
+      tooltip {Click to open FLTK official website.} xywh {271 87 48 23} box NO_BOX color 50 labelcolor 15 align 22
     }
     Fl_Button hlp_source_code {
       label {gitlab.com/facuA/fltube}
-      tooltip {Click to open FLTube repository.} xywh {269 110 180 19} box NO_BOX color 50 labelcolor 137 align 22
+      tooltip {Click to open FLTube repository.} xywh {269 110 180 19} box NO_BOX color 50 labelcolor 15 align 22
     }
     Fl_Button hlp_ytdlp_link {
       label {yt-dlp}
-      tooltip {Click to open yt-dlp official website.} xywh {333 88 52 22} box NO_BOX labelcolor 137 align 22
+      tooltip {Click to open yt-dlp official website.} xywh {333 88 52 22} box NO_BOX labelcolor 15 align 22
     }
     Fl_Button hlp_cpp_link {
       label {C++}
-      tooltip {Click to open C++ official website.} xywh {399 87 38 23} box NO_BOX labelcolor 137 align 22
+      tooltip {Click to open C++ official website.} xywh {399 87 38 23} box NO_BOX labelcolor 15 align 22
     }
   }
   Fl_Tabs help_info_tabs {open
-    xywh {15 158 450 183}
+    xywh {15 158 450 183} labelcolor 15
   } {
     Fl_Group howtouse_tab {
-      label {How to use} open
-      xywh {15 183 450 158} selection_color 47 labelfont 1 hide
+      label {How to use}
+      xywh {15 183 450 158} labelfont 1 labelcolor 8
     } {
       Fl_Text_Display howtouse_txt {
         xywh {19 189 442 148} box NO_BOX color 49 align 129
@@ -338,15 +366,15 @@ widget_class HelpFLTubeWindow {
     }
     Fl_Group shortcuts_tab {
       label Shortcuts open
-      xywh {15 183 450 158} selection_color 47 labelfont 1
+      xywh {15 183 450 158} labelfont 1 labelcolor 8 hide
     } {
       Fl_Text_Display shortcuts_txt {
         xywh {19 189 442 148} box NO_BOX color 49 align 129
       }
     }
     Fl_Group config_tab {
-      label Configuration open
-      xywh {15 183 450 158} selection_color 47 labelfont 1 hide
+      label Configuration
+      xywh {15 183 450 158} labelfont 1 labelcolor 8 hide
     } {
       Fl_Text_Display config_txt {
         xywh {19 189 442 148} box NO_BOX color 49 align 129
@@ -354,7 +382,7 @@ widget_class HelpFLTubeWindow {
     }
     Fl_Group authors_tab {
       label Authors open
-      xywh {15 183 450 158} selection_color 47 labelfont 1 hide
+      xywh {15 183 450 158} labelfont 1 labelcolor 8 hide
     } {
       Fl_Text_Display authors_txt {
         xywh {19 189 442 148} box NO_BOX color 49 align 129
@@ -377,10 +405,10 @@ widget_class InitialLoadingWindow {
   }
 }
 
-widget_class MoreVideoInfo {open selected
-  xywh {0 0 547 466}
+widget_class MoreVideoInfo {open
+  xywh {0 0 547 466} hide
   code0 {this->label(_("Detailed Video Metadata"));}
-  class Fl_Double_Window modal visible
+  class Fl_Double_Window modal
 } {
   Fl_Box vm_thumbnail {
     xywh {108 8 330 190} box UP_FRAME

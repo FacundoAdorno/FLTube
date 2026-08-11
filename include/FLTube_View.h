@@ -22,6 +22,14 @@
 #define _(String) gettext(String)
 #define ng_(SINGULAR, PLURAL, COUNT) ngettext(SINGULAR, PLURAL, COUNT)
 #endif
+/**
+ Color themes defined at FLTube application.
+*/
+enum ColorTheme {
+    DEFAULT,
+    LIGHT,
+    DARK
+};
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Menu_Bar.H>
@@ -44,6 +52,9 @@ public:
   static Fl_Menu_Item *quality_480_bttn;
   static Fl_Menu_Item *quality_720_bttn;
   static Fl_Menu_Item *quality_1080_bttn;
+  static Fl_Menu_Item *default_theme_bttn;
+  static Fl_Menu_Item *light_theme_bttn;
+  static Fl_Menu_Item *dark_theme_bttn;
   static Fl_Menu_Item *history_clearall_bttn;
   static Fl_Menu_Item *history_pause_bttn;
   static Fl_Menu_Item *history_unpause_bttn;
