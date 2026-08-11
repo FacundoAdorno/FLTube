@@ -991,6 +991,22 @@ void pre_init() {
         if (STREAM_VIDEO_RESOLUTION != DEFAULT_STREAM_VIDEO_RESOLUTION)
             logger->debug(_("Default streaming resolution (360p) changed at configuration to this new resolution: ") + std::to_string(STREAM_VIDEO_RESOLUTION));
     }
+    if (config->existProperty("COLOR_THEME")) {
+        std::string config_color_theme = config->getProperty("COLOR_THEME", "DEFAULT");
+        bool valid_value = false;
+        std::map<std::string, ColorTheme> color_alternatives
+            {{"DEFAULT", ColorTheme::DEFAULT}, {"LIGHT", ColorTheme::LIGHT}, {"DARK", ColorTheme::DARK}};
+        for (auto color_th: color_alternatives) {
+            if (config_color_theme == color_th.first) {
+                logger->debug(_("Color Theme selected at configuration file is: ") + config_color_theme);
+                CURRENT_COLOR_THEME = color_th.second;
+                valid_value = true;
+            }
+        }
+        if (!valid_value) {
+            logger->debug(_("Color Theme selected at configuration file is not valid. Using DEFAULT color theme."));
+        }
+    }
 
     initial_win->loading_about_data->label(_("Checking 'yt-dlp' installation..."));
     logger->info(_("Cheking if yt-dlp is at your system PATH..."));
@@ -1081,7 +1097,7 @@ void pre_init() {
  */
 void post_init() {
     //Apply the initial theme
-    switch_color_theme(ColorTheme::DEFAULT, true);
+    switch_color_theme(CURRENT_COLOR_THEME, true);
 
     int y_refernce_pos = mainWin->search_result_selectors->y() + 10;
 
