@@ -59,10 +59,12 @@ std::string USERDATA_FILE_PATH = std::string(getHomePathOr("")) + "/.local/share
 
 std::string SYSTEM_CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
 
+std::string CONFIG_APP_PATH = std::string(getHomePathOr("")) + "/.config/fltube/app.conf";
+
 // Keep the current selected color theme
 ColorTheme CURRENT_COLOR_THEME = ColorTheme::DEFAULT;
 
-std::string CONFIGFILE_PATH = "";
+std::string CONFIG_FILE_PATH = "";
 
 // Path to fltube resources, like images, sounds, etc. Can be modified at fltube.conf file.
 std::string RESOURCES_PATH = "/usr/local/share/fltube/resources";
@@ -151,6 +153,7 @@ void exitApp(unsigned short int exitStatusCode = FLT_OK) {
     cache->finish();
     delete page_manager;
     delete mainWin;
+    delete config;
     //Exiting the app...
     logger->info(_("Closing FLtube... Bye!\n"));
     exit(exitStatusCode);
@@ -297,13 +300,13 @@ void showFLTubeHelpWindow(Fl_Widget* w) {
             config->getShortcutTextFor(SHORTCUTS::FOCUS_VIDEO_3).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_VIDEO_4).c_str(),
             config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_1).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_2).c_str(),
             config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_3).c_str(), config->getShortcutTextFor(SHORTCUTS::FOCUS_CHANNEL_4).c_str(),
-            config->getShortcutTextFor(SHORTCUTS::SHOW_HELP).c_str(), CONFIGFILE_PATH.c_str());
+            config->getShortcutTextFor(SHORTCUTS::SHOW_HELP).c_str(), CONFIG_FILE_PATH.c_str());
         helpWin->shortcuts_txt->buffer()->text(help_text_bffr);
         helpWin->config_txt->buffer(new Fl_Text_Buffer());
         helpWin->config_txt->wrap_mode(Fl_Text_Display::WRAP_AT_COLUMN, 50);
         snprintf(help_text_bffr, sizeof(help_text_bffr),
                 _("The current instance of FLTube is loading the configurations from %s file.\n\n*** EXAMPLES ***\n[*] CHANGE THE DEFAULT STREAM RESOLUTION TO 720p:\n - Uncomment or add this property, and set the desire resolution (240, 360, 480, 720 or 1080).\n      %s = 720\n\n[*] CHANGE THE VIDEO PLAYER TO mpv INSTEAD OF mplayer:\n - Add or uncomment the following properties:\n      %s = mpv\n      %s = --ao=pulse\n      %s = \n The last two params can be empty, but MUST be set uncomment if you change the video player.\n"),
-                CONFIGFILE_PATH.c_str(), "STREAM_VIDEO_RESOLUTION", "STREAM_PLAYER_PATH", "STREAM_PLAYER_PARAMS", "STREAM_PLAYER_EXTRA_PARAMS_FOR_LIVE");
+                CONFIG_FILE_PATH.c_str(), "STREAM_VIDEO_RESOLUTION", "STREAM_PLAYER_PATH", "STREAM_PLAYER_PARAMS", "STREAM_PLAYER_EXTRA_PARAMS_FOR_LIVE");
         helpWin->config_txt->buffer()->text(help_text_bffr);
         helpWin->authors_txt->buffer(new Fl_Text_Buffer());
         helpWin->authors_txt->wrap_mode(Fl_Text_Display::WRAP_AT_COLUMN, 50);
@@ -745,6 +748,7 @@ void change_stream_resolution_cb (Fl_Widget* w, void* data) {
     if (has_changed) {
         ytdlp->set_resolution(STREAM_VIDEO_RESOLUTION);
         update_video_info();
+        config->addAppProperty("STREAM_VIDEO_RESOLUTION", std::to_string(new_resolution).c_str());
         logger->debug(_("Stream video resolution updated by user to ") + std::to_string(new_resolution));
     }
 }
@@ -842,6 +846,9 @@ void switch_color_theme(ColorTheme ct, bool force_reload = false) {
 void change_color_theme_cb(Fl_Widget* w, void* data) {
     ColorTheme selected_theme = static_cast<ColorTheme>(reinterpret_cast<std::intptr_t>(data));
     switch_color_theme(selected_theme);
+    std::map<ColorTheme, std::string> color_alternatives
+        {{ColorTheme::DEFAULT, "DEFAULT"}, {ColorTheme::LIGHT, "LIGHT"}, {ColorTheme::DARK, "DARK"}};
+    config->addAppProperty("COLOR_THEME", color_alternatives[selected_theme].c_str());
 }
 
 void show_video_metadata_cb(Fl_Widget* w, void* data) {
@@ -949,11 +956,12 @@ void show_video_metadata_cb(Fl_Widget* w, void* data) {
 void pre_init() {
     ///// LOAD CONFIGURATIONS  //////
     // If not specified custom configuration file through parameter "--config"...
-    if (CONFIGFILE_PATH.empty())
-        CONFIGFILE_PATH = (std::filesystem::exists(USER_CONFIGFILE_PATH)) ? USER_CONFIGFILE_PATH : SYSTEM_CONFIGFILE_PATH;
-    logger->debug(_("Loading configurations from ") + CONFIGFILE_PATH);
+    if (CONFIG_FILE_PATH.empty())
+        CONFIG_FILE_PATH = (std::filesystem::exists(USER_CONFIGFILE_PATH)) ? USER_CONFIGFILE_PATH : SYSTEM_CONFIGFILE_PATH;
+    //TODO Determinar la ruta como se definirá el CONFIG_APP_PATH
+    logger->debug(_("Loading configurations from ") + CONFIG_FILE_PATH);
     initial_win->loading_about_data->label(_("Processing configuration file..."));
-    config = new ConfigurationManager(CONFIGFILE_PATH.c_str(), logger);
+    config = new ConfigurationManager(CONFIG_FILE_PATH.c_str(), CONFIG_APP_PATH.c_str(), logger);
     initial_win->loading_about_data->label(_("Processing user configuration file..."));
     userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion(std::string(VERSION)), logger);
     page_manager = new PaginationManager();
@@ -1131,8 +1139,15 @@ void post_init() {
     if (arrow_up != nullptr) mainWin->next_search_term_bttn->image(arrow_up);
     if (arrow_down != nullptr) mainWin->prev_search_term_bttn->image(arrow_down);
 
-
-    mainWin->cache_unpause_bttn->hide();
+    if (config->getIntProperty("CACHE_RECORD_STATUS", CACHE_RECORD_STATUS::STARTED) == CACHE_RECORD_STATUS::STARTED) {
+        cache->change_status(CACHE_RECORD_STATUS::STARTED);
+        mainWin->cache_pause_bttn->show();
+        mainWin->cache_unpause_bttn->hide();
+    } else {
+        cache->change_status(CACHE_RECORD_STATUS::STOPPED);
+        mainWin->cache_unpause_bttn->show();
+        mainWin->cache_pause_bttn->hide();
+    }
     mainWin->cache_clearall_bttn->callback([](Fl_Widget* w, void* data) {
         cache->remove_all_entries();
         logger->debug(_("All cache entries were deleted by user demand..."));
@@ -1141,6 +1156,7 @@ void post_init() {
         if (cache->change_status(CACHE_RECORD_STATUS::STOPPED)) {
             mainWin->cache_pause_bttn->hide();
             mainWin->cache_unpause_bttn->show();
+            config->addAppProperty("CACHE_RECORD_STATUS", std::to_string(CACHE_RECORD_STATUS::STOPPED).c_str());
             logger->debug(_("Cache recording was stopped by user demand..."));
         }
     });
@@ -1148,15 +1164,26 @@ void post_init() {
         if (cache->change_status(CACHE_RECORD_STATUS::STARTED)) {
             mainWin->cache_unpause_bttn->hide();
             mainWin->cache_pause_bttn->show();
+            config->addAppProperty("CACHE_RECORD_STATUS", std::to_string(CACHE_RECORD_STATUS::STARTED).c_str());
             logger->debug(_("Cache recording was started by user demand..."));
         }
     });
-    mainWin->history_unpause_bttn->hide();
+
+    if (config->getIntProperty("HISTORY_ENABLED", 1) == 1) {
+        mainWin->history_pause_bttn->show();
+        mainWin->history_unpause_bttn->hide();
+        NAVIGATION_HISTORY_ENABLED = true;
+    } else {
+        mainWin->history_unpause_bttn->show();
+        mainWin->history_pause_bttn->hide();
+        NAVIGATION_HISTORY_ENABLED = false;
+    }
     mainWin->history_pause_bttn->callback([](Fl_Widget* w, void* data) {
         if (NAVIGATION_HISTORY_ENABLED) {
             NAVIGATION_HISTORY_ENABLED = false;
             mainWin->history_unpause_bttn->show();
             mainWin->history_pause_bttn->hide();
+            config->addAppProperty("HISTORY_ENABLED", "0");
             logger->debug(_("Navigation History recording was stopped by user demand..."));
         }
     });
@@ -1165,6 +1192,7 @@ void post_init() {
             NAVIGATION_HISTORY_ENABLED = true;
             mainWin->history_pause_bttn->show();
             mainWin->history_unpause_bttn->hide();
+            config->addAppProperty("HISTORY_ENABLED", "1");
             logger->debug(_("Navigation History recording was started by user demand..."));
         }
     });
@@ -1197,6 +1225,17 @@ void post_init() {
     mainWin->default_theme_bttn->callback((Fl_Callback*) change_color_theme_cb);
     mainWin->light_theme_bttn->callback((Fl_Callback*) change_color_theme_cb);
     mainWin->dark_theme_bttn->callback((Fl_Callback*) change_color_theme_cb);
+
+    mainWin->reset_appconfig_bttn->callback([](Fl_Widget* w, void* data) {
+        bool dummyFlag;
+        bool continue_resetoptions = showChoiceWindow(_("This will reset all options to default values. Need to re-open the application to apply changes. Do you want to continue?"), dummyFlag);
+        if (continue_resetoptions) {
+           config->clearAppProperties();
+           logger->info(_("Reseting application options to default values."));
+           exitApp();
+        }
+
+    });
 
     // Redraw the window to show the new button
     mainWin->redraw();
@@ -1474,8 +1513,8 @@ void parseOptions(int argc, char **argv){
     if (existsCmdOption(argc, argv, "--config")){
         const std::string path = getOptionValue(argc, argv, "--config");
         if (path != "" && std::filesystem::exists(path)){
-            CONFIGFILE_PATH = path;
-            printf(_("Loading custom config file %s.\n"), CONFIGFILE_PATH.c_str());
+            CONFIG_FILE_PATH = path;
+            printf(_("Loading custom config file %s.\n"), CONFIG_FILE_PATH.c_str());
         } else {
             if (!std::filesystem::exists(path)) {
                 printf(_("Specified path at --config parameter does not exist.\n"));

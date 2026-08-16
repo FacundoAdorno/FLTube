@@ -44,7 +44,7 @@ decl {enum ColorTheme {
 }
 
 widget_class FLTubeMainWindow {
-  label FLTube selected
+  label FLTube open
   xywh {0 0 593 540}
   class Fl_Double_Window visible
 } {
@@ -142,6 +142,10 @@ widget_class FLTubeMainWindow {
           label {Start recording}
           tooltip aaaaaaaaaaaaaaaa xywh {0 0 100 20}
         }
+      }
+      MenuItem reset_appconfig_bttn {
+        label {Reset Options} selected
+        xywh {0 0 100 20}
       }
       MenuItem check_update_bttn {
         label {Check for updates}
@@ -302,7 +306,7 @@ widget_class TinyChoiceWindow {
 }
 
 widget_class HelpFLTubeWindow {
-  label {FLTube Help} open
+  label {FLTube Help}
   xywh {0 0 480 352} hide
   class Fl_Double_Window modal
 } {

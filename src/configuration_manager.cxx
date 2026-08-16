@@ -12,14 +12,15 @@
  */
 #include "../include/configuration_manager.h"
 #include "../include/fltube_utils.h"
+#include <filesystem>
 
-
-ConfigurationManager::ConfigurationManager(std::string path_to_conf, std::shared_ptr<TerminalLogger> const& logger_) : logger(logger_)
+Configuration::Configuration(std::string conf_path, std::shared_ptr<TerminalLogger> const& logger_, bool persist_, bool readonly_) :
+    filepath(conf_path), logger(logger_), persist(persist_), readonly(readonly_)
 {
   configurations = std::make_unique<std::map<std::string, std::string>>();
-  shortcuts = new KeyboardShortcuts();
+
   if (logger_ == nullptr) this->logger = std::make_shared<TerminalLogger>(false);
-    std::ifstream infile(path_to_conf);
+    std::ifstream infile(conf_path);
     std::string line, config_key, config_value;
     while (std::getline(infile, line)) {
         config_key = config_value = "";
@@ -36,19 +37,52 @@ ConfigurationManager::ConfigurationManager(std::string path_to_conf, std::shared
             }
         }
     }
-
-    shortcuts->overwriteDefaults(this);
 }
 
-ConfigurationManager::~ConfigurationManager(){
-    delete shortcuts;
+Configuration::~Configuration(){
+    if (this->persist) {
+        logger->debug(_("Saving to disk current App configuration: ") + this->filepath);
+        std::ofstream outputfile;
+        if ( std::filesystem::exists(this->filepath) ) {
+            std::string bkp_filename = this->filepath + ".bkp";
+            //Making a backup of previous file (if exists) before saving new data...
+            std::filesystem::remove(bkp_filename);
+            std::filesystem::copy_file(this->filepath, bkp_filename, std::filesystem::copy_options::overwrite_existing);
+            std::filesystem::remove(this->filepath);
+        }
+        //Open file (and create if not exists) for write.
+        outputfile.open(filepath, std::ofstream::trunc);
+
+        for (auto iter = configurations->begin(); iter != configurations->end(); ++iter) {
+            outputfile << iter->first << "=" << iter->second << "\n";
+        }
+
+        if (this->readonly) {
+            // Make this config readonly if so configured...
+            std::filesystem::permissions( this->filepath,
+                                          std::filesystem::perms::owner_read | std::filesystem::perms::group_read | std::filesystem::perms::others_read,
+                                          std::filesystem::perm_options::replace );
+        }
+
+        outputfile.close();
+    }
 }
 
-bool ConfigurationManager::existProperty(const char* config_name) {
+ConfigurationManager::ConfigurationManager(std::string conf_file_path, std::string conf_app_path, std::shared_ptr<TerminalLogger> const& logger_): logger(logger_) {
+
+    if (logger_ == nullptr) this->logger = std::make_shared<TerminalLogger>(false);
+    this->config_by_file = std::make_unique<Configuration>(conf_file_path, logger_);
+    this->config_by_app = std::make_unique<Configuration>(conf_app_path, logger_, true, true);
+    shortcuts = new KeyboardShortcuts();
+    shortcuts->overwriteDefaults(*this->config_by_file);
+    shortcuts->overwriteDefaults(*this->config_by_app);
+}
+
+bool Configuration::existProperty(const char* config_name) const {
     return (config_name && configurations && configurations->find(config_name) != configurations->end());
 }
 
-std::string ConfigurationManager::getProperty(const char* config_name, const char* default_value){
+std::string Configuration::getProperty(const char* config_name, const char* default_value) const {
     if (!config_name || std::strlen(config_name) == 0) {
         return "";
     }
@@ -58,7 +92,33 @@ std::string ConfigurationManager::getProperty(const char* config_name, const cha
     return std::string((default_value) ? default_value : "");
 }
 
-int ConfigurationManager::getIntProperty(const char *config_name, int default_value) {
+bool Configuration::addProperty(const char* config_name, const char* new_value, bool overwrite) {
+    if (existProperty(config_name) && !overwrite)  return false;
+    // otherwise add property
+    (*configurations)[config_name] = new_value;
+
+    return true;
+}
+
+void Configuration::clearAll() {
+    this->configurations->clear();
+}
+
+bool ConfigurationManager::existProperty(const char* config_name) const {
+    for (auto config : {config_by_app.get(), config_by_file.get()} ) {
+        if (config->existProperty(config_name)) return true;
+    }
+    return false;
+}
+
+std::string ConfigurationManager::getProperty(const char* config_name, const char* default_value) const {
+    for (auto config : {config_by_app.get(), config_by_file.get()} ) {
+        if (config->existProperty(config_name)) return config->getProperty(config_name, default_value);
+    }
+    return default_value;
+}
+
+int ConfigurationManager::getIntProperty(const char *config_name, const int default_value) const {
 
     char default_value_bff[20];
     snprintf(default_value_bff, sizeof(default_value_bff), "%d", default_value);
@@ -75,7 +135,7 @@ int ConfigurationManager::getIntProperty(const char *config_name, int default_va
     return default_value;
 }
 
-bool ConfigurationManager::getBoolProperty(const char* config_name, bool default_value) {
+bool ConfigurationManager::getBoolProperty(const char* config_name, const bool default_value) const {
     std::string p = getProperty(config_name, "");
     if (!p.empty()) {
         if (p == "True" || p == "true") return true;
@@ -83,6 +143,14 @@ bool ConfigurationManager::getBoolProperty(const char* config_name, bool default
     }
     // If configuration is not defined, or value not equal to "True", "true", "False", or "false"...
     return default_value;
+}
+
+void ConfigurationManager::addAppProperty(const char* config_name, const char* new_value) {
+    this->config_by_app->addProperty(config_name, new_value);
+}
+
+void ConfigurationManager::clearAppProperties() {
+    this->config_by_app->clearAll();
 }
 
 int ConfigurationManager::getShortcutFor(SHORTCUTS s){
@@ -216,11 +284,11 @@ int KeyboardShortcuts::isWellDefined(std::string shortcut_def) {
     return KeyboardShortcuts::INVALID_SHORTCUT;
 };
 
-void KeyboardShortcuts::overwriteDefaults(ConfigurationManager* config) {
+void KeyboardShortcuts::overwriteDefaults(const Configuration& config) {
     std::string shtc_value;
     int shtc_value_int;
     for ( auto iter = this->shortcuts_str->begin(); iter != shortcuts_str->end(); ++iter) {
-        shtc_value = config->getProperty(iter->second, "");
+        shtc_value = config.getProperty(iter->second, "");
         if (shtc_value != "") {
             shtc_value_int = KeyboardShortcuts::isWellDefined(shtc_value);
             // printf("Value 1: %d - Value 2: %d", FL_CTRL + FL_F + 1 ,shtc_value_int);

@@ -61,6 +61,7 @@ public:
   static Fl_Menu_Item *cache_clearall_bttn;
   static Fl_Menu_Item *cache_pause_bttn;
   static Fl_Menu_Item *cache_unpause_bttn;
+  static Fl_Menu_Item *reset_appconfig_bttn;
   static Fl_Menu_Item *check_update_bttn;
   Fl_Tabs *central_tabs;
   Fl_Group *searchbox_tab;

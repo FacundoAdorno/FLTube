@@ -35,32 +35,73 @@ enum class SHORTCUTS {
  *          config_key = value.
  * Comments starts with "#".
 */
-class ConfigurationManager {
+class Configuration {
 protected:
     std::string filepath;
     std::unique_ptr<std::map<std::string, std::string>> configurations;
-    KeyboardShortcuts* shortcuts;
     std::shared_ptr<TerminalLogger> logger;
+    // Write this configuration to disk in the specified filepath.
+    bool persist;
+    // If write to disk, specify if the created file must be readonly or not.
+    bool readonly;
 
 public:
-    ConfigurationManager(std::string path_to_conf, std::shared_ptr<TerminalLogger> const& logger);
-    ~ConfigurationManager();
+    Configuration(std::string path_to_conf, std::shared_ptr<TerminalLogger> const& logger, bool persist = false, bool readonly = false);
+    ~Configuration();
     /*
      *   Returns true if the configuration is set in the configuration file.
      */
-    bool existProperty(const char* config_name);
+    bool existProperty(const char* config_name) const;
     /*
      * Return the value of a property configuration.
      * If no property is found, returns @default_value or empty string ("") if no default value is specified..
      */
-    std::string getProperty(const char* config_name, const char* default_value);
+    std::string getProperty(const char* config_name, const char* default_value) const;
+
+    /* Add a new property. Overwrite existing one by default if no otherwise specified.
+     * Returns true if value was added. */
+    bool addProperty(const char* config_name, const char* new_value, bool overwrite = true);
+
+    /* Remove all properties saved at this configuration instance. */
+    void clearAll();
+};
+
+class ConfigurationManager {
+protected:
+    /* Configuration loaded by a static file that can be modified from an editor. Namely, the fltube.conf. */
+    std::unique_ptr<Configuration> config_by_file;
+    /* Configuration generated through the app usage, loaded from a read-only file.
+     *  This configuration has more priority over configuration by file. */
+    std::unique_ptr<Configuration> config_by_app;
+    std::shared_ptr<TerminalLogger> logger;
+
+    KeyboardShortcuts* shortcuts;
+public:
+    ConfigurationManager(std::string conf_file_path, std::string conf_app_path, std::shared_ptr<TerminalLogger> const& logger);
+
+    /*
+     *   Returns true if the configuration exists in at least at any configuration source.
+     */
+    bool existProperty(const char* config_name) const;
+    /*
+     * Return the value of a property configuration. Iterate over all configuration sources until property is found.
+     * If no property is found, returns @default_value or empty string ("") if no default value is specified..
+     */
+    std::string getProperty(const char* config_name, const char* default_value) const;
+
     /** Return the value of a INTEGER property configuration.
      *  If no property is found, returns @default_value. */
-    int getIntProperty(const char *config_name, int default_value);
+    int getIntProperty(const char *config_name, const int default_value) const;
 
     /** Return the value of a BOOLEAN property configuration.
      *  If no property is found, returns @default_value. */
-    bool getBoolProperty(const char *config_name, bool default_value);
+    bool getBoolProperty(const char *config_name, const bool default_value) const;
+
+    /*  Add and persist a new property defined from application usage. */
+    void addAppProperty(const char* config_name, const char* new_value);
+
+    /* Delete all properties created from application usage. Simulate a "reset" to default values. */
+    void clearAppProperties();
 
     /**
      * Return the specific keybindings for some shortcut name. As underlying implementation, a KeyboardShortcuts object is used.
@@ -135,7 +176,7 @@ class KeyboardShortcuts {
         ~KeyboardShortcuts() {};
 
         /** OVerwrite the defaults keybindings if defined in a ConfigurationManager. */
-        void overwriteDefaults(ConfigurationManager* config);
+        void overwriteDefaults(const Configuration& config);
         /** Set an individual shortcut. */
         void setShortcut(SHORTCUTS s , int value, std::string keybinding_text);
         /** Return the configured keybinding for an specific shortcut.
