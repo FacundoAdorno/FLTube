@@ -17,6 +17,8 @@
 
 const std::string YtDlp_Helper::DEFAULT_YTDLP_PATH = "yt-dlp";
 
+const std::string YtDlp_Helper::ALTERN_YT_PLAYER_CLIENT = "web_embedded";
+
 /** Parse the metadata printed by the exec of a yt-dlp command. Returns a YTDLP_Video_Metadata struct. */
 YTDLP_Video_Metadata* YtDlp_Helper::parse_metadata(const char ytdlp_video_metadata[1024]){
     std::stringstream lineStream(ytdlp_video_metadata);
@@ -192,8 +194,55 @@ yt_metadata_arr YtDlp_Helper::do_youtube_search(const char* search_text ,Paginat
     return result_yt_metadata;
 }
 
-void YtDlp_Helper::stream(const char* video_url) {
+std::string YtDlp_Helper::get_stream_url(const char* video_url, const char* stream_format, bool &is_dash_format, std::vector<std::string> &urls, std::string alt_player_client) {
     char get_final_url_cmd[2048];
+    std::string final_url_result;
+    urls.clear();
+    is_dash_format = false;
+
+    // If video is not live, 1rst try to obtain final video URL using default method...
+    // 1rst: lookup final video URL if exists at cache...
+    final_url_result = cache->get_entry_value(getIdFor(video_url));
+    if (final_url_result == CacheEntry::EMPTY_VALUE) {
+        std::string alt_player_arg = "";
+        if (alt_player_client != "") {
+            alt_player_arg = "--extractor-args \"youtube:player_client=" + alt_player_client + "\"";
+        }
+        // 2nd: if final video url is not cached, then obtain it using yt-dlp.
+        snprintf(get_final_url_cmd, sizeof(get_final_url_cmd), "%s -S \"%s\" -g \"%s\" %s 2> %s/ytdlp_errors.log",
+                 YTDLP_BIN_PATH.c_str(), stream_format, video_url, alt_player_arg.c_str(), this->TEMP_WORKING_DIR.c_str());
+        this->logger->debug("EXEC COMMAND = " + std::string(get_final_url_cmd) + "\n");
+        final_url_result = exec(get_final_url_cmd);
+        urls = tokenize(final_url_result, '\n');
+    } else {
+        urls = tokenize(final_url_result, DASH_URL_CACHE_SEPARATOR);
+    }
+
+    // Check if yt-dlp result is at DASH format...
+    if (urls.size() > 1) {
+        // Verify if yt-dlp returns a Progressive format (video+audio in one URL) or DASH (video and audio in differents URLs).
+        // Progressive format is desired for older PC's, but if no available for required format, then multiplex DASH urls using FFmpeg...
+        if (urls.size() == 2) {
+            logger->debug(_("No progressive format is available for the requested resolution. Instead, yt-dlp returned a DASH format. Resolution: ") + std::to_string(this->video_resolution));
+            is_dash_format = true;
+        } else {
+            logger->error(_("yt-dlp returns more than 2 URLS. Aborting stream operation for unknown response format."));
+            logger->debug(_("Unkonwn URL Format response: ") + final_url_result);
+            return "";
+        }
+    }
+
+    if (is_dash_format) {
+        final_url_result = urls.at(0) + DASH_URL_CACHE_SEPARATOR + urls.at(1);
+    } else {
+        // Sanitize URL if not in DASH format...
+        replace_all(final_url_result, "\n", "");
+    }
+
+    return final_url_result;
+}
+
+FLTUBE_STATUS_CODES YtDlp_Helper::stream(const char* video_url) {
     char stream_videoplayer_cmd[3072];
     char stream_format[100];
     std::string final_url_result;
@@ -202,40 +251,26 @@ void YtDlp_Helper::stream(const char* video_url) {
         snprintf(stream_videoplayer_cmd, sizeof(stream_videoplayer_cmd),
                  "%s -S \"%s\" -o - \"%s\" | %s %s %s -", YTDLP_BIN_PATH.c_str(), stream_format, video_url, this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str(), this->media_player->getExtraParams().c_str());
     } else {
-        // If video is not live, 1rst try to obtain final video URL using default method...
-        // 1rst: lookup final video URL if exists at cache...
-        final_url_result = cache->get_entry_value(getIdFor(video_url));
-        std::vector<std::string> urls;
-        if (final_url_result == CacheEntry::EMPTY_VALUE) {
-            // 2nd: if final video url is not cached, then obtain it using yt-dlp.
-            snprintf(get_final_url_cmd, sizeof(get_final_url_cmd), "%s -S \"%s\" -g \"%s\" 2> %s/ytdlp_errors.log", YTDLP_BIN_PATH.c_str(), stream_format, video_url, this->TEMP_WORKING_DIR.c_str());
-            this->logger->debug("EXEC COMMAND = " + std::string(get_final_url_cmd) + "\n");
-            final_url_result = exec(get_final_url_cmd);
-            urls = tokenize(final_url_result, '\n');
-        } else {
-            urls = tokenize(final_url_result, DASH_URL_CACHE_SEPARATOR);
-        }
-
-        // Check if yt-dlp result is at DASH format...
         bool is_dash_format = false;
-        if (urls.size() > 1) {
-            // Verify if yt-dlp returns a Progressive format (video+audio in one URL) or DASH (video and audio in differents URLs).
-            // Progressive format is desired for older PC's, but if no available for required format, then multiplex DASH urls using FFmpeg...
-            if (urls.size() == 2) {
-                logger->debug(_("No progressive format is available for the requested resolution. Instead, yt-dlp returned a DASH format. Resolution: ") + std::to_string(this->video_resolution));
-                is_dash_format = true;
-            } else {
-                logger->error(_("yt-dlp returns more than 2 URLS. Aborting stream operation for unknown response format."));
-                logger->debug(_("Unkonwn URL Format response: ") + final_url_result);
-                return;
+        std::vector<std::string> urls;
+        final_url_result = this->get_stream_url(video_url, stream_format, is_dash_format, urls);
+
+        FLTUBE_STATUS_CODES res = check_url_access(urls[0]);
+        if (res != FLT_OK) {
+            for (std::string alt_player: this->alt_player_clients) {
+                if (res == FLT_HTTP_FORBIDDEN) {
+                    logger->debug(_("yt-dlp resolved to an INVALID URL (403 FORBIDDEN code was returned). Trying with another player_client: ") + alt_player);
+                    final_url_result = this->get_stream_url(video_url, stream_format, is_dash_format, urls, alt_player);
+                    res = check_url_access(urls[0]);
+                } else if (res == FLT_OK) {
+                    break;
+                }
             }
         }
 
-        if (is_dash_format) {
-            final_url_result = urls.at(0) + DASH_URL_CACHE_SEPARATOR + urls.at(1);
-        } else {
-            // Sanitize URL if not in DASH format...
-            replace_all(final_url_result, "\n", "");
+        if (res != FLT_OK) {
+            logger->error(_("Cannot obtain a valid stream URL. Please check if your yt-dlp installation is up to date. More info at: ") + std::string("https://github.com/yt-dlp/yt-dlp/releases/latest"));
+            return res;
         }
 
         if (final_url_result != "") {
@@ -259,12 +294,13 @@ void YtDlp_Helper::stream(const char* video_url) {
                     "%s -f \"%s\" -o - --merge-output-format mkv \"%s\" | %s %s -", YTDLP_BIN_PATH.c_str(), stream_format, video_url, this->media_player->getBinaryPath().c_str(), this->media_player->getParams().c_str());
             } else {
                 logger->error(_("Cannot obtain URL for specified video, and alternative stream method is disabled."));
-                return;
+                return FTL_HTTP_GENERAL_ERROR;
             }
         }
     }
     this->logger->debug("EXEC COMMAND = " + std::string(stream_videoplayer_cmd) + "\n");
     system(stream_videoplayer_cmd);
+    return FLT_OK;
 }
 
 /**

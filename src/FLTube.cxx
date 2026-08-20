@@ -45,6 +45,8 @@ std::array <VideoInfo*, PaginationManager::SEARCH_PAGE_SIZE> video_info_arr{ nul
 // Pointer to the video currently selected for stream...
 VideoInfo* video_selected_for_stream = nullptr;
 
+std::atomic<FLTUBE_STATUS_CODES> last_stream_result(FLT_OK);
+
 // Array that holds the search results METADATA, in groups of size @PaginationManager::SEARCH_PAGE_SIZE...
 std::array <YTDLP_Video_Metadata*, PaginationManager::SEARCH_PAGE_SIZE> video_metadata{ nullptr, nullptr, nullptr, nullptr };
 
@@ -135,6 +137,8 @@ std::atomic<bool> ytdlp_action_in_progress(false);
 std::atomic<bool> SHOWING_LOADING_SCREEN_F(false);
 
 std::atomic<bool> SHOWING_LOADING_DETAILED_METADATA_F(false);
+
+std::atomic<bool> MESSAGE_PENDING(false);
 /**
  * Callback for main window close action. By default, exit app with success status code (0).
  */
@@ -367,6 +371,19 @@ void lock_buttons(bool lock){
     Fl::check();
 }
 
+/* Custom FLTK idle function to check if there are a message pending to show after an atempt to make a YTDLP Stream.*/
+void check_forbidden_stream(void*)
+{
+    if (MESSAGE_PENDING.load()) {
+        if (last_stream_result.load() == FLT_HTTP_FORBIDDEN) {
+            last_stream_result.store(FLT_OK);
+            MESSAGE_PENDING.store(false);
+            showMessageWindow(_("Cannot stream selected video (403 Forbidden Access is informed). Please, check if your yt-dlp version is up to date or ask for help in FLTube github repository."));
+        }
+    }
+    Fl::repeat_timeout(0.25, check_forbidden_stream);
+}
+
 /** Callback to preview a video... */
 void preview_video_cb(Fl_Button* widget, void* video_url){
     if (ytdlp_action_in_progress)
@@ -401,11 +418,19 @@ void preview_video_cb(Fl_Button* widget, void* video_url){
         logger->info(message);
         auto stream_lambda = [&](std::string* url, bool is_a_live) {
             ytdlp_action_in_progress = true;
+
             //TODO 'ytdlp' variable must be protected when using in other thread????????
             ytdlp->is_live(is_a_live);
-            ytdlp->stream(url->c_str());
-            ytdlp_action_in_progress = false;
+            FLTUBE_STATUS_CODES stream_result;
+            stream_result = ytdlp->stream(url->c_str());
 
+            if (stream_result == FLT_HTTP_FORBIDDEN) {
+                last_stream_result.store(stream_result);
+                MESSAGE_PENDING.store(true);
+                Fl::awake();
+            }
+
+            ytdlp_action_in_progress = false;
         };
         // TODO: in the future, a ThreadPool of one or more threads could be implemented for optimization. More info at https://www.geeksforgeeks.org/cpp/thread-pool-in-cpp/.
         std::thread worker(stream_lambda, url, vi->is_live_image->visible());
@@ -1029,6 +1054,9 @@ void pre_init() {
         return;
     }
 
+    auto props = config->getListsProperty("ALTERNATIVE_YT_PLAYER_LIST", YtDlp_Helper::ALTERN_YT_PLAYER_CLIENT.c_str());
+    for (auto prop : props) ytdlp->add_alt_player_client(prop);
+
     initial_win->loading_about_data->label(_("Loading resources files..."));
     live_image = load_resource_image("livebutton_18p.png");
     playicon_image = load_resource_image("playicon.png");
@@ -1059,6 +1087,7 @@ void pre_init() {
 
     // Add a custom FLTK event dispatcher
     Fl::event_dispatch([](int event, Fl_Window* w) -> int{
+        //TODO Modify atomic variables access syntax using "load" or "store" functions, so is better to understand the real concurrence action...
         if (ytdlp_action_in_progress) {
             // If streaming is in progress, then turn cursor to default if changed...
             if (current_displayed_cursor != FL_CURSOR_WAIT) lock_buttons(true);
@@ -1236,6 +1265,9 @@ void post_init() {
         }
 
     });
+
+    /// FLTK CUSTOM TIMEOUT CALLBACKS
+    Fl::add_timeout(0.25, check_forbidden_stream);
 
     // Redraw the window to show the new button
     mainWin->redraw();

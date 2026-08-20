@@ -145,6 +145,18 @@ bool ConfigurationManager::getBoolProperty(const char* config_name, const bool d
     return default_value;
 }
 
+std::vector<std::string> ConfigurationManager::getListsProperty(const char *config_name, const char *default_value) const {
+    std::vector<std::string> props;
+    if (existProperty(config_name)) {
+        std::string prop_value = getProperty(config_name, default_value);
+        props = tokenize(prop_value, ',');
+        for (auto& prop : props)    trim(prop);
+    } else {
+        if (strlen(default_value) > 0)  props.push_back(default_value);
+    }
+    return props;
+}
+
 void ConfigurationManager::addAppProperty(const char* config_name, const char* new_value) {
     this->config_by_app->addProperty(config_name, new_value);
 }

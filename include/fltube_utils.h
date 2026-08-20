@@ -64,7 +64,7 @@ const std::string YOUTUBE_URL_PREFIX = HTTPS_PREFIX + "youtu.be/";
 /** FLtube custom status codes definition... */
 enum FLTUBE_STATUS_CODES {
     FLT_OK=0, FLT_GENERAL_FAILED= 1, FLT_DOWNLOAD_FL_FAILED = 2, FLT_DOWNLOAD_FL_BYPASSED = 3,
-    FLT_INVALID_CMD_PARAM=4,
+    FLT_INVALID_CMD_PARAM=4, FLT_UNEXPECTED_PARAM = 5, FTL_HTTP_GENERAL_ERROR = 6, FLT_HTTP_FORBIDDEN = 7,
 };
 
 /** Simplet permissions scheme. */
@@ -209,6 +209,8 @@ bool canWriteOnDir(const char* directory);
 static CURL* get_curl_handle(const char* forURL, FILE* output_file = nullptr);
 
 FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::string outfilename, bool overwrite = false);
+
+FLTUBE_STATUS_CODES check_url_access(std::string url);
 
 bool verify_network_connection();
 

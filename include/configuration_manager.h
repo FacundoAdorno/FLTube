@@ -97,6 +97,10 @@ public:
      *  If no property is found, returns @default_value. */
     bool getBoolProperty(const char *config_name, const bool default_value) const;
 
+    /** Return a vector of string properties, delimited by a comma (,).
+     *  If default_value is empty, returned vector will be empty. **/
+    std::vector<std::string> getListsProperty(const char *config_name, const char *default_value) const;
+
     /*  Add and persist a new property defined from application usage. */
     void addAppProperty(const char* config_name, const char* new_value);
 

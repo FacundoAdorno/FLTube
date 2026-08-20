@@ -225,6 +225,41 @@ FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::
     return returnCode;
 }
 
+/* Verify if URL is reachable and it access is allowed. Returns the following codes:
+ *  - FLT_OK if access is allowed.
+ *  - FLT_UNEXPECTED_PARAM if URL is not a valid one or is empty.
+ *  - FLT_HTTP_FORBIDDEN if a 403 Forbidden is returned from server.
+ *  - FLT_HTTP_GENERAL_ERROR if server returns an http code > 400. */
+FLTUBE_STATUS_CODES check_url_access(std::string url) {
+    if (url.empty() || !isUrl(url.c_str())) return FLT_UNEXPECTED_PARAM;
+
+    CURL *curl;
+    CURLcode response;
+    FLTUBE_STATUS_CODES returnCode = FLT_OK;
+
+    curl = get_curl_handle(url.c_str());
+    curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
+    /* get us the resource without a body - use HEAD */
+    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+
+    if (curl) {
+        response = curl_easy_perform(curl);
+        if (response == CURLE_HTTP_RETURNED_ERROR) {
+            long http_code = 0;
+            curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
+            if (http_code >= 400) {
+                if (http_code == 403) {
+                    // Forbidden 403
+                    returnCode = FLT_HTTP_FORBIDDEN;
+                } else {
+                    returnCode = FTL_HTTP_GENERAL_ERROR;
+                }
+            }
+        }
+    }
+    return returnCode;
+}
+
 /**
  *  Check if there is network connectivity. Returns true if Internet is reachable.
  */

@@ -134,12 +134,18 @@ class YtDlp_Helper {
          *      map <"search term / channel ID <map <"video_id", parsed metadata>>>"  */
         std::map<std::string, std::vector<std::pair<std::string, YTDLP_Video_Metadata*>>> search_cache;
 
+        /* List of alternative YouTube player client in case of default fails with HTTP 403 Forbidden code,
+         * as defined in https://github.com/yt-dlp/yt-dlp#youtube. */
+        std::vector<std::string> alt_player_clients;
+
         /* When doing a search, a inner search history is saved, in order to recall previous searches results... */
         std::vector<std::string> search_history;
         int current_search_history_index;
 
         /* Method to define the specific search parameters for Youtube Extractor, and make the videos search.  */
         yt_metadata_arr do_youtube_search(const char* search_text, Pagination_Info page_info);
+
+        std::string get_stream_url(const char* video_url, const char* stream_format, bool& is_dash_format, std::vector<std::string> &urls, std::string alt_player_client = "");
 
         std::vector<YTDLP_Video_Metadata*> retrieve_metadata(const char* search_text);
 
@@ -156,6 +162,9 @@ class YtDlp_Helper {
         const static int DEFAULT_MIN_BATCH_SIZE = 40;
         const static int DEFAULT_MAX_BATCH_SIZE = 200;
         const static std::string DEFAULT_YTDLP_PATH;
+        /* Alternative YouTube player client in case of default fails with HTTP 403 Forbidden code,
+         * as defined in https://github.com/yt-dlp/yt-dlp#youtube. */
+        const static std::string ALTERN_YT_PLAYER_CLIENT;
 
 
         YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache, std::string working_dir, unsigned int batch_size, std::string ytdlp_path):
@@ -221,7 +230,7 @@ class YtDlp_Helper {
 
         /*  Start the streaming of an specific video URL. If the video is live, you should specify this before stream.
          *  If the default stream method is not working, stream using the alternative method (if configured this way). */
-        void stream(const char* video_url);
+        FLTUBE_STATUS_CODES stream(const char* video_url);
 
         /*  Change the configured search type permanently. */
         void set_search_type(SEARCH_BY_TYPE s) {
@@ -245,6 +254,13 @@ class YtDlp_Helper {
         /* Set the @YT_METADATA_PROFILE used in next video search. */
         void set_metadata_profile(YT_METADATA_PROFILE profile) {
             this->metadata_profile = profile;
+        }
+
+        void add_alt_player_client(std::string new_player) {
+            if (new_player.empty()) return;
+            if (std::find(alt_player_clients.begin(), alt_player_clients.end(), new_player) == alt_player_clients.end()) {
+                this->alt_player_clients.push_back(new_player);
+            }
         }
 
         /* Returns the metadata template used when printing video metadata... Values available are:
