@@ -59,9 +59,20 @@ Configuration::~Configuration(){
 
         if (this->readonly) {
             // Make this config readonly if so configured...
-            std::filesystem::permissions( this->filepath,
-                                          std::filesystem::perms::owner_read | std::filesystem::perms::group_read | std::filesystem::perms::others_read,
-                                          std::filesystem::perm_options::replace );
+            try {
+                std::filesystem::permissions( this->filepath,
+                                            std::filesystem::perms::owner_read | std::filesystem::perms::group_read | std::filesystem::perms::others_read,
+                                            std::filesystem::perm_options::replace );
+            } catch (const std::filesystem::filesystem_error& e) {
+                // Fallback for filesystems where std::filesystem::permissions()
+                // is not implemented.
+                if (::chmod(this->filepath.c_str(), 0444) != 0) {
+                    char mssg[256];
+                    snprintf(mssg, sizeof(mssg), _("chmod() failed [%s]: cannot set readonly for file %s."),
+                             std::strerror(errno), this->filepath.c_str());
+                    logger->error(mssg);
+                }
+            }
         }
 
         outputfile.close();
