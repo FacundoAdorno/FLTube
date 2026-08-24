@@ -71,6 +71,9 @@ std::string CONFIG_FILE_PATH = "";
 // Path to fltube resources, like images, sounds, etc. Can be modified at fltube.conf file.
 std::string RESOURCES_PATH = "/usr/local/share/fltube/resources";
 
+// Current displayed language for UI.
+std::string current_language;
+
 //If value is true, enable the debug mode. Defaults to false.
 bool DEBUG_ENABLED = false;
 
@@ -876,6 +879,22 @@ void change_color_theme_cb(Fl_Widget* w, void* data) {
     config->addAppProperty("COLOR_THEME", color_alternatives[selected_theme].c_str());
 }
 
+void change_lang_cb(Fl_Widget* w, void* data) {
+    const char* selected_lang = static_cast<const char*>(data);
+    if (current_language == selected_lang)  return;
+    if (!set_new_language(selected_lang)) {
+        char mssg[128];
+        snprintf(mssg, sizeof(mssg), _("Cannot update application UI to language '%s' because it is not available."), get_lang_text(selected_lang).c_str());
+        logger->error(mssg);
+        return;
+    }
+    config->addAppProperty("LANGUAGE_APP", selected_lang);
+    current_language = selected_lang;
+    logger->info(_("FLTube UI language updated to ") + get_lang_text(selected_lang));
+    showMessageWindow( _("FLTube will close. Open the app again to apply the language change."), _("Language changed" ));
+    exitApp();
+}
+
 void show_video_metadata_cb(Fl_Widget* w, void* data) {
     // Check if there is Internet connectivity before do a search...
     if (! verify_network_connection()) {
@@ -983,10 +1002,12 @@ void pre_init() {
     // If not specified custom configuration file through parameter "--config"...
     if (CONFIG_FILE_PATH.empty())
         CONFIG_FILE_PATH = (std::filesystem::exists(USER_CONFIGFILE_PATH)) ? USER_CONFIGFILE_PATH : SYSTEM_CONFIGFILE_PATH;
-    //TODO Determinar la ruta como se definirá el CONFIG_APP_PATH
     logger->debug(_("Loading configurations from ") + CONFIG_FILE_PATH);
     initial_win->loading_about_data->label(_("Processing configuration file..."));
     config = new ConfigurationManager(CONFIG_FILE_PATH.c_str(), CONFIG_APP_PATH.c_str(), logger);
+    //Init Localization. Use locale path specified at config, or custom config DEFAULT_LOCAL_PATH.
+    current_language = config->getProperty("LANGUAGE_APP", accepted_langs.at(DEFAULT_LANGUAGE).c_str());
+    setup_gettext(current_language, config->getProperty("LOCALE_PATH", DEFAULT_LOCAL_PATH.c_str()));
     initial_win->loading_about_data->label(_("Processing user configuration file..."));
     userdata = new UserDataManager(USERDATA_FILE_PATH, getIntVersion(std::string(VERSION)), logger);
     page_manager = new PaginationManager();
@@ -997,8 +1018,6 @@ void pre_init() {
     cache->set_save_directory_path(
         config->getProperty("CACHE_PATH", default_cache_path.c_str()), "fltube_url_cache.txt");
     cache->init();
-    //Init Localization. Use locale path specified at config, or custom config default_locale_path().
-    setup_gettext("", config->getProperty("LOCALE_PATH", default_locale_path().c_str()));
 
     initial_win->loading_about_data->label(_("Configuring the application..."));
     if(config->existProperty("STREAM_PLAYER_PATH")) {
@@ -1254,6 +1273,10 @@ void post_init() {
     mainWin->default_theme_bttn->callback((Fl_Callback*) change_color_theme_cb);
     mainWin->light_theme_bttn->callback((Fl_Callback*) change_color_theme_cb);
     mainWin->dark_theme_bttn->callback((Fl_Callback*) change_color_theme_cb);
+
+    mainWin->en_lang_bttn->callback((Fl_Callback*)change_lang_cb);
+    mainWin->es_lang_bttn->callback((Fl_Callback*)change_lang_cb);
+    mainWin->pt_BR_lang_bttn->callback((Fl_Callback*)change_lang_cb);
 
     mainWin->reset_appconfig_bttn->callback([](Fl_Widget* w, void* data) {
         bool dummyFlag;

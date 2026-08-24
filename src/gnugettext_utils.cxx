@@ -13,36 +13,60 @@
 #include "../include/gnugettext_utils.h"
 
 
-std::string default_locale_path(){
-    return std::string("/usr/local/share/locale");
-}
-
 /*
- * Setup locale used for app ("es", "en"). If nullptr passed, use system locale. Also, you can specify an alternative locale path.
+ * Setup locale used for app ("es", "en"). If nullptr passed, use system locale. This param is used to define
+ *      the following env variables: (1) LC_ALL y (2) LANGUAGE (gettext env var).
+ * Also, you can specify an alternative locale path.
  */
-void setup_gettext(const std::string& locale = "", const std::string& locale_path = "") {
-    // Establecer el locale
+void setup_gettext(const std::string& locale_ = "", const std::string& locale_path = "") {
+    //  Set the app language. If cannot, use DEFAULT_LANGUAGE.
+    bool language_is_valid = is_language_available(locale_);
+    std::string locale = ((language_is_valid) ? locale_ : accepted_langs.at(DEFAULT_LANGUAGE));
+    setenv("LANGUAGE", locale.c_str(), 1);
+
+    // Set the locale (if exists at system). If cannot, use system locale.
     if (locale.empty()) {
-        // Si no se proporciona un locale, usar el sistema
+        // Use system locale if no locale param is provided...
         setlocale(LC_ALL, "");
     } else {
-        // Intentar establecer el locale proporcionado
-        if (setlocale(LC_ALL, locale.c_str()) == nullptr) {
-            std::cerr << "Warning: Locale '" << locale << "' not available. Falling back to system locale." << std::endl;
-            setlocale(LC_ALL, "");
-        }
+        // Try to set the provided locale...
+        if (setlocale(LC_ALL, locale.c_str()) == nullptr) { setlocale(LC_ALL, ""); }
     }
 
     if( locale_path.empty() || !std::filesystem::exists(locale_path) ) {
         std::cout << "Locales path: '" << locale_path << "' does not exists!!!" << std::endl;
-        bindtextdomain("FLTube", default_locale_path().c_str());
+        bindtextdomain("FLTube", DEFAULT_LOCAL_PATH.c_str());
     } else {
         std::cout << "USING Locales path: '" << locale_path << "'" << std::endl;
         bindtextdomain("FLTube", locale_path.c_str());
     }
     textdomain("FLTube");
 
-    std::cout << "Locale set to: " << (locale.empty() ? "system locale" : locale) << std::endl;
+    std::cout << "Locale set to: " << get_lang_text(locale) << std::endl;
+    std::cout << "Language set to: " << get_lang_text(locale) << std::endl;
+}
+
+LANGUAGE_APP get_lang(std::string target_lang) {
+    for (auto iter = accepted_langs.begin(); iter != accepted_langs.end(); iter++) {
+        if (iter->second == target_lang) return iter->first;
+    }
+    return LANGUAGE_APP::UNKNOWN;
+}
+
+std::string get_lang_text(std::string target_lang) {
+    LANGUAGE_APP lang = get_lang(target_lang);
+    if (lang != LANGUAGE_APP::UNKNOWN) return accepted_langs_text.at(lang);
+    return std::string{};   // Returns empty string if not exists...
+}
+
+bool is_language_available(std::string target_lang) {
+    return (get_lang(target_lang) != LANGUAGE_APP::UNKNOWN);
+}
+
+bool set_new_language(const std::string& locale) {
+    if (!is_language_available(locale)) return false;
+    setenv("LANGUAGE", locale.c_str(), 1);
+    return true;
 }
 
 

@@ -34,6 +34,11 @@ Fl_Menu_Item FLTubeMainWindow::menu_options_menu[] = {
  {gettext_noop("Light Theme"), 0,  0, (void*)(ColorTheme::LIGHT), 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Dark Theme"), 0,  0, (void*)(ColorTheme::DARK), 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
+ {gettext_noop("Language"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("English"), 0,  0, (void*)("en"), 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Espa\303\261ol"), 0,  0, (void*)("es"), 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("Portugu\303\252s"), 0,  0, (void*)("pt_BR"), 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {0,0,0,0,0,0,0,0,0},
  {gettext_noop("Navigation History"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Clear all"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Stop recording"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
@@ -57,14 +62,17 @@ Fl_Menu_Item* FLTubeMainWindow::quality_1080_bttn = FLTubeMainWindow::menu_optio
 Fl_Menu_Item* FLTubeMainWindow::default_theme_bttn = FLTubeMainWindow::menu_options_menu + 9;
 Fl_Menu_Item* FLTubeMainWindow::light_theme_bttn = FLTubeMainWindow::menu_options_menu + 10;
 Fl_Menu_Item* FLTubeMainWindow::dark_theme_bttn = FLTubeMainWindow::menu_options_menu + 11;
-Fl_Menu_Item* FLTubeMainWindow::history_clearall_bttn = FLTubeMainWindow::menu_options_menu + 14;
-Fl_Menu_Item* FLTubeMainWindow::history_pause_bttn = FLTubeMainWindow::menu_options_menu + 15;
-Fl_Menu_Item* FLTubeMainWindow::history_unpause_bttn = FLTubeMainWindow::menu_options_menu + 16;
-Fl_Menu_Item* FLTubeMainWindow::cache_clearall_bttn = FLTubeMainWindow::menu_options_menu + 19;
-Fl_Menu_Item* FLTubeMainWindow::cache_pause_bttn = FLTubeMainWindow::menu_options_menu + 20;
-Fl_Menu_Item* FLTubeMainWindow::cache_unpause_bttn = FLTubeMainWindow::menu_options_menu + 21;
-Fl_Menu_Item* FLTubeMainWindow::reset_appconfig_bttn = FLTubeMainWindow::menu_options_menu + 23;
-Fl_Menu_Item* FLTubeMainWindow::check_update_bttn = FLTubeMainWindow::menu_options_menu + 24;
+Fl_Menu_Item* FLTubeMainWindow::en_lang_bttn = FLTubeMainWindow::menu_options_menu + 14;
+Fl_Menu_Item* FLTubeMainWindow::es_lang_bttn = FLTubeMainWindow::menu_options_menu + 15;
+Fl_Menu_Item* FLTubeMainWindow::pt_BR_lang_bttn = FLTubeMainWindow::menu_options_menu + 16;
+Fl_Menu_Item* FLTubeMainWindow::history_clearall_bttn = FLTubeMainWindow::menu_options_menu + 19;
+Fl_Menu_Item* FLTubeMainWindow::history_pause_bttn = FLTubeMainWindow::menu_options_menu + 20;
+Fl_Menu_Item* FLTubeMainWindow::history_unpause_bttn = FLTubeMainWindow::menu_options_menu + 21;
+Fl_Menu_Item* FLTubeMainWindow::cache_clearall_bttn = FLTubeMainWindow::menu_options_menu + 24;
+Fl_Menu_Item* FLTubeMainWindow::cache_pause_bttn = FLTubeMainWindow::menu_options_menu + 25;
+Fl_Menu_Item* FLTubeMainWindow::cache_unpause_bttn = FLTubeMainWindow::menu_options_menu + 26;
+Fl_Menu_Item* FLTubeMainWindow::reset_appconfig_bttn = FLTubeMainWindow::menu_options_menu + 28;
+Fl_Menu_Item* FLTubeMainWindow::check_update_bttn = FLTubeMainWindow::menu_options_menu + 29;
 
 FLTubeMainWindow::FLTubeMainWindow(int X, int Y, int W, int H, const char *L) :
   Fl_Double_Window(X, Y, W, H, L)
@@ -161,6 +169,18 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
       o->label(_(o->label()));
     }
     { Fl_Menu_Item* o = &menu_options_menu[24];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[25];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[26];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[28];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[29];
       o->label(_(o->label()));
     }
     options_menu->menu(menu_options_menu);

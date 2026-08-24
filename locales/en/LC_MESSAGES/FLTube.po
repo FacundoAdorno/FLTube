@@ -1,0 +1,1147 @@
+# English translations for PACKAGE package.
+# Copyright (C) 2026 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-29 16:27-0300\n"
+"PO-Revision-Date: 2026-06-29 16:27-0300\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/cache.cxx:60
+msgid ""
+"The time-to-live for a cache entry must not be less than 120 seconds. "
+"Setting to default value."
+msgstr ""
+"The time-to-live for a cache entry must not be less than 120 seconds. "
+"Setting to default value."
+
+#: src/cache.cxx:84
+#, c-format
+msgid ""
+"[ID = %s] Cannot create a cache entry whose value is empty. Aborting "
+"operation..."
+msgstr ""
+"[ID = %s] Cannot create a cache entry whose value is empty. Aborting "
+"operation..."
+
+#: src/cache.cxx:93
+msgid "Cache entry DELETED - ID = "
+msgstr "Cache entry DELETED - ID = "
+
+#: src/cache.cxx:103
+msgid "Creating a new cache entry for ID = "
+msgstr "Creating a new cache entry for ID = "
+
+#: src/cache.cxx:165
+msgid ""
+"This is a 'in memory' cache, so no load data function is available. Ignoring "
+"this call..."
+msgstr ""
+"This is a 'in memory' cache, so no load data function is available. Ignoring "
+"this call..."
+
+#: src/cache.cxx:170
+msgid ""
+"This is a 'in memory' cache, so no save function is available. Ignoring this "
+"call..."
+msgstr ""
+"This is a 'in memory' cache, so no save function is available. Ignoring this "
+"call..."
+
+#: src/cache.cxx:177
+msgid "No cache directory was specified. Please, fix it."
+msgstr "No cache directory was specified. Please, fix it."
+
+#: src/cache.cxx:180
+#, c-format
+msgid "The cache directory %s is invalid. Please, create it."
+msgstr "The cache directory %s is invalid. Please, create it."
+
+#: src/cache.cxx:189
+msgid "The cache filename was not specified."
+msgstr "The cache filename was not specified."
+
+#: src/cache.cxx:200
+msgid "Cache directory falls back to a temporary one: "
+msgstr "Cache directory falls back to a temporary one: "
+
+#: src/cache.cxx:212
+msgid "Aborting cache data load because no cache path was specified..."
+msgstr "Aborting cache data load because no cache path was specified..."
+
+#: src/cache.cxx:218
+#, c-format
+msgid "No cache file found at %s. Proceeding without loading cache data..."
+msgstr "No cache file found at %s. Proceeding without loading cache data..."
+
+#: src/cache.cxx:263
+#, c-format
+msgid ""
+"Cache load statistics: ENTRIES_VALID=%d; ENTRIES_REJECTED=%d; "
+"ENTRIES_INVALID=%d; TOTAL_ENTRIES_PROCESSED=%d."
+msgstr ""
+"Cache load statistics: ENTRIES_VALID=%d; ENTRIES_REJECTED=%d; "
+"ENTRIES_INVALID=%d; TOTAL_ENTRIES_PROCESSED=%d."
+
+#: src/cache.cxx:281
+msgid "All cache entries were saved at "
+msgstr "All cache entries were saved at "
+
+#: src/configuration_manager.cxx:230
+#, c-format
+msgid ""
+"Keybinding for shortcut '%s' already in use. Please, change it for an unused "
+"combination of keys.\n"
+msgstr ""
+"Keybinding for shortcut '%s' already in use. Please, change it for an unused "
+"combination of keys.\n"
+
+#: src/configuration_manager.cxx:232
+#, c-format
+msgid ""
+"Invalid keybinding for shortcut '%s'. Please, change it for a valid "
+"combination of keys.\n"
+msgstr ""
+"Invalid keybinding for shortcut '%s'. Please, change it for a valid "
+"combination of keys.\n"
+
+#: src/FLTube.cxx:127
+msgid ""
+"The main window was closed by user demand when a video was in streaming."
+msgstr ""
+"The main window was closed by user demand when a video was in streaming."
+
+#: src/FLTube.cxx:131
+#, c-format
+msgid "Cleaning temporal files at %s."
+msgstr "Cleaning temporal files at %s."
+
+#: src/FLTube.cxx:141
+msgid "Closing FLtube... Bye!\n"
+msgstr "Closing FLtube... Bye!\n"
+
+#: src/FLTube.cxx:213
+#, c-format
+msgid "Resource image at '%s' cannot be loaded..."
+msgstr "Resource image at '%s' cannot be loaded..."
+
+#: src/FLTube.cxx:256
+msgid "FLTube Help"
+msgstr "FLTube Help"
+
+#: src/FLTube.cxx:259
+#, c-format
+msgid "Version %s"
+msgstr "Version %s"
+
+#: src/FLTube.cxx:268
+msgid ""
+"FLTube is an application for search & stream Youtube videos. You can search "
+"by a search term or by entering the URL of a specific YouTube video.\n"
+"\n"
+"Once the results are returned, you can watch any of these videos by clicking "
+"on their thumbnail. The stream resolution is 360p by default, but can be "
+"changed at fltube.conf configuration file.\n"
+"\n"
+"You can also view the latest videos by the creator of a specific video by "
+"clicking on their name (a button at the bottom right of each result).\n"
+"\n"
+"If a search returns multiple results, they will be paginated, and you can "
+"navigate through them using the \"<Previous\" and \"Next>\" buttons at the "
+"bottom of the window. You can jump yo the first page or the last loaded page "
+"using the \"<l\" and \"l>\" buttons.\n"
+"\n"
+"Every time you watch a video, it is added to an existing list called "
+"\"Navigation History\". This list can be consulted using the user interface "
+"at the \"My Lists\" tab.\n"
+"\n"
+"Besides, you can mark a video as \"Liked\" pressing a button with heart "
+"shape. A video list called \"Liked\" will be generated to in order to "
+"consult it in the future.\n"
+"\n"
+"The application keeps a cache of the final URL of the latest viewed videos, "
+"in order to speed-up the video loading time. The duration of this cache is "
+"of 6 hours by default; passed that time, the cache entry will be invalidated "
+"and the video must be loaded again from Youtube servers.\n"
+msgstr ""
+"FLTube is an application for search & stream Youtube videos. You can search "
+"by a search term or by entering the URL of a specific YouTube video.\n"
+"\n"
+"Once the results are returned, you can watch any of these videos by clicking "
+"on their thumbnail. The stream resolution is 360p by default, but can be "
+"changed at fltube.conf configuration file.\n"
+"\n"
+"You can also view the latest videos by the creator of a specific video by "
+"clicking on their name (a button at the bottom right of each result).\n"
+"\n"
+"If a search returns multiple results, they will be paginated, and you can "
+"navigate through them using the \"<Previous\" and \"Next>\" buttons at the "
+"bottom of the window. You can jump yo the first page or the last loaded page "
+"using the \"<l\" and \"l>\" buttons.\n"
+"\n"
+"Every time you watch a video, it is added to an existing list called "
+"\"Navigation History\". This list can be consulted using the user interface "
+"at the \"My Lists\" tab.\n"
+"\n"
+"Besides, you can mark a video as \"Liked\" pressing a button with heart "
+"shape. A video list called \"Liked\" will be generated to in order to "
+"consult it in the future.\n"
+"\n"
+"The application keeps a cache of the final URL of the latest viewed videos, "
+"in order to speed-up the video loading time. The duration of this cache is "
+"of 6 hours by default; passed that time, the cache entry will be invalidated "
+"and the video must be loaded again from Youtube servers.\n"
+
+#: src/FLTube.cxx:276
+#, c-format
+msgid ""
+"- Focus at search input: %s\n"
+"- Search videos: %s\n"
+"- Search term history: %s\n"
+"- Get previous results: %s\n"
+"- Get next results: %s\n"
+"- Open video 1: %s\n"
+"- Open video 2: %s\n"
+"- Open video 3: %s\n"
+"- Open video 4: %s\n"
+"- Search videos of Channel 1: %s\n"
+"- Search videos of Channel 2: %s\n"
+"- Search videos of Channel 3: %s\n"
+"- Search videos of Channel 4: %s\n"
+"- Show this Help Window: %s\n"
+"\n"
+"[NOTE] Default shortcuts can be modified at %s.\n"
+msgstr ""
+"- Focus at search input: %s\n"
+"- Search videos: %s\n"
+"- Search term history: %s\n"
+"- Get previous results: %s\n"
+"- Get next results: %s\n"
+"- Open video 1: %s\n"
+"- Open video 2: %s\n"
+"- Open video 3: %s\n"
+"- Open video 4: %s\n"
+"- Search videos of Channel 1: %s\n"
+"- Search videos of Channel 2: %s\n"
+"- Search videos of Channel 3: %s\n"
+"- Search videos of Channel 4: %s\n"
+"- Show this Help Window: %s\n"
+"\n"
+"[NOTE] Default shortcuts can be modified at %s.\n"
+
+#: src/FLTube.cxx:291
+#, c-format
+msgid ""
+"The current instance of FLTube is loading the configurations from %s file.\n"
+"\n"
+"*** EXAMPLES ***\n"
+"[*] CHANGE THE DEFAULT STREAM RESOLUTION TO 720p:\n"
+" - Uncomment or add this property, and set the desire resolution (240, 360, "
+"480, 720 or 1080).\n"
+"      %s = 720\n"
+"\n"
+"[*] CHANGE THE VIDEO PLAYER TO mpv INSTEAD OF mplayer:\n"
+" - Add or uncomment the following properties:\n"
+"      %s = mpv\n"
+"      %s = --ao=pulse\n"
+"      %s = \n"
+" The last two params can be empty, but MUST be set uncomment if you change "
+"the video player.\n"
+msgstr ""
+"The current instance of FLTube is loading the configurations from %s file.\n"
+"\n"
+"*** EXAMPLES ***\n"
+"[*] CHANGE THE DEFAULT STREAM RESOLUTION TO 720p:\n"
+" - Uncomment or add this property, and set the desire resolution (240, 360, "
+"480, 720 or 1080).\n"
+"      %s = 720\n"
+"\n"
+"[*] CHANGE THE VIDEO PLAYER TO mpv INSTEAD OF mplayer:\n"
+" - Add or uncomment the following properties:\n"
+"      %s = mpv\n"
+"      %s = --ao=pulse\n"
+"      %s = \n"
+" The last two params can be empty, but MUST be set uncomment if you change "
+"the video player.\n"
+
+#: src/FLTube.cxx:297
+#, c-format
+msgid ""
+"[*_ DEVELOPERS _*]\n"
+"  Facundo Gabriel Adorno (Argentina)\n"
+"    -Contact: adorno.facundo@gmail.com\n"
+"\n"
+"[*_ CONTRIBUTORS _*]\n"
+"  Nicolas Longardi (Uruguay)\n"
+"   -Contact: nico@locosporlinux.com\n"
+msgstr ""
+"[*_ DEVELOPERS _*]\n"
+"  Facundo Gabriel Adorno (Argentina)\n"
+"    -Contact: adorno.facundo@gmail.com\n"
+"\n"
+"[*_ CONTRIBUTORS _*]\n"
+"  Nicolas Longardi (Uruguay)\n"
+"   -Contact: nico@locosporlinux.com\n"
+
+#: src/FLTube.cxx:358 src/FLTube.cxx:570 src/FLTube.cxx:1092
+msgid "Your device is offline. Check your internet connection."
+msgstr "Your device is offline. Check your internet connection."
+
+#: src/FLTube.cxx:359 src/FLTube.cxx:571 src/FLTube.cxx:1093
+msgid ""
+"There seems that you don't have access to the Internet. Please, verify you "
+"network connection before proceed..."
+msgstr ""
+"There seems that you don't have access to the Internet. Please, verify you "
+"network connection before proceed..."
+
+#: src/FLTube.cxx:383
+#, c-format
+msgid "Starting streaming preview of video '%s' - (%s)..."
+msgstr "Starting streaming preview of video '%s' - (%s)..."
+
+#: src/FLTube.cxx:398
+msgid ""
+"Cannot get video URL. Review the video metadata enabling app debugging..."
+msgstr ""
+"Cannot get video URL. Review the video metadata enabling app debugging..."
+
+#: src/FLTube.cxx:458 src/FLTube.cxx:942
+#, c-format
+msgid "Video URL Cached (valid until %s). Click to remove from cache."
+msgstr "Video URL Cached (valid until %s). Click to remove from cache."
+
+#: src/FLTube.cxx:474 src/FLTube.cxx:809
+msgid "viewers"
+msgstr "viewers"
+
+#: src/FLTube.cxx:474 src/FLTube.cxx:811
+msgid "views"
+msgstr "views"
+
+#: src/FLTube.cxx:477
+#, c-format
+msgid ""
+"Error when getting count of viewers of video: (title: \"%s\", ID: \"%s\")"
+msgstr ""
+"Error when getting count of viewers of video: (title: \"%s\", ID: \"%s\")"
+
+#: src/FLTube.cxx:480
+msgid "Unknown"
+msgstr "Unknown"
+
+#: src/FLTube.cxx:496
+msgid ""
+"Something went wrong when generating a resize thumbnail for video with ID="
+msgstr ""
+"Something went wrong when generating a resize thumbnail for video with ID="
+
+#: src/FLTube.cxx:654
+#, c-format
+msgid ""
+"The following cache was invalidated by user request: id=%s; "
+"expiration_date=%s."
+msgstr ""
+"The following cache was invalidated by user request: id=%s; "
+"expiration_date=%s."
+
+#: src/FLTube.cxx:672
+#, c-format
+msgid "Remove video '%s' from list '%s'."
+msgstr "Remove video '%s' from list '%s'."
+
+#: src/FLTube.cxx:687
+msgid ""
+"For some reason, FLTUBE VERSION file for update verification cannot be "
+"downloaded."
+msgstr ""
+"For some reason, FLTUBE VERSION file for update verification cannot be "
+"downloaded."
+
+#: src/FLTube.cxx:698
+#, c-format
+msgid ""
+"FLTube has available a new version to download.\n"
+"New version available: %s."
+msgstr ""
+"FLTube has available a new version to download.\n"
+"New version available: %s."
+
+#: src/FLTube.cxx:699
+msgid "New version available!"
+msgstr "New version available!"
+
+#: src/FLTube.cxx:701
+msgid "You have the last version available."
+msgstr "You have the last version available."
+
+#: src/FLTube.cxx:701
+msgid "You're up to date."
+msgstr "You're up to date."
+
+#: src/FLTube.cxx:711
+msgid ""
+"Changing the video stream resolution to higher than 360p may cause older "
+"laptops to freeze. Do you want to proceed?"
+msgstr ""
+"Changing the video stream resolution to higher than 360p may cause older "
+"laptops to freeze. Do you want to proceed?"
+
+#: src/FLTube.cxx:734
+msgid "Stream video resolution updated by user to "
+msgstr "Stream video resolution updated by user to "
+
+#: src/FLTube.cxx:779
+msgid "No metadata available for video with ID: "
+msgstr "No metadata available for video with ID: "
+
+#: src/FLTube.cxx:784
+msgid "Title"
+msgstr "Title"
+
+#: src/FLTube.cxx:786
+msgid "Creator"
+msgstr "Creator"
+
+#: src/FLTube.cxx:786
+msgid "followers"
+msgstr "followers"
+
+#: src/FLTube.cxx:787
+msgid "Upload Date"
+msgstr "Upload Date"
+
+#: src/FLTube.cxx:791
+msgid "Long Format Video"
+msgstr "Long Format Video"
+
+#: src/FLTube.cxx:794
+msgid "Short Format Video"
+msgstr "Short Format Video"
+
+#: src/FLTube.cxx:797
+msgid "Livestream"
+msgstr "Livestream"
+
+#: src/FLTube.cxx:798
+msgid "This was previously live"
+msgstr "This was previously live"
+
+#: src/FLTube.cxx:801
+msgid "Undefined Video Format"
+msgstr "Undefined Video Format"
+
+#: src/FLTube.cxx:804
+msgid "Video Type"
+msgstr "Video Type"
+
+#: src/FLTube.cxx:805
+msgid "Category"
+msgstr "Category"
+
+#: src/FLTube.cxx:807
+msgid "Duration"
+msgstr "Duration"
+
+#: src/FLTube.cxx:813
+msgid "Views Count"
+msgstr "Views Count"
+
+#: src/FLTube.cxx:815
+msgid "Like Count"
+msgstr "Like Count"
+
+#: src/FLTube.cxx:817
+msgid "Original URL"
+msgstr "Original URL"
+
+#: src/FLTube.cxx:818
+msgid "Description"
+msgstr "Description"
+
+#: src/FLTube.cxx:824
+msgid "Tags"
+msgstr "Tags"
+
+#: src/FLTube.cxx:837
+msgid "Loading configurations from "
+msgstr "Loading configurations from "
+
+#: src/FLTube.cxx:838
+msgid "Processing configuration file..."
+msgstr "Processing configuration file..."
+
+#: src/FLTube.cxx:840
+msgid "Processing user configuration file..."
+msgstr "Processing user configuration file..."
+
+#: src/FLTube.cxx:844
+msgid "Populating cache..."
+msgstr "Populating cache..."
+
+#: src/FLTube.cxx:852
+msgid "Checking 'yt-dlp' installation..."
+msgstr "Checking 'yt-dlp' installation..."
+
+#: src/FLTube.cxx:853
+msgid "Cheking if yt-dlp is at your system PATH..."
+msgstr "Cheking if yt-dlp is at your system PATH..."
+
+#: src/FLTube.cxx:855
+msgid ""
+"yt-dlp is not installed on your system or its binary is not at $PATH system "
+"variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run "
+"in a terminal the 'install_yt-dlp' script."
+msgstr ""
+"yt-dlp is not installed on your system or its binary is not at $PATH system "
+"variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run "
+"in a terminal the 'install_yt-dlp' script."
+
+#: src/FLTube.cxx:856
+msgid "yt-dlp is not installed. Closing app...\n"
+msgstr "yt-dlp is not installed. Closing app...\n"
+
+#: src/FLTube.cxx:862
+msgid "Configuring the application..."
+msgstr "Configuring the application..."
+
+#: src/FLTube.cxx:884
+msgid ""
+"Default streaming resolution (360p) changed at configuration to this new "
+"resolution: "
+msgstr ""
+"Default streaming resolution (360p) changed at configuration to this new "
+"resolution: "
+
+#: src/FLTube.cxx:887
+msgid "Loading resources files..."
+msgstr "Loading resources files..."
+
+#: src/FLTube.cxx:996
+msgid "All cache entries were deleted by user demand..."
+msgstr "All cache entries were deleted by user demand..."
+
+#: src/FLTube.cxx:1002
+msgid "Cache recording was stopped by user demand..."
+msgstr "Cache recording was stopped by user demand..."
+
+#: src/FLTube.cxx:1009
+msgid "Cache recording was started by user demand..."
+msgstr "Cache recording was started by user demand..."
+
+#: src/FLTube.cxx:1018
+msgid "Navigation History recording was stopped by user demand..."
+msgstr "Navigation History recording was stopped by user demand..."
+
+#: src/FLTube.cxx:1026
+msgid "Navigation History recording was started by user demand..."
+msgstr "Navigation History recording was started by user demand..."
+
+#: src/FLTube.cxx:1031
+msgid ""
+"This action cannot be undone. Do you want to clean all Navigation History?"
+msgstr ""
+"This action cannot be undone. Do you want to clean all Navigation History?"
+
+#: src/FLTube.cxx:1034
+msgid "Navigation History content was cleaned by user demand..."
+msgstr "Navigation History content was cleaned by user demand..."
+
+#: src/FLTube.cxx:1099
+#, c-format
+msgid "Searching for results for '%s' user input..."
+msgstr "Searching for results for '%s' user input..."
+
+#: src/FLTube.cxx:1106
+msgid ""
+"For now, only Youtube URL's are valid for download. Please, edit your input "
+"text or search using a generic term."
+msgstr ""
+"For now, only Youtube URL's are valid for download. Please, edit your input "
+"text or search using a generic term."
+
+#: src/FLTube.cxx:1157
+msgid "The Fl_Button is inexistent when search videos for a channel!!!\n"
+msgstr "The Fl_Button is inexistent when search videos for a channel!!!\n"
+
+#: src/FLTube.cxx:1161
+msgid "Looking up videos of CHANNEL with ID: "
+msgstr "Looking up videos of CHANNEL with ID: "
+
+#: src/FLTube.cxx:1163
+msgid ""
+"Channel ID is empty. Please verify the video metadata initilization!!!\n"
+msgstr ""
+"Channel ID is empty. Please verify the video metadata initilization!!!\n"
+
+#: src/FLTube.cxx:1190
+msgid "Search input is empty. Please, retry and enter a valid text."
+msgstr "Search input is empty. Please, retry and enter a valid text."
+
+#: src/FLTube.cxx:1331
+#, c-format
+msgid "Loading custom config file %s.\n"
+msgstr "Loading custom config file %s.\n"
+
+#: src/FLTube.cxx:1334
+#, c-format
+msgid "Specified path at --config parameter does not exist.\n"
+msgstr "Specified path at --config parameter does not exist.\n"
+
+#: src/FLTube.cxx:1336
+#, c-format
+msgid "--config parameter with no path specified.\n"
+msgstr "--config parameter with no path specified.\n"
+
+#: src/FLTube.cxx:1342
+#, c-format
+msgid "DEBUG MODE enabled.\n"
+msgstr "DEBUG MODE enabled.\n"
+
+#: src/FLTube.cxx:1367
+#, c-format
+msgid "Starting FLTube v.%s\n"
+msgstr "Starting FLTube v.%s\n"
+
+#: src/FLTube.cxx:1394
+msgid "The FLTube main window has loaded."
+msgstr "The FLTube main window has loaded."
+
+#: src/fltube_utils.cxx:36
+#, c-format
+msgid "There was an error executing the following command: %s \n"
+msgstr "There was an error executing the following command: %s \n"
+
+#: src/fltube_utils.cxx:37
+#, c-format
+msgid "Closing the program due to an error.\n"
+msgstr "Closing the program due to an error.\n"
+
+#: src/fltube_utils.cxx:233
+#, c-format
+msgid "Connection testing failure: %s. Check your connectivity.\n"
+msgstr "Connection testing failure: %s. Check your connectivity.\n"
+
+#: src/FLTube_View.cxx:24
+msgid "Options"
+msgstr "Options"
+
+#: src/FLTube_View.cxx:25
+msgid "Quality"
+msgstr "Quality"
+
+#: src/FLTube_View.cxx:26
+msgid "240p"
+msgstr "240p"
+
+#: src/FLTube_View.cxx:27
+msgid "360p"
+msgstr "360p"
+
+#: src/FLTube_View.cxx:28
+msgid "480p"
+msgstr "480p"
+
+#: src/FLTube_View.cxx:29
+msgid "720p"
+msgstr "720p"
+
+#: src/FLTube_View.cxx:30
+msgid "1080p"
+msgstr "1080p"
+
+#: src/FLTube_View.cxx:32
+msgid "Navigation History"
+msgstr "Navigation History"
+
+#: src/FLTube_View.cxx:33 src/FLTube_View.cxx:38
+msgid "Clear all"
+msgstr "Clear all"
+
+#: src/FLTube_View.cxx:34 src/FLTube_View.cxx:39
+msgid "Stop recording"
+msgstr "Stop recording"
+
+#: src/FLTube_View.cxx:35 src/FLTube_View.cxx:40
+msgid "Start recording"
+msgstr "Start recording"
+
+#: src/FLTube_View.cxx:37
+msgid "Cache"
+msgstr "Cache"
+
+#: src/FLTube_View.cxx:42
+msgid "Check for updates"
+msgstr "Check for updates"
+
+#: src/FLTube_View.cxx:89
+msgid "Help"
+msgstr "Help"
+
+#: src/FLTube_View.cxx:90
+msgid "Show info about this application and some help of how to use it."
+msgstr "Show info about this application and some help of how to use it."
+
+#: src/FLTube_View.cxx:144
+msgid "Search box"
+msgstr "Search box"
+
+#: src/FLTube_View.cxx:145
+msgid "Search videos at this section."
+msgstr "Search videos at this section."
+
+#: src/FLTube_View.cxx:151
+msgid "Term/URL  "
+msgstr "Term/URL  "
+
+#: src/FLTube_View.cxx:152
+msgid ""
+"Enter a search term for search or a valid Youtube URL. TIP: use the Up and "
+"Down arrow keys to navigate previous search terms."
+msgstr ""
+"Enter a search term for search or a valid Youtube URL. TIP: use the Up and "
+"Down arrow keys to navigate previous search terms."
+
+#: src/FLTube_View.cxx:164
+msgid "Go &search!"
+msgstr "Go &search!"
+
+#: src/FLTube_View.cxx:165
+msgid ""
+"If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."
+msgstr ""
+"If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."
+
+#: src/FLTube_View.cxx:169
+msgid "Navigate next search terms in history. Or use Up arrow key."
+msgstr "Navigate next search terms in history. Or use Up arrow key."
+
+#: src/FLTube_View.cxx:174
+msgid "Navigate previous search terms in history. Or use Down arrow key."
+msgstr "Navigate previous search terms in history. Or use Down arrow key."
+
+#: src/FLTube_View.cxx:180
+msgid "My Lists"
+msgstr "My Lists"
+
+#: src/FLTube_View.cxx:181
+msgid "Lookup your lists of videos at this section (History, Liked, etc...)."
+msgstr "Lookup your lists of videos at this section (History, Liked, etc...)."
+
+#: src/FLTube_View.cxx:187
+msgid "Lists  "
+msgstr "Lists  "
+
+#: src/FLTube_View.cxx:196
+msgid "This list currently has no videos."
+msgstr "This list currently has no videos."
+
+#: src/FLTube_View.cxx:203
+msgid "<l"
+msgstr "<l"
+
+#: src/FLTube_View.cxx:204
+msgid "Go to the first page."
+msgstr "Go to the first page."
+
+#: src/FLTube_View.cxx:206
+msgid "<&Previous"
+msgstr "<&Previous"
+
+#: src/FLTube_View.cxx:207
+msgid "Get previous results of current search results set."
+msgstr "Get previous results of current search results set."
+
+#: src/FLTube_View.cxx:209
+msgid "&Next>"
+msgstr "&Next>"
+
+#: src/FLTube_View.cxx:210
+msgid "Get following results of current search results set."
+msgstr "Get following results of current search results set."
+
+#: src/FLTube_View.cxx:212
+msgid "l>"
+msgstr "l>"
+
+#: src/FLTube_View.cxx:213
+msgid "Go to the last loaded page."
+msgstr "Go to the last loaded page."
+
+#: src/FLTube_View.cxx:216
+msgid "Current page / Total of pages."
+msgstr "Current page / Total of pages."
+
+#: src/FLTube_View.cxx:227
+msgid "Click to stream the video (preview it)..."
+msgstr "Click to stream the video (preview it)..."
+
+#: src/FLTube_View.cxx:230
+msgid "This video is currently played..."
+msgstr "This video is currently played..."
+
+#: src/FLTube_View.cxx:234
+msgid "Total video views, or if live current count of concurrent spectators."
+msgstr "Total video views, or if live current count of concurrent spectators."
+
+#: src/FLTube_View.cxx:238
+msgid "The video is live."
+msgstr "The video is live."
+
+#: src/FLTube_View.cxx:243
+msgid "You have view this video in the past."
+msgstr "You have view this video in the past."
+
+#: src/FLTube_View.cxx:247
+msgid "Press to mark the video as \"Liked\"."
+msgstr "Press to mark the video as \"Liked\"."
+
+#: src/FLTube_View.cxx:252
+msgid "Add this video to the \"Watch Later\" video list."
+msgstr "Add this video to the \"Watch Later\" video list."
+
+#: src/FLTube_View.cxx:262
+msgid "Show more information about this video."
+msgstr "Show more information about this video."
+
+#: src/FLTube_View.cxx:271
+msgid "Click to remove video from current list."
+msgstr "Click to remove video from current list."
+
+#: src/FLTube_View.cxx:277
+msgid "Duration expressed as H:MM:SS."
+msgstr "Duration expressed as H:MM:SS."
+
+#: src/FLTube_View.cxx:282
+msgid "Video upload date."
+msgstr "Video upload date."
+
+#: src/FLTube_View.cxx:287
+msgid "Click to list all channel's video."
+msgstr "Click to list all channel's video."
+
+#: src/FLTube_View.cxx:328
+msgid "Close and exit"
+msgstr "Close and exit"
+
+#: src/FLTube_View.cxx:368
+msgid "Accept"
+msgstr "Accept"
+
+#: src/FLTube_View.cxx:371
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/FLTube_View.cxx:374
+msgid "Don't warn me again and ACCEPT always."
+msgstr "Don't warn me again and ACCEPT always."
+
+#: src/FLTube_View.cxx:375
+msgid "Check if don't want to be warn again, assuming all risks."
+msgstr "Check if don't want to be warn again, assuming all risks."
+
+#: src/FLTube_View.cxx:417
+msgid "FLTube"
+msgstr "FLTube"
+
+#: src/FLTube_View.cxx:423
+msgid "Version x.y.z"
+msgstr "Version x.y.z"
+
+#: src/FLTube_View.cxx:427
+msgid "Watch YouTube videos in your very old PC."
+msgstr "Watch YouTube videos in your very old PC."
+
+#: src/FLTube_View.cxx:431
+msgid "Technologies:"
+msgstr "Technologies:"
+
+#: src/FLTube_View.cxx:434
+msgid "Source code at:"
+msgstr "Source code at:"
+
+#: src/FLTube_View.cxx:437
+msgid "Licensed under GNU GPL v3.0."
+msgstr "Licensed under GNU GPL v3.0."
+
+#: src/FLTube_View.cxx:440
+msgid "FLTK"
+msgstr "FLTK"
+
+#: src/FLTube_View.cxx:441
+msgid "Click to open FLTK official website."
+msgstr "Click to open FLTK official website."
+
+#: src/FLTube_View.cxx:447
+msgid "gitlab.com/facuA/fltube"
+msgstr "gitlab.com/facuA/fltube"
+
+#: src/FLTube_View.cxx:448
+msgid "Click to open FLTube repository."
+msgstr "Click to open FLTube repository."
+
+#: src/FLTube_View.cxx:454
+msgid "yt-dlp"
+msgstr "yt-dlp"
+
+#: src/FLTube_View.cxx:455
+msgid "Click to open yt-dlp official website."
+msgstr "Click to open yt-dlp official website."
+
+#: src/FLTube_View.cxx:460
+msgid "C++"
+msgstr "C++"
+
+#: src/FLTube_View.cxx:461
+msgid "Click to open C++ official website."
+msgstr "Click to open C++ official website."
+
+#: src/FLTube_View.cxx:469
+msgid "How to use"
+msgstr "How to use"
+
+#: src/FLTube_View.cxx:480
+msgid "Shortcuts"
+msgstr "Shortcuts"
+
+#: src/FLTube_View.cxx:490
+msgid "Configuration"
+msgstr "Configuration"
+
+#: src/FLTube_View.cxx:501
+msgid "Authors"
+msgstr "Authors"
+
+#: src/FLTube_View.cxx:548
+msgid "LOADING..."
+msgstr "LOADING..."
+
+#: src/FLTube_View.cxx:549
+msgid ""
+"Please wait until the application data is loaded. This may take a little "
+"while..."
+msgstr ""
+"Please wait until the application data is loaded. This may take a little "
+"while..."
+
+#: src/FLTube_View.cxx:608
+msgid "Retrieving video metadata..."
+msgstr "Retrieving video metadata..."
+
+#: src/FLTube_View.cxx:613
+msgid "Detailed Video Metadata"
+msgstr "Detailed Video Metadata"
+
+#: src/gnugettext_utils.cxx:52
+msgid "Autos & Vehicles"
+msgstr "Autos & Vehicles"
+
+#: src/gnugettext_utils.cxx:53
+msgid "Comedy"
+msgstr "Comedy"
+
+#: src/gnugettext_utils.cxx:54
+msgid "Education"
+msgstr "Education"
+
+#: src/gnugettext_utils.cxx:55
+msgid "Entertainment"
+msgstr "Entertainment"
+
+#: src/gnugettext_utils.cxx:56
+msgid "Film & Animation"
+msgstr "Film & Animation"
+
+#: src/gnugettext_utils.cxx:57
+msgid "Gaming"
+msgstr "Gaming"
+
+#: src/gnugettext_utils.cxx:58
+msgid "Howto & Style"
+msgstr "Howto & Style"
+
+#: src/gnugettext_utils.cxx:59
+msgid "Music"
+msgstr "Music"
+
+#: src/gnugettext_utils.cxx:60
+msgid "News & Politics"
+msgstr "News & Politics"
+
+#: src/gnugettext_utils.cxx:61
+msgid "Nonprofits & Activism"
+msgstr "Nonprofits & Activism"
+
+#: src/gnugettext_utils.cxx:62
+msgid "People & Blogs"
+msgstr "People & Blogs"
+
+#: src/gnugettext_utils.cxx:63
+msgid "Pets & Animals"
+msgstr "Pets & Animals"
+
+#: src/gnugettext_utils.cxx:64
+msgid "Science & Technology"
+msgstr "Science & Technology"
+
+#: src/gnugettext_utils.cxx:65
+msgid "Sports"
+msgstr "Sports"
+
+#: src/gnugettext_utils.cxx:66
+msgid "Travel & Events"
+msgstr "Travel & Events"
+
+#: src/userdata_manager.cxx:40
+#, c-format
+msgid ""
+"There was an error when loading data from %s. The file will be rewritted, "
+"and previous copied to a backup file %s.\n"
+msgstr ""
+"There was an error when loading data from %s. The file will be rewritted, "
+"and previous copied to a backup file %s.\n"
+
+#: src/userdata_manager.cxx:45
+#, c-format
+msgid "User Data was loaded correctly from %s .\n"
+msgstr "User Data was loaded correctly from %s .\n"
+
+#: src/userdata_manager.cxx:58
+#, c-format
+msgid ""
+"The user data file at %s doesn't exists. Will be created at program exit...\n"
+msgstr ""
+"The user data file at %s doesn't exists. Will be created at program exit...\n"
+
+#: src/userdata_manager.cxx:66
+#, c-format
+msgid "Specified version at first line (%s)is not valid. Abort processing...\n"
+msgstr ""
+"Specified version at first line (%s)is not valid. Abort processing...\n"
+
+#: src/userdata_manager.cxx:74
+#, c-format
+msgid ""
+"Error while parsing version number at '%s' userdata file. Abort "
+"processing...\n"
+msgstr ""
+"Error while parsing version number at '%s' userdata file. Abort "
+"processing...\n"
+
+#: src/userdata_manager.cxx:105
+#, c-format
+msgid "ABORT VIDEO PROCESSING. Video field size = %lu \n"
+msgstr "ABORT VIDEO PROCESSING. Video field size = %lu \n"
+
+#: src/userdata_manager.cxx:133
+#, c-format
+msgid ""
+"List '%s' is duplicated at userdata file. Avoiding to add duplication...\n"
+msgstr ""
+"List '%s' is duplicated at userdata file. Avoiding to add duplication...\n"
+
+#: src/userdata_manager.cxx:149
+#, c-format
+msgid "Video not found: %s.\n"
+msgstr "Video not found: %s.\n"
+
+#: src/userdata_manager.cxx:154
+#, c-format
+msgid "- List '%s' (Count of videos: %d).\n"
+msgstr "- List '%s' (Count of videos: %d).\n"
+
+#: src/userdata_manager.cxx:167
+#, c-format
+msgid "Userdata was saved succesfully at '%s' file.\n"
+msgstr "Userdata was saved succesfully at '%s' file.\n"
+
+#: src/userdata_manager.cxx:170
+#, c-format
+msgid ""
+"Userdata file cannot be saved at '%s'!!! Check if you have write permission "
+"on directory...\n"
+msgstr ""
+"Userdata file cannot be saved at '%s'!!! Check if you have write permission "
+"on directory...\n"
+
+#: src/userdata_manager.cxx:250
+msgid "Error on clean of an inexistent video list..."
+msgstr "Error on clean of an inexistent video list..."
+
+#: src/userdata_manager.cxx:264
+msgid "Video is a null pointer... Cannot proceed."
+msgstr "Video is a null pointer... Cannot proceed."
+
+#: src/userdata_manager.cxx:316
+msgid ""
+"Cannot add video because one of the parameters, video or listName, is "
+"empty...\n"
+msgstr ""
+"Cannot add video because one of the parameters, video or listName, is "
+"empty...\n"
+
+#: src/userdata_manager.cxx:321
+#, c-format
+msgid "Cannot add video to a non-existent list '%s'.\n"
+msgstr "Cannot add video to a non-existent list '%s'.\n"
+
+#: src/userdata_manager.cxx:333
+msgid ""
+"Cannot remove video because one of the parameters, listName or id, is "
+"empty...\n"
+msgstr ""
+"Cannot remove video because one of the parameters, listName or id, is "
+"empty...\n"
+
+#: src/userdata_manager.cxx:338
+#, c-format
+msgid "Cannot add remove from a non-existent list '%s'.\n"
+msgstr "Cannot add remove from a non-existent list '%s'.\n"
+
+#: src/userdata_manager.cxx:407
+msgid "Error: Cannot add a null video.\n"
+msgstr "Error: Cannot add a null video.\n"
+
+#: src/ytdlp_helper.cxx:222
+msgid ""
+"The default stream command doesn't work. Fallback to the alternative method "
+"to get final video URL."
+msgstr ""
+"The default stream command doesn't work. Fallback to the alternative method "
+"to get final video URL."
+
+#: src/ytdlp_helper.cxx:227
+msgid ""
+"Cannot obtain URL for specified video, and alternative stream method is "
+"disabled."
+msgstr ""
+"Cannot obtain URL for specified video, and alternative stream method is "
+"disabled."
+
+#: include/ytdlp_helper.h:145
+msgid ""
+"Fallbacks to default minimun batch size for yt-dlp search. Check property "
+"'PREFETCH_BATCH_RESULTS_SIZE' at fltube.conf file. Configured value cannot "
+"be greater than "
+msgstr ""
+"Fallbacks to default minimun batch size for yt-dlp search. Check property "
+"'PREFETCH_BATCH_RESULTS_SIZE' at fltube.conf file. Configured value cannot "
+"be greater than "
+
+#: include/ytdlp_helper.h:149
+msgid "%Y-%m-%d"
+msgstr "%Y-%m-%d"
+
+#: include/ytdlp_helper.h:150
+msgid "%Y-%m-%d %H:%M:%S"
+msgstr "%Y-%m-%d %H:%M:%S"

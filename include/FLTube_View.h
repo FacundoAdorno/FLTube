@@ -55,6 +55,9 @@ public:
   static Fl_Menu_Item *default_theme_bttn;
   static Fl_Menu_Item *light_theme_bttn;
   static Fl_Menu_Item *dark_theme_bttn;
+  static Fl_Menu_Item *en_lang_bttn;
+  static Fl_Menu_Item *es_lang_bttn;
+  static Fl_Menu_Item *pt_BR_lang_bttn;
   static Fl_Menu_Item *history_clearall_bttn;
   static Fl_Menu_Item *history_pause_bttn;
   static Fl_Menu_Item *history_unpause_bttn;

@@ -60,7 +60,7 @@ widget_class FLTubeMainWindow {
       xywh {0 0 100 20}
     } {
       Submenu {} {
-        label Quality open
+        label Quality
         xywh {0 0 100 20}
       } {
         MenuItem quality_240_bttn {
@@ -110,6 +110,26 @@ widget_class FLTubeMainWindow {
         }
       }
       Submenu {} {
+        label Language open
+        xywh {0 0 100 20}
+      } {
+        MenuItem en_lang_bttn {
+          label English
+          user_data {"en"}
+          xywh {0 0 100 20}
+        }
+        MenuItem es_lang_bttn {
+          label {Español}
+          user_data {"es"}
+          xywh {0 0 100 20}
+        }
+        MenuItem pt_BR_lang_bttn {
+          label {Português}
+          user_data {"pt_BR"} selected
+          xywh {0 0 100 20}
+        }
+      }
+      Submenu {} {
         label {Navigation History}
         xywh {0 0 100 20}
       } {
@@ -144,7 +164,7 @@ widget_class FLTubeMainWindow {
         }
       }
       MenuItem reset_appconfig_bttn {
-        label {Reset Options} selected
+        label {Reset Options}
         xywh {0 0 100 20}
       }
       MenuItem check_update_bttn {

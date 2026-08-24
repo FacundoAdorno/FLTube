@@ -1,0 +1,138 @@
+# English translations for PACKAGE package.
+# Copyright (C) 2026 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-03 11:40-0300\n"
+"PO-Revision-Date: 2026-02-03 11:40-0300\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: scripts/install_yt-dlp.sh:39
+#, sh-printf-format
+msgid ""
+"[ == HELP == ]\n"
+"    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system, "
+"besides it installs\n"
+"    the External JS Runtime required since 'yt-dlp@2025.11.12' "
+"(QuickJS@%s).\n"
+"    Advice that this software require that Python 3.X been installed on "
+"your\n"
+"    system (more info at: %s).\n"
+"\n"
+"USAGE:\n"
+"    install_yt-dp [options]\n"
+"\n"
+"OPTIONS:\n"
+"  -p    Alternative PATH for binary installation/update. It must exists in "
+"case of installation.\n"
+"        Default directory is '%s'.\n"
+"  -j    Only download javascript runtime (QuickJS@%s) and exit.\n"
+"  -y    Confirm all questions. Avoid interaction with script and accept "
+"all.\n"
+"  -h,   Show this usage help."
+msgstr ""
+"[ == HELP == ]\n"
+"    Use this script to INSTALL or UPDATE the 'yt-dlp' tool in your system, "
+"besides it installs\n"
+"    the External JS Runtime required since 'yt-dlp@2025.11.12' "
+"(QuickJS@%s).\n"
+"    Advice that this software require that Python 3.X been installed on "
+"your\n"
+"    system (more info at: %s).\n"
+"\n"
+"USAGE:\n"
+"    install_yt-dp [options]\n"
+"\n"
+"OPTIONS:\n"
+"  -p    Alternative PATH for binary installation/update. It must exists in "
+"case of installation.\n"
+"        Default directory is '%s'.\n"
+"  -j    Only download javascript runtime (QuickJS@%s) and exit.\n"
+"  -y    Confirm all questions. Avoid interaction with script and accept "
+"all.\n"
+"  -h,   Show this usage help."
+
+#: scripts/install_yt-dlp.sh:87
+#, sh-printf-format
+msgid "'%s' does not exists. Do you want to create it?"
+msgstr "'%s' does not exists. Do you want to create it?"
+
+#: scripts/install_yt-dlp.sh:89 scripts/install_yt-dlp.sh:95
+#, sh-printf-format
+msgid "Directory '%s' created."
+msgstr "Directory '%s' created."
+
+#: scripts/install_yt-dlp.sh:91
+#, sh-printf-format
+msgid "You must create '%s' before procced. Aborting installation..."
+msgstr "You must create '%s' before procced. Aborting installation..."
+
+#: scripts/install_yt-dlp.sh:97
+msgid "Starting 'yt-dlp' DOWNLOAD..."
+msgstr "Starting 'yt-dlp' DOWNLOAD..."
+
+#: scripts/install_yt-dlp.sh:101
+#, sh-printf-format
+msgid "'yt-dlp' installed at %s/yt-dlp path."
+msgstr "'yt-dlp' installed at %s/yt-dlp path."
+
+#: scripts/install_yt-dlp.sh:110
+#, sh-printf-format
+msgid "Starting 'quickjs@%s' DOWNLOAD..."
+msgstr "Starting 'quickjs@%s' DOWNLOAD..."
+
+#: scripts/install_yt-dlp.sh:116
+#, sh-printf-format
+msgid "'quickjs' installed at %s/%s path."
+msgstr "'quickjs' installed at %s/%s path."
+
+#: scripts/install_yt-dlp.sh:119
+msgid ""
+"'quickjs' cannot be downloaded for some reason. Download manually or run "
+"this script again..."
+msgstr ""
+"'quickjs' cannot be downloaded for some reason. Download manually or run "
+"this script again..."
+
+#: scripts/install_yt-dlp.sh:148
+#, sh-printf-format
+msgid ""
+"'yt-dlp' is installed globally at your system %s.\n"
+"    Maybe is installed as a system package. Is recommended to use this "
+"script for download the latest 'yt-dlp' version.\n"
+"    Do you want to continue and install another 'yt-dlp' binary on your "
+"system?"
+msgstr ""
+"'yt-dlp' is installed globally at your system %s.\n"
+"    Maybe is installed as a system package. Is recommended to use this "
+"script for download the latest 'yt-dlp' version.\n"
+"    Do you want to continue and install another 'yt-dlp' binary on your "
+"system?"
+
+#: scripts/install_yt-dlp.sh:163
+#, sh-printf-format
+msgid "'yt-dlp' is not in your system. Do you want to install at '%s'?"
+msgstr "'yt-dlp' is not in your system. Do you want to install at '%s'?"
+
+#: scripts/install_yt-dlp.sh:168
+msgid "Installation aborted by user choice..."
+msgstr "Installation aborted by user choice..."
+
+#: scripts/install_yt-dlp.sh:177
+#, sh-printf-format
+msgid "Do you want to update 'yt-dlp@%s' to any NEW VERSION (if any)?"
+msgstr "Do you want to update 'yt-dlp@%s' to any NEW VERSION (if any)?"
+
+#: scripts/install_yt-dlp.sh:182
+msgid "yt-dlp update process aborted by user choice..."
+msgstr "yt-dlp update process aborted by user choice..."
