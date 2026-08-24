@@ -60,7 +60,7 @@ void GeneralCache::init() {
         this->logger->warn(_("The time-to-live for a cache entry must not be less than 120 seconds. Setting to default value."));
         cache_entry_ttl = CacheEntry::DEFAULT_ENTRY_TTL;
     }
-    this->logger->debug("Application cache was created.");
+    this->logger->debug(_("Application cache was created."));
     load();
 }
 

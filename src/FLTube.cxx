@@ -805,7 +805,7 @@ void switch_color_theme(ColorTheme ct, bool force_reload = false) {
             Fl::set_color(FL_BACKGROUND_COLOR, 240, 240, 240);
             Fl::set_color(FL_BACKGROUND2_COLOR, 224, 224, 224);
             Fl::set_color(FL_FOREGROUND_COLOR, 0, 0, 0);
-            Fl::set_color(FL_SELECTION_COLOR, 140, 59, 27);
+            Fl::set_color(FL_SELECTION_COLOR, 178, 34, 34);
             Fl::set_color(FL_INACTIVE_COLOR, 96, 96, 96);
             reload_icons = (old_theme == ColorTheme::DARK);
             break;
@@ -1067,7 +1067,7 @@ void pre_init() {
     std::string ytdlp_path = config->getProperty("YTDLP_PATH", YtDlp_Helper::DEFAULT_YTDLP_PATH.c_str());
     try {
         ytdlp = std::make_shared<YtDlp_Helper>(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR, batch_size, ytdlp_path);
-        logger->debug("yt-dlp version detected at your system: " + ytdlp->installed_version);
+        logger->debug(_("yt-dlp version detected at your system: ") + ytdlp->installed_version);
     } catch (const YtDlpInitException& e) {
         logger->error(e.what());
         return;

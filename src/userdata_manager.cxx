@@ -75,7 +75,7 @@ UserDataManager::UserDataManager(std::string userdata_filepath, int current_vers
                     return 1;   //Exit without continue processing file...
                 }
                 this->userdatafile_software_version = version_i;
-                snprintf(message_bffr, sizeof(message_bffr), "VERSION USED TO SAVE CURRENT USERDATA FILE: %c.%c.%c\n", version_str.at(0), version_str.at(1), version_str.at(2));
+                snprintf(message_bffr, sizeof(message_bffr), _("VERSION USED TO SAVE CURRENT USERDATA FILE: %c.%c.%c\n"), version_str.at(0), version_str.at(1), version_str.at(2));
                 logger->info(message_bffr);
             }
             // TODO determine what to do if version of a saved file is older than current FLTube version...
