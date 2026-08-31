@@ -44,6 +44,7 @@ public:
   FLTubeMainWindow(int X, int Y, int W, int H, const char *L = 0);
   FLTubeMainWindow(int W, int H, const char *L = 0);
   FLTubeMainWindow();
+  Fl_Button *warn_mssg_bttn;
   Fl_Button *about_bttn;
   Fl_Menu_Bar *options_menu;
   static Fl_Menu_Item menu_options_menu[];

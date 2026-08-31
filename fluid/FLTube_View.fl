@@ -45,14 +45,17 @@ decl {enum ColorTheme {
 
 widget_class FLTubeMainWindow {
   label FLTube open
-  xywh {0 0 593 540}
+  xywh {0 0 593 550}
   class Fl_Double_Window visible
 } {
+  Fl_Button warn_mssg_bttn {selected
+    tooltip {Warning: some issues require your attention. Click for more info.} xywh {13 6 24 24} box NO_BOX align 192
+  }
   Fl_Button about_bttn {
     label Help
     tooltip {Show info about this application and some help of how to use it.} xywh {521 6 64 22}
   }
-  Fl_Menu_Bar options_menu {open
+  Fl_Menu_Bar options_menu {
     xywh {434 6 80 22}
   } {
     Submenu {} {
@@ -125,7 +128,7 @@ widget_class FLTubeMainWindow {
         }
         MenuItem pt_BR_lang_bttn {
           label {Português}
-          user_data {"pt_BR"} selected
+          user_data {"pt_BR"}
           xywh {0 0 100 20}
         }
       }
@@ -174,70 +177,70 @@ widget_class FLTubeMainWindow {
     }
   }
   Fl_Tabs central_tabs {open
-    xywh {10 28 578 92}
+    xywh {10 37 578 92}
   } {
     Fl_Group searchbox_tab {
       label {Search box}
       user_data {"SEARCHVIDEOS_TAB"} open
-      tooltip {Search videos at this section.} xywh {10 56 578 64} box UP_FRAME labelfont 1 labelcolor 8 align 5
+      tooltip {Search videos at this section.} xywh {10 65 578 64} box UP_FRAME labelfont 1 labelcolor 8 align 5
     } {
       Fl_Input search_term_or_url {
         label {Term/URL  }
-        tooltip {Enter a search term for search or a valid Youtube URL. TIP: use the Up and Down arrow keys to navigate previous search terms.} xywh {110 63 450 24} align 132
+        tooltip {Enter a search term for search or a valid Youtube URL. TIP: use the Up and Down arrow keys to navigate previous search terms.} xywh {110 72 450 24} align 132
         class SearchInput
       }
       Fl_Button do_search_bttn {
         label {Go &search!}
         user_data search_term_or_url
-        tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 90 150 22} box BORDER_FRAME color 8
+        tooltip {If search by URL, it must be a complete one (i.e. https://youtu.be/12345)...} xywh {227 99 150 22} box BORDER_FRAME color 8
       }
       Fl_Button next_search_term_bttn {
-        tooltip {Navigate next search terms in history. Or use Up arrow key.} xywh {561 60 18 14} box ROUNDED_FRAME down_box DOWN_BOX color 8 labelsize 11
+        tooltip {Navigate next search terms in history. Or use Up arrow key.} xywh {561 69 18 14} box ROUNDED_FRAME down_box DOWN_BOX color 8 labelsize 11
       }
       Fl_Button prev_search_term_bttn {
-        tooltip {Navigate previous search terms in history. Or use Down arrow key.} xywh {561 76 18 14} box ROUNDED_FRAME down_box DOWN_BOX color 8 labelsize 11
+        tooltip {Navigate previous search terms in history. Or use Down arrow key.} xywh {561 85 18 14} box ROUNDED_FRAME down_box DOWN_BOX color 8 labelsize 11
       }
     }
     Fl_Group videolists_tab {
       label {My Lists}
       user_data {"VIDEOLISTS_TABS"} open
-      tooltip {Lookup your lists of videos at this section (History, Liked, etc...).} xywh {10 56 577 64} box UP_FRAME labelfont 1 labelcolor 8 hide
+      tooltip {Lookup your lists of videos at this section (History, Liked, etc...).} xywh {10 65 577 64} box UP_FRAME labelfont 1 labelcolor 8 hide
     } {
       Fl_Choice videolist_selector {
         label {Lists  } open
-        xywh {89 63 480 24} down_box BORDER_BOX
+        xywh {89 72 480 24} down_box BORDER_BOX
       } {}
     }
   }
-  Fl_Group search_result_selectors {open
-    xywh {10 126 578 380} box BORDER_FRAME color 8
+  Fl_Group search_result_selectors {
+    xywh {10 135 578 380} box BORDER_FRAME color 8
   } {
     Fl_Box no_videos_list_warn {
       label {This list currently has no videos.}
-      xywh {40 280 518 72} labelfont 3 hide
+      xywh {40 289 518 72} labelfont 3 hide
     }
   }
-  Fl_Group pagination_controls {open
-    xywh {9 508 577 30}
+  Fl_Group pagination_controls {
+    xywh {9 517 577 30}
   } {
     Fl_Button first_page_bttn {
       label {<l}
-      tooltip {Go to the first page.} xywh {10 510 18 23} box BORDER_FRAME color 8
+      tooltip {Go to the first page.} xywh {10 519 18 23} box BORDER_FRAME color 8
     }
     Fl_Button previous_results_bttn {
       label {<&Previous}
-      tooltip {Get previous results of current search results set.} xywh {30 510 115 23} box BORDER_FRAME color 8
+      tooltip {Get previous results of current search results set.} xywh {30 519 115 23} box BORDER_FRAME color 8
     }
     Fl_Button next_results_bttn {
       label {&Next>}
-      tooltip {Get following results of current search results set.} xywh {450 510 115 23} box BORDER_FRAME color 8
+      tooltip {Get following results of current search results set.} xywh {450 519 115 23} box BORDER_FRAME color 8
     }
     Fl_Button last_page_bttn {
       label {l>}
-      tooltip {Go to the last loaded page.} xywh {567 510 18 23} box BORDER_FRAME color 8
+      tooltip {Go to the last loaded page.} xywh {567 519 18 23} box BORDER_FRAME color 8
     }
     Fl_Box pagination_status_info {
-      tooltip {Current page / Total of pages.} xywh {240 512 115 23}
+      tooltip {Current page / Total of pages.} xywh {240 521 115 23}
     }
   }
 }

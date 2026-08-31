@@ -19,9 +19,8 @@
 #include "../include/configuration_manager.h"
 #include "../include/userdata_manager.h"
 #include "../include/cache.h"
-#include <FL/Enumerations.H>
-#include <cstdio>
-#include <string>
+#include "../include/custom_widgets.h"
+#include <memory>
 
 /** Main Fltube window. */
 FLTubeMainWindow* mainWin =  (FLTubeMainWindow *)0;
@@ -35,6 +34,10 @@ TinyMessageWindow* message_window = (TinyMessageWindow *)0;
 InitialLoadingWindow* initial_win = (InitialLoadingWindow*)0;
 
 MoreVideoInfo* detailed_metadata_win = (MoreVideoInfo*)0;
+
+/* Message Queue to manage UI application warnings. This warning are, for example,
+ * "Risk of high processing load due to high-definition playback.", etc... */
+std::shared_ptr<MessageQueue> mq = std::make_shared<MessageQueue>();
 
 // Default resolution for video streaming
 VCODEC_RESOLUTIONS STREAM_VIDEO_RESOLUTION = R360p;
@@ -116,6 +119,7 @@ std::array<Fl_PNG_Image*,2> watchlater_icon_alts {nullptr, nullptr};
 std::array<Fl_PNG_Image*,2> watchlater_filled_icon_alts {nullptr, nullptr};
 std::array<Fl_PNG_Image*,2> arrow_up_alts {nullptr, nullptr};
 std::array<Fl_PNG_Image*,2> arrow_down_alts {nullptr, nullptr};
+std::array<Fl_PNG_Image*,2> warn_icon_alts {nullptr, nullptr};
 
 Fl_PNG_Image* live_image = nullptr;
 Fl_PNG_Image* already_viewed_image = nullptr;
@@ -129,6 +133,7 @@ Fl_PNG_Image* watchlater_icon_image = nullptr;
 Fl_PNG_Image* watchlater_filled_icon_image = nullptr;
 Fl_PNG_Image* arrow_up = nullptr;
 Fl_PNG_Image* arrow_down = nullptr;
+Fl_PNG_Image* warn_icon_image = nullptr;
 
 /* Keep the current displayed cursor. FLTK doesn't have a way to know this. */
 Fl_Cursor current_displayed_cursor = FL_CURSOR_DEFAULT;
@@ -385,6 +390,44 @@ void check_forbidden_stream(void*)
         }
     }
     Fl::repeat_timeout(0.25, check_forbidden_stream);
+}
+
+/* Validations performed every second (1 per second) to trigger visual warnings in the UI.  */
+void fast_check_if_warnings(void*) {
+    if (config->getIntProperty("CACHE_RECORD_STATUS", CACHE_RECORD_STATUS::STARTED) == CACHE_RECORD_STATUS::STOPPED)
+        mq->add_message("cache_stopped", _("The URL video caché is stopped."),
+                            _("Enable caché to improve video URL retrieve performance."));
+    else
+        mq->remove_message("cache_stopped");
+
+    if (config->getIntProperty("HISTORY_ENABLED", 1) == 0)
+        mq->add_message("history_disabled", _("Navigation History is disabled.") , _("Enable in order to register yor video view activity."));
+    else
+        mq->remove_message("history_disabled");
+
+    if (config->getIntProperty("STREAM_VIDEO_RESOLUTION", R360p) > 360)
+        mq->add_message("resolution_above_360", _("Streaming resolution higher than 360p."), _("It may cause the computer to freeze due to high CPU usage, particularly on older computers."));
+    else
+        mq->remove_message("resolution_above_360");
+
+    if (!mq->isEmpty())  mainWin->warn_mssg_bttn->show();
+    else    mainWin->warn_mssg_bttn->hide();
+
+    Fl::repeat_timeout(1, fast_check_if_warnings);
+}
+
+/* Validations performed every 10 seconds to trigger visual warnings in the UI. */
+void normal_check_if_warnings(void*) {
+    // Check if there is Internet connection
+    if (!verify_network_connection())
+        mq->add_message("no_internet_available", _("Your device is offline."), _("Check your internet connection."));
+    else
+        mq->remove_message("no_internet_available");
+
+    if (!mq->isEmpty())  mainWin->warn_mssg_bttn->show();
+    else    mainWin->warn_mssg_bttn->hide();
+
+    Fl::repeat_timeout(10, normal_check_if_warnings);
 }
 
 /** Callback to preview a video... */
@@ -836,9 +879,11 @@ void switch_color_theme(ColorTheme ct, bool force_reload = false) {
         watchlater_filled_icon_image = watchlater_filled_icon_alts.at(pos);
         arrow_up = arrow_up_alts.at(pos);
         arrow_down = arrow_down_alts.at(pos);
+        warn_icon_image = warn_icon_alts.at(pos);
 
         mainWin->prev_search_term_bttn->image(arrow_down);
         mainWin->next_search_term_bttn->image(arrow_up);
+        mainWin->warn_mssg_bttn->image(warn_icon_image);
 
         for (int j=0; j < video_info_arr.size(); j++) {
             if (video_info_arr[j] != nullptr) {
@@ -1099,6 +1144,8 @@ void pre_init() {
     arrow_up_alts.at(DARK_ICON_POS) = load_resource_image("arrow_up_dark.png");
     arrow_down_alts.at(LIGHT_ICON_POS) = load_resource_image("arrow_down.png");
     arrow_down_alts.at(DARK_ICON_POS) = load_resource_image("arrow_down_dark.png");
+    warn_icon_alts.at(LIGHT_ICON_POS) = load_resource_image("warn.png");
+    warn_icon_alts.at(DARK_ICON_POS) = load_resource_image("warn_dark.png");
 
     //Create temporal directory and change current working directory to that dir.
     std::filesystem::create_directory(FLTUBE_TEMPORAL_DIR);
@@ -1167,6 +1214,19 @@ void post_init() {
     for (VideoInfo* videoInfo: video_info_arr) {
         videoInfo->hide();
     }
+
+    mainWin->warn_mssg_bttn->image(warn_icon_image);
+    if (mq->isEmpty())  mainWin->warn_mssg_bttn->hide();
+    mainWin->warn_mssg_bttn->callback([](Fl_Widget* w, void* data) {
+        Warning_Window *warn_mssg_win = new Warning_Window(400, 300, "Warning Messages", mq);
+        warn_mssg_win->show();
+        // Loop until the message window is closed...
+        while (warn_mssg_win->shown()) {
+            Fl::wait();
+        }
+
+        delete warn_mssg_win;
+    });
 
     mainWin->about_bttn->callback((Fl_Callback*)showFLTubeHelpWindow);
     mainWin->about_bttn->shortcut(config->getShortcutFor(SHORTCUTS::SHOW_HELP));
@@ -1291,6 +1351,8 @@ void post_init() {
 
     /// FLTK CUSTOM TIMEOUT CALLBACKS
     Fl::add_timeout(0.25, check_forbidden_stream);
+    Fl::add_timeout(1, fast_check_if_warnings);
+    Fl::add_timeout(10, normal_check_if_warnings);
 
     // Redraw the window to show the new button
     mainWin->redraw();
@@ -1620,13 +1682,15 @@ int main(int argc, char **argv) {
     logger->info(message);
 
     snprintf(message, sizeof(message), "FLTube %s", VERSION);
-    mainWin = new FLTubeMainWindow(593, 540, message);
+    mainWin = new FLTubeMainWindow();
+    mainWin->copy_label(message);
     center_window(mainWin);
     mainWin->callback((Fl_Callback*)exitApp);
     mainWin->search_term_or_url->when(FL_WHEN_ENTER_KEY);
     mainWin->search_term_or_url->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));
     mainWin->search_term_or_url->shortcut(config->getShortcutFor(SHORTCUTS::FOCUS_SEARCH));
     mainWin->search_term_or_url->set_search_source(ytdlp);
+    mainWin->search_term_or_url->take_focus();
     mainWin->prev_search_term_bttn->callback((Fl_Callback*)moveSearchValue,(void*)0);
     mainWin->next_search_term_bttn->callback((Fl_Callback*)moveSearchValue,(void*)1);
     mainWin->do_search_bttn->callback((Fl_Callback*)searchButtonAction_cb, (void*)(mainWin->search_term_or_url));

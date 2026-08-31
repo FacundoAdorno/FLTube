@@ -88,7 +88,7 @@ FLTubeMainWindow::FLTubeMainWindow(int W, int H, const char *L) :
 }
 
 FLTubeMainWindow::FLTubeMainWindow() :
-  Fl_Double_Window(0, 0, 593, 540, "FLTube")
+  Fl_Double_Window(0, 0, 593, 550, "FLTube")
 {
   clear_flag(16);
   _FLTubeMainWindow();
@@ -104,6 +104,11 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
   this->labelcolor(FL_FOREGROUND_COLOR);
   this->align(Fl_Align(FL_ALIGN_TOP));
   this->when(FL_WHEN_RELEASE);
+  { warn_mssg_bttn = new Fl_Button(13, 6, 24, 24);
+    warn_mssg_bttn->tooltip(_("Warning: some issues require your attention. Click for more info."));
+    warn_mssg_bttn->box(FL_NO_BOX);
+    warn_mssg_bttn->align(Fl_Align(192));
+  } // Fl_Button* warn_mssg_bttn
   { about_bttn = new Fl_Button(521, 6, 64, 22, _("Help"));
     about_bttn->tooltip(_("Show info about this application and some help of how to use it."));
   } // Fl_Button* about_bttn
@@ -185,15 +190,15 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     }
     options_menu->menu(menu_options_menu);
   } // Fl_Menu_Bar* options_menu
-  { central_tabs = new Fl_Tabs(10, 28, 578, 92);
-    { searchbox_tab = new Fl_Group(10, 56, 578, 64, _("Search box"));
+  { central_tabs = new Fl_Tabs(10, 37, 578, 92);
+    { searchbox_tab = new Fl_Group(10, 65, 578, 64, _("Search box"));
       searchbox_tab->tooltip(_("Search videos at this section."));
       searchbox_tab->box(FL_UP_FRAME);
       searchbox_tab->labelfont(1);
       searchbox_tab->labelcolor(FL_INACTIVE_COLOR);
       searchbox_tab->user_data((void*)("SEARCHVIDEOS_TAB"));
       searchbox_tab->align(Fl_Align(FL_ALIGN_TOP_LEFT));
-      { search_term_or_url = new SearchInput(110, 63, 450, 24, _("Term/URL  "));
+      { search_term_or_url = new SearchInput(110, 72, 450, 24, _("Term/URL  "));
         search_term_or_url->tooltip(_("Enter a search term for search or a valid Youtube URL. TIP: use the Up and Do"
 "wn arrow keys to navigate previous search terms."));
         search_term_or_url->box(FL_DOWN_BOX);
@@ -206,20 +211,20 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
         search_term_or_url->align(Fl_Align(132));
         search_term_or_url->when(FL_WHEN_RELEASE);
       } // SearchInput* search_term_or_url
-      { do_search_bttn = new Fl_Button(227, 90, 150, 22, _("Go &search!"));
+      { do_search_bttn = new Fl_Button(227, 99, 150, 22, _("Go &search!"));
         do_search_bttn->tooltip(_("If search by URL, it must be a complete one (i.e. https://youtu.be/12345)..."));
         do_search_bttn->box(FL_BORDER_FRAME);
         do_search_bttn->color(FL_INACTIVE_COLOR);
         do_search_bttn->user_data((void*)(search_term_or_url));
       } // Fl_Button* do_search_bttn
-      { next_search_term_bttn = new Fl_Button(561, 60, 18, 14);
+      { next_search_term_bttn = new Fl_Button(561, 69, 18, 14);
         next_search_term_bttn->tooltip(_("Navigate next search terms in history. Or use Up arrow key."));
         next_search_term_bttn->box(FL_ROUNDED_FRAME);
         next_search_term_bttn->down_box(FL_DOWN_BOX);
         next_search_term_bttn->color(FL_INACTIVE_COLOR);
         next_search_term_bttn->labelsize(11);
       } // Fl_Button* next_search_term_bttn
-      { prev_search_term_bttn = new Fl_Button(561, 76, 18, 14);
+      { prev_search_term_bttn = new Fl_Button(561, 85, 18, 14);
         prev_search_term_bttn->tooltip(_("Navigate previous search terms in history. Or use Down arrow key."));
         prev_search_term_bttn->box(FL_ROUNDED_FRAME);
         prev_search_term_bttn->down_box(FL_DOWN_BOX);
@@ -228,51 +233,51 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
       } // Fl_Button* prev_search_term_bttn
       searchbox_tab->end();
     } // Fl_Group* searchbox_tab
-    { videolists_tab = new Fl_Group(10, 56, 577, 64, _("My Lists"));
+    { videolists_tab = new Fl_Group(10, 65, 577, 64, _("My Lists"));
       videolists_tab->tooltip(_("Lookup your lists of videos at this section (History, Liked, etc...)."));
       videolists_tab->box(FL_UP_FRAME);
       videolists_tab->labelfont(1);
       videolists_tab->labelcolor(FL_INACTIVE_COLOR);
       videolists_tab->user_data((void*)("VIDEOLISTS_TABS"));
       videolists_tab->hide();
-      { videolist_selector = new Fl_Choice(89, 63, 480, 24, _("Lists  "));
+      { videolist_selector = new Fl_Choice(89, 72, 480, 24, _("Lists  "));
         videolist_selector->down_box(FL_BORDER_BOX);
       } // Fl_Choice* videolist_selector
       videolists_tab->end();
     } // Fl_Group* videolists_tab
     central_tabs->end();
   } // Fl_Tabs* central_tabs
-  { search_result_selectors = new Fl_Group(10, 126, 578, 380);
+  { search_result_selectors = new Fl_Group(10, 135, 578, 380);
     search_result_selectors->box(FL_BORDER_FRAME);
     search_result_selectors->color(FL_INACTIVE_COLOR);
-    { no_videos_list_warn = new Fl_Box(40, 280, 518, 72, _("This list currently has no videos."));
+    { no_videos_list_warn = new Fl_Box(40, 289, 518, 72, _("This list currently has no videos."));
       no_videos_list_warn->labelfont(3);
       no_videos_list_warn->hide();
     } // Fl_Box* no_videos_list_warn
     search_result_selectors->end();
   } // Fl_Group* search_result_selectors
-  { pagination_controls = new Fl_Group(9, 508, 577, 30);
-    { first_page_bttn = new Fl_Button(10, 510, 18, 23, _("<l"));
+  { pagination_controls = new Fl_Group(9, 517, 577, 30);
+    { first_page_bttn = new Fl_Button(10, 519, 18, 23, _("<l"));
       first_page_bttn->tooltip(_("Go to the first page."));
       first_page_bttn->box(FL_BORDER_FRAME);
       first_page_bttn->color(FL_INACTIVE_COLOR);
     } // Fl_Button* first_page_bttn
-    { previous_results_bttn = new Fl_Button(30, 510, 115, 23, _("<&Previous"));
+    { previous_results_bttn = new Fl_Button(30, 519, 115, 23, _("<&Previous"));
       previous_results_bttn->tooltip(_("Get previous results of current search results set."));
       previous_results_bttn->box(FL_BORDER_FRAME);
       previous_results_bttn->color(FL_INACTIVE_COLOR);
     } // Fl_Button* previous_results_bttn
-    { next_results_bttn = new Fl_Button(450, 510, 115, 23, _("&Next>"));
+    { next_results_bttn = new Fl_Button(450, 519, 115, 23, _("&Next>"));
       next_results_bttn->tooltip(_("Get following results of current search results set."));
       next_results_bttn->box(FL_BORDER_FRAME);
       next_results_bttn->color(FL_INACTIVE_COLOR);
     } // Fl_Button* next_results_bttn
-    { last_page_bttn = new Fl_Button(567, 510, 18, 23, _("l>"));
+    { last_page_bttn = new Fl_Button(567, 519, 18, 23, _("l>"));
       last_page_bttn->tooltip(_("Go to the last loaded page."));
       last_page_bttn->box(FL_BORDER_FRAME);
       last_page_bttn->color(FL_INACTIVE_COLOR);
     } // Fl_Button* last_page_bttn
-    { pagination_status_info = new Fl_Box(240, 512, 115, 23);
+    { pagination_status_info = new Fl_Box(240, 521, 115, 23);
       pagination_status_info->tooltip(_("Current page / Total of pages."));
     } // Fl_Box* pagination_status_info
     pagination_controls->end();
