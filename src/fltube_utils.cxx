@@ -238,38 +238,6 @@ FLTUBE_STATUS_CODES check_url_access(std::string url, CURL *curl) {
     return returnCode;
 }
 
-/**
- *  Check if there is network connectivity. Returns true if Internet is reachable.
- */
-bool verify_network_connection(CURL *_curl) {
-    CURL *curl = curl_easy_duphandle(_curl);   // Duplicate handle in order to avoid freeze app.
-
-    if (curl == nullptr) return false;
-
-    const char* url_test = "https://www.google.com";
-    // Use null device to redirect CURL output...
-    FILE* null_file = fopen("/dev/null", "w");
-    if (null_file == nullptr)  {
-        perror("Error opening file");
-        return false;
-    }
-
-    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5L);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
-    curl_easy_setopt(curl, CURLOPT_URL, url_test);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, null_file);
-    CURLcode response = curl_easy_perform(curl);
-
-    bool connected = (response == CURLE_OK);
-
-    if ( !connected )
-        printf(_("Connection testing failure: %s. Check your connectivity.\n"), url_test);
-
-    fclose(null_file);
-    curl_easy_cleanup(curl);
-    return connected;
-}
-
 /** Returns a resized Fl_Image widget from an existing JPG image. If original image doesn't exists, a @nullptr is returned.*/
 Fl_Image* create_resized_image_from_jpg(std::string jpg_filepath, int target_width){
     if(!std::filesystem::exists(jpg_filepath)) {
@@ -535,7 +503,7 @@ void NetworkConnection::reset() {
         // curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
 
         if ( ! low_bandwidth_connectivity) {
-            curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 10L);    // CURL default value: 300s
+            curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 5L);    // CURL default value: 300s
             curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 20L);      // CURL default value: 0 (no limit)
         } else {    // is slow...
             curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 10L);
@@ -547,6 +515,41 @@ void NetworkConnection::reset() {
 CURL* NetworkConnection::get_connection() {
     this->reset();
     return curl_;
+}
+
+bool NetworkConnection::is_network_available() {
+    CURL *curl = curl_easy_duphandle(curl_);   // Duplicate handle in order to avoid freeze app.
+
+    if (curl == nullptr) return false;
+
+    // IP for google.com. Used for operating systems that doesn't have a local DNS resolver, like Flinux and TinyCore.
+    const char* url_test = "https://8.8.8.8/";
+    // Use null device to redirect CURL output...
+    FILE* null_file = fopen("/dev/null", "w");
+    if (null_file == nullptr)  {
+        perror("Error opening file");
+        return false;
+    }
+
+    if (!this->low_bandwidth_connectivity) {
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3L);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 6L);
+    } else {
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5L);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
+    }
+    curl_easy_setopt(curl, CURLOPT_URL, url_test);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, null_file);
+    CURLcode response = curl_easy_perform(curl);
+
+    bool connected = (response == CURLE_OK);
+
+    if ( !connected )
+        printf(_("Connection testing failure: %s. Check your connectivity.\n"), url_test);
+
+    fclose(null_file);
+    curl_easy_cleanup(curl);
+    return connected;
 }
 
 void NetworkConnection::set_low_bandwidth(bool is_slow) {

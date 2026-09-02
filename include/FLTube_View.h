@@ -59,6 +59,7 @@ public:
   static Fl_Menu_Item *en_lang_bttn;
   static Fl_Menu_Item *es_lang_bttn;
   static Fl_Menu_Item *pt_BR_lang_bttn;
+  static Fl_Menu_Item *slow_connect_bttn;
   static Fl_Menu_Item *history_clearall_bttn;
   static Fl_Menu_Item *history_pause_bttn;
   static Fl_Menu_Item *history_unpause_bttn;

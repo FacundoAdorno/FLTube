@@ -228,10 +228,17 @@ public:
     /* Return the reusable current CURL* connection. This is reseted to defaults options values. */
     CURL* get_connection();
 
+    /*  Check if there is network connectivity. Returns true if Internet is reachable. */
+    bool is_network_available();
+
     /* Use this option when working with low-bandwidth connections.
      * Otherwise, set it to `false`, as a normal-bandwidth connection is expected.
      */
     void set_low_bandwidth(bool is_low);
+
+    bool has_low_bandwidth() {
+        return this->low_bandwidth_connectivity;
+    }
 };
 
 std::string exec(const char* cmd, int& exitStatus);
@@ -255,8 +262,6 @@ static CURL* get_curl_handle(const char* forURL, FILE* output_file = nullptr);
 FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::string outfilename, CURL *curl, bool overwrite = false);
 
 FLTUBE_STATUS_CODES check_url_access(std::string url, CURL *curl);
-
-bool verify_network_connection(CURL *curl);
 
 Fl_Image* create_resized_image_from_jpg(std::string jpg_filepath, int target_width);
 

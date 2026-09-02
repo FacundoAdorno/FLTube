@@ -48,14 +48,14 @@ widget_class FLTubeMainWindow {
   xywh {0 0 593 550}
   class Fl_Double_Window visible
 } {
-  Fl_Button warn_mssg_bttn {selected
+  Fl_Button warn_mssg_bttn {
     tooltip {Warning: some issues require your attention. Click for more info.} xywh {13 6 24 24} box NO_BOX align 192
   }
   Fl_Button about_bttn {
     label Help
     tooltip {Show info about this application and some help of how to use it.} xywh {521 6 64 22}
   }
-  Fl_Menu_Bar options_menu {
+  Fl_Menu_Bar options_menu {open
     xywh {434 6 80 22}
   } {
     Submenu {} {
@@ -130,6 +130,15 @@ widget_class FLTubeMainWindow {
           label {Português}
           user_data {"pt_BR"}
           xywh {0 0 100 20}
+        }
+      }
+      Submenu {} {
+        label Network open
+        xywh {0 0 100 20}
+      } {
+        MenuItem slow_connect_bttn {
+          label {I've slow connection} selected
+          xywh {0 0 100 20} type Toggle
         }
       }
       Submenu {} {

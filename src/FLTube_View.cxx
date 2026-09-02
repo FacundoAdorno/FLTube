@@ -39,6 +39,9 @@ Fl_Menu_Item FLTubeMainWindow::menu_options_menu[] = {
  {gettext_noop("Espa\303\261ol"), 0,  0, (void*)("es"), 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Portugu\303\252s"), 0,  0, (void*)("pt_BR"), 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
+ {gettext_noop("Network"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {gettext_noop("I\'ve slow connection"), 0,  0, 0, 2, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
+ {0,0,0,0,0,0,0,0,0},
  {gettext_noop("Navigation History"), 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Clear all"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {gettext_noop("Stop recording"), 0,  0, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
@@ -65,14 +68,15 @@ Fl_Menu_Item* FLTubeMainWindow::dark_theme_bttn = FLTubeMainWindow::menu_options
 Fl_Menu_Item* FLTubeMainWindow::en_lang_bttn = FLTubeMainWindow::menu_options_menu + 14;
 Fl_Menu_Item* FLTubeMainWindow::es_lang_bttn = FLTubeMainWindow::menu_options_menu + 15;
 Fl_Menu_Item* FLTubeMainWindow::pt_BR_lang_bttn = FLTubeMainWindow::menu_options_menu + 16;
-Fl_Menu_Item* FLTubeMainWindow::history_clearall_bttn = FLTubeMainWindow::menu_options_menu + 19;
-Fl_Menu_Item* FLTubeMainWindow::history_pause_bttn = FLTubeMainWindow::menu_options_menu + 20;
-Fl_Menu_Item* FLTubeMainWindow::history_unpause_bttn = FLTubeMainWindow::menu_options_menu + 21;
-Fl_Menu_Item* FLTubeMainWindow::cache_clearall_bttn = FLTubeMainWindow::menu_options_menu + 24;
-Fl_Menu_Item* FLTubeMainWindow::cache_pause_bttn = FLTubeMainWindow::menu_options_menu + 25;
-Fl_Menu_Item* FLTubeMainWindow::cache_unpause_bttn = FLTubeMainWindow::menu_options_menu + 26;
-Fl_Menu_Item* FLTubeMainWindow::reset_appconfig_bttn = FLTubeMainWindow::menu_options_menu + 28;
-Fl_Menu_Item* FLTubeMainWindow::check_update_bttn = FLTubeMainWindow::menu_options_menu + 29;
+Fl_Menu_Item* FLTubeMainWindow::slow_connect_bttn = FLTubeMainWindow::menu_options_menu + 19;
+Fl_Menu_Item* FLTubeMainWindow::history_clearall_bttn = FLTubeMainWindow::menu_options_menu + 22;
+Fl_Menu_Item* FLTubeMainWindow::history_pause_bttn = FLTubeMainWindow::menu_options_menu + 23;
+Fl_Menu_Item* FLTubeMainWindow::history_unpause_bttn = FLTubeMainWindow::menu_options_menu + 24;
+Fl_Menu_Item* FLTubeMainWindow::cache_clearall_bttn = FLTubeMainWindow::menu_options_menu + 27;
+Fl_Menu_Item* FLTubeMainWindow::cache_pause_bttn = FLTubeMainWindow::menu_options_menu + 28;
+Fl_Menu_Item* FLTubeMainWindow::cache_unpause_bttn = FLTubeMainWindow::menu_options_menu + 29;
+Fl_Menu_Item* FLTubeMainWindow::reset_appconfig_bttn = FLTubeMainWindow::menu_options_menu + 31;
+Fl_Menu_Item* FLTubeMainWindow::check_update_bttn = FLTubeMainWindow::menu_options_menu + 32;
 
 FLTubeMainWindow::FLTubeMainWindow(int X, int Y, int W, int H, const char *L) :
   Fl_Double_Window(X, Y, W, H, L)
@@ -164,10 +168,10 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     { Fl_Menu_Item* o = &menu_options_menu[19];
       o->label(_(o->label()));
     }
-    { Fl_Menu_Item* o = &menu_options_menu[20];
+    { Fl_Menu_Item* o = &menu_options_menu[21];
       o->label(_(o->label()));
     }
-    { Fl_Menu_Item* o = &menu_options_menu[21];
+    { Fl_Menu_Item* o = &menu_options_menu[22];
       o->label(_(o->label()));
     }
     { Fl_Menu_Item* o = &menu_options_menu[23];
@@ -176,16 +180,22 @@ void FLTubeMainWindow::_FLTubeMainWindow() {
     { Fl_Menu_Item* o = &menu_options_menu[24];
       o->label(_(o->label()));
     }
-    { Fl_Menu_Item* o = &menu_options_menu[25];
+    { Fl_Menu_Item* o = &menu_options_menu[26];
       o->label(_(o->label()));
     }
-    { Fl_Menu_Item* o = &menu_options_menu[26];
+    { Fl_Menu_Item* o = &menu_options_menu[27];
       o->label(_(o->label()));
     }
     { Fl_Menu_Item* o = &menu_options_menu[28];
       o->label(_(o->label()));
     }
     { Fl_Menu_Item* o = &menu_options_menu[29];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[31];
+      o->label(_(o->label()));
+    }
+    { Fl_Menu_Item* o = &menu_options_menu[32];
       o->label(_(o->label()));
     }
     options_menu->menu(menu_options_menu);

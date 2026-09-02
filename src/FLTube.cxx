@@ -421,7 +421,7 @@ void fast_check_if_warnings(void*) {
 /* Validations performed every 10 seconds to trigger visual warnings in the UI. */
 void normal_check_if_warnings(void*) {
     // Check if there is Internet connection
-    if (!verify_network_connection(network->get_connection()))
+    if (! network->is_network_available())
         mq->add_message("no_internet_available", _("Your device is offline."), _("Check your internet connection."));
     else
         mq->remove_message("no_internet_available");
@@ -436,7 +436,7 @@ void normal_check_if_warnings(void*) {
 void preview_video_cb(Fl_Button* widget, void* video_url){
     if (ytdlp_action_in_progress)
         return;
-    if (! verify_network_connection(network->get_connection())) {
+    if (! network->is_network_available()) {
         logger->warn(_("Your device is offline. Check your internet connection."));
         showMessageWindow( _("There seems that you don't have access to the Internet. "
         "Please, verify you network connection before proceed..."));
@@ -609,6 +609,13 @@ void update_video_info() {
  * Returns @true if there is more results to process at video list. Returns @false in otherwise.
  */
 bool updateVideoMetadataFromVideoList() {
+    if (! network->is_network_available()) {
+        logger->warn(_("Your device is offline. Check your internet connection."));
+        showMessageWindow( _("There seems that you don't have access to the Internet. "
+        "Please, verify you network connection before proceed..."));
+        return false;
+    }
+
     Fl::check();
     std::string selected_list = mainWin->videolist_selector->mvalue()->label();
     VideoList* vlist = userdata->getVideoList(selected_list);
@@ -656,7 +663,7 @@ void getVideosAtList_cb(Fl_Choice* w, void* a){
     mainWin->previous_results_bttn->deactivate();
     mainWin->first_page_bttn->deactivate();
     // Check if there is Internet connectivity before do a search...
-    if (! verify_network_connection(network->get_connection())) {
+    if (! network->is_network_available()) {
         logger->warn(_("Your device is offline. Check your internet connection."));
         showMessageWindow( _("There seems that you don't have access to the Internet. "
         "Please, verify you network connection before proceed..."));
@@ -944,7 +951,7 @@ void change_lang_cb(Fl_Widget* w, void* data) {
 
 void show_video_metadata_cb(Fl_Widget* w, void* data) {
     // Check if there is Internet connectivity before do a search...
-    if (! verify_network_connection(network->get_connection())) {
+    if (! network->is_network_available()) {
         logger->warn(_("Your device is offline. Check your internet connection."));
         showMessageWindow( _("There seems that you don't have access to the Internet. "
         "Please, verify you network connection before proceed..."));
@@ -1229,6 +1236,7 @@ void post_init() {
     if (mq->isEmpty())  mainWin->warn_mssg_bttn->hide();
     mainWin->warn_mssg_bttn->callback([](Fl_Widget* w, void* data) {
         Warning_Window *warn_mssg_win = new Warning_Window(400, 300, "Warning Messages", mq);
+        center_window(warn_mssg_win);
         warn_mssg_win->show();
         // Loop until the message window is closed...
         while (warn_mssg_win->shown()) {
@@ -1359,6 +1367,22 @@ void post_init() {
 
     });
 
+    mainWin->slow_connect_bttn->callback([](Fl_Widget* w, void* data) {
+        bool selected = mainWin->slow_connect_bttn->value();
+        if (selected) {
+            bool dummyFlag;
+            bool continue_op = showChoiceWindow(_("Use this option if your Internet connection is slower than usual. Network request timeouts will be increased. Proceed?"), dummyFlag);
+            if (!continue_op)  {
+                mainWin->slow_connect_bttn->value(0);
+                return;
+            }
+        }
+        network->set_low_bandwidth(selected);
+        char mssg[128]{};
+        snprintf(mssg, sizeof(mssg), _("Connection bandwidth quality set to %s by user request."), (selected) ? _("LOW") : _("NORMAL"));
+        logger->debug(mssg);
+    });
+
     /// FLTK CUSTOM TIMEOUT CALLBACKS
     Fl::add_timeout(0.25, check_forbidden_stream);
     Fl::add_timeout(1, fast_check_if_warnings);
@@ -1398,7 +1422,7 @@ void doSearch(const char* input_text) {
     ytdlp_action_in_progress = true;
     change_cursor(FL_CURSOR_WAIT);
     // Check if there is Internet connectivity before do a search...
-    if (! verify_network_connection(network->get_connection())) {
+    if (! network->is_network_available()) {
         //Restore cursor after search failed because no Internet is available...
         ytdlp_action_in_progress = false;
         change_cursor();
