@@ -34,6 +34,7 @@
 #include <algorithm>
 #include <cstring>
 #include <regex>
+#include <exception>
 
 #include <FL/Fl_Image.H>
 #include <FL/Fl_JPEG_Image.H>
@@ -190,6 +191,49 @@ public:
     std::string getExtraParams() {   return this->extra_live_parameters; }
 };
 
+
+/**
+ * Use this Exception when the process of initializing the YT-DLP object cannot be completed.
+ * In example, when yt-dlp is not installed at your system.
+ */
+class CurlInitException : public std::exception {
+private:
+    std::string message;
+public:
+
+    CurlInitException(const char* msg) :
+    message(msg) {}
+
+    const char* what() const noexcept {
+        return message.c_str();
+    }
+};
+
+/* This class mantains a reusable CURL object. This can be used across multiple functions and objects. */
+class NetworkConnection {
+private:
+    CURL* curl_ = nullptr;
+    std::string USERAGENT_ = "libcurl-agent/1.0";
+    bool low_bandwidth_connectivity = false;
+
+    /* Reset the reusable connection to its default values. */
+    void reset();
+public:
+    /* Create a reusable CURL connection.
+     * @throws CurlInitException if connection cannot be created.
+     */
+    NetworkConnection();
+    ~NetworkConnection();
+
+    /* Return the reusable current CURL* connection. This is reseted to defaults options values. */
+    CURL* get_connection();
+
+    /* Use this option when working with low-bandwidth connections.
+     * Otherwise, set it to `false`, as a normal-bandwidth connection is expected.
+     */
+    void set_low_bandwidth(bool is_low);
+};
+
 std::string exec(const char* cmd, int& exitStatus);
 
 std::string exec(const char* cmd);
@@ -208,11 +252,11 @@ bool canWriteOnDir(const char* directory);
 
 static CURL* get_curl_handle(const char* forURL, FILE* output_file = nullptr);
 
-FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::string outfilename, bool overwrite = false);
+FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::string outfilename, CURL *curl, bool overwrite = false);
 
-FLTUBE_STATUS_CODES check_url_access(std::string url);
+FLTUBE_STATUS_CODES check_url_access(std::string url, CURL *curl);
 
-bool verify_network_connection();
+bool verify_network_connection(CURL *curl);
 
 Fl_Image* create_resized_image_from_jpg(std::string jpg_filepath, int target_width);
 

@@ -255,13 +255,13 @@ FLTUBE_STATUS_CODES YtDlp_Helper::stream(const char* video_url) {
         std::vector<std::string> urls;
         final_url_result = this->get_stream_url(video_url, stream_format, is_dash_format, urls);
 
-        FLTUBE_STATUS_CODES res = check_url_access(urls[0]);
+        FLTUBE_STATUS_CODES res = check_url_access(urls[0], network->get_connection());
         if (res != FLT_OK) {
             for (std::string alt_player: this->alt_player_clients) {
                 if (res == FLT_HTTP_FORBIDDEN) {
                     logger->debug(_("yt-dlp resolved to an INVALID URL (403 FORBIDDEN code was returned). Trying with another player_client: ") + alt_player);
                     final_url_result = this->get_stream_url(video_url, stream_format, is_dash_format, urls, alt_player);
-                    res = check_url_access(urls[0]);
+                    res = check_url_access(urls[0], network->get_connection());
                 } else if (res == FLT_OK) {
                     break;
                 }

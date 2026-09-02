@@ -125,6 +125,8 @@ class YtDlp_Helper {
 
         std::shared_ptr<PermanentDiskCache> cache;
 
+        std::shared_ptr<NetworkConnection> network;
+
         unsigned int batch_search_size;
 
         std::string YTDLP_BIN_PATH;
@@ -167,8 +169,10 @@ class YtDlp_Helper {
         const static std::string ALTERN_YT_PLAYER_CLIENT;
 
 
-        YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream, std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache, std::string working_dir, unsigned int batch_size, std::string ytdlp_path):
-            is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache),
+        YtDlp_Helper(VCODEC_RESOLUTIONS v_resolution, MediaPlayerInfo* mp, bool enable_alt_stream,
+                     std::shared_ptr<TerminalLogger> const& lgg, std::shared_ptr<PermanentDiskCache> const& cache,
+                     std::shared_ptr<NetworkConnection> const& netconn, std::string working_dir, unsigned int batch_size, std::string ytdlp_path):
+            is_live_flag(false), video_resolution(v_resolution), media_player(mp), extractor(YTDLP_EXTRACTOR::YOUTUBE), enable_alternative_stream_method(enable_alt_stream), logger(lgg), cache(cache), network(netconn),
             batch_search_size(batch_size), search_cache({}), search_history({}), current_search_history_index(0),
             metadata_profile(YT_METADATA_PROFILE::SIMPLE)
             {

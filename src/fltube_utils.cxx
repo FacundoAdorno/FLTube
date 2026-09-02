@@ -173,31 +173,10 @@ bool canWriteOnDir(const char* directory){
     return checkDirectoryPermissions(directory, {CAN_WRITE});
 }
 
-/**
- *  Create a CURL handle, for an specific URL (not null) and an optional output_file;
- */
-static CURL* get_curl_handle(const char* forURL, FILE* output_file) {
-    if(forURL == nullptr || forURL[0] == '\0'){
-        return nullptr;
-    }
-    CURL *curl;
-    curl_global_init(CURL_GLOBAL_ALL);
-    curl = curl_easy_init();
-    if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, forURL);
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);  //This allow redirections (i.e. HTTP 301 code)
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-        if (output_file != nullptr)     curl_easy_setopt(curl, CURLOPT_WRITEDATA, output_file);
-    }
-    return curl;
-}
-
 //Function for download a file to a local output directory, and set a custom name. Returns 0 if all is ok.
-FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::string outfilename, bool overwrite) {
-    CURL *curl;
-    FILE *fp;
-    CURLcode response;
+FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::string outfilename, CURL *curl, bool overwrite) {
+    if (curl == nullptr)    return FLT_DOWNLOAD_FL_FAILED;
+
     FLTUBE_STATUS_CODES returnCode = FLT_OK;
     std::string fullpath = output_dir + outfilename;
     //If must not overwrite the file, check if exists before do any download...
@@ -205,23 +184,23 @@ FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::
         return FLT_DOWNLOAD_FL_BYPASSED;
     }
 
-    fp = fopen(fullpath.c_str(),"wb");
+    FILE *fp = fopen(fullpath.c_str(),"wb");
     if (fp == nullptr) {
        perror("Error creating download file");
-        //TODO: what else we can do if fp is nullptr?
+       return FLT_DOWNLOAD_FL_FAILED;
     }
-    curl = get_curl_handle(url.c_str(), fp);
-    if (curl) {
-        response = curl_easy_perform(curl);
 
-        if (response != CURLE_OK) {
-            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(response));
-            returnCode = FLT_DOWNLOAD_FL_FAILED;
-            std::filesystem::remove(fullpath.c_str());
-        }
-        curl_easy_cleanup(curl);
-        fclose(fp);
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+    CURLcode response = curl_easy_perform(curl);
+
+    if (response != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(response));
+        returnCode = FLT_DOWNLOAD_FL_FAILED;
+        std::filesystem::remove(fullpath.c_str());
     }
+    fclose(fp);
+
     return returnCode;
 }
 
@@ -230,19 +209,18 @@ FLTUBE_STATUS_CODES download_file(std::string url, std::string output_dir, std::
  *  - FLT_UNEXPECTED_PARAM if URL is not a valid one or is empty.
  *  - FLT_HTTP_FORBIDDEN if a 403 Forbidden is returned from server.
  *  - FLT_HTTP_GENERAL_ERROR if server returns an http code > 400. */
-FLTUBE_STATUS_CODES check_url_access(std::string url) {
+FLTUBE_STATUS_CODES check_url_access(std::string url, CURL *curl) {
     if (url.empty() || !isUrl(url.c_str())) return FLT_UNEXPECTED_PARAM;
 
-    CURL *curl;
     CURLcode response;
     FLTUBE_STATUS_CODES returnCode = FLT_OK;
 
-    curl = get_curl_handle(url.c_str());
-    curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
-    /* get us the resource without a body - use HEAD */
-    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
 
     if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
+        /* get us the resource without a body - use HEAD */
+        curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
         response = curl_easy_perform(curl);
         if (response == CURLE_HTTP_RETURNED_ERROR) {
             long http_code = 0;
@@ -263,29 +241,33 @@ FLTUBE_STATUS_CODES check_url_access(std::string url) {
 /**
  *  Check if there is network connectivity. Returns true if Internet is reachable.
  */
-bool verify_network_connection() {
-    CURL *curl;
-    CURLcode response;
+bool verify_network_connection(CURL *_curl) {
+    CURL *curl = curl_easy_duphandle(_curl);   // Duplicate handle in order to avoid freeze app.
+
+    if (curl == nullptr) return false;
+
     const char* url_test = "https://www.google.com";
     // Use null device to redirect CURL output...
     FILE* null_file = fopen("/dev/null", "w");
     if (null_file == nullptr)  {
-        //TODO what else we can do if null_file is nullptr?
         perror("Error opening file");
+        return false;
     }
-    curl = get_curl_handle(url_test, null_file);
-    if (curl) {
-        response = curl_easy_perform(curl);
-        if ( response != CURLE_OK) {
-            printf(_("Connection testing failure: %s. Check your connectivity.\n"), url_test);
-            curl_easy_cleanup(curl);
-            return false;
-        }
-        curl_easy_cleanup(curl);
-        if (null_file != nullptr) fclose(null_file);
-        return true;
-    }
-    return false;
+
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5L);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
+    curl_easy_setopt(curl, CURLOPT_URL, url_test);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, null_file);
+    CURLcode response = curl_easy_perform(curl);
+
+    bool connected = (response == CURLE_OK);
+
+    if ( !connected )
+        printf(_("Connection testing failure: %s. Check your connectivity.\n"), url_test);
+
+    fclose(null_file);
+    curl_easy_cleanup(curl);
+    return connected;
 }
 
 /** Returns a resized Fl_Image widget from an existing JPG image. If original image doesn't exists, a @nullptr is returned.*/
@@ -524,4 +506,49 @@ bool PaginationManager::exists_previous() {
 bool PaginationManager::is_last_page_known() {
     int last_page_index = ((int)count_of_results - 1) / SEARCH_PAGE_SIZE;
     return search_page_index == last_page_index;
+}
+
+NetworkConnection::NetworkConnection() {
+        curl_global_init(CURL_GLOBAL_ALL);
+        curl_ = curl_easy_init();
+        if (!curl_) {
+            char error_mssg[128]{};
+            snprintf(error_mssg, sizeof(error_mssg), _("Cannot initialize CURL (currently running version %s.)"), curl_version());
+            throw new CurlInitException(error_mssg);
+        }
+        this->reset();
+}
+
+NetworkConnection::~NetworkConnection() {
+    if (curl_) {
+        curl_easy_cleanup(curl_);
+    }
+}
+
+void NetworkConnection::reset() {
+    if (curl_) {
+        //Reset first
+        curl_easy_reset(curl_);
+        curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1L);  //This allow redirections (i.e. HTTP 301 code)
+        curl_easy_setopt(curl_, CURLOPT_USERAGENT, USERAGENT_.c_str());
+        curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, NULL);
+        // curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
+
+        if ( ! low_bandwidth_connectivity) {
+            curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 10L);    // CURL default value: 300s
+            curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 20L);      // CURL default value: 0 (no limit)
+        } else {    // is slow...
+            curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 10L);
+            curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 60L);
+        }
+    }
+}
+
+CURL* NetworkConnection::get_connection() {
+    this->reset();
+    return curl_;
+}
+
+void NetworkConnection::set_low_bandwidth(bool is_slow) {
+    this->low_bandwidth_connectivity = is_slow;
 }

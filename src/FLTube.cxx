@@ -101,6 +101,8 @@ ConfigurationManager* config = nullptr;
 
 UserDataManager* userdata = nullptr;
 
+std::shared_ptr<NetworkConnection> network = nullptr;
+
 std::shared_ptr<YtDlp_Helper> ytdlp = nullptr;
 
 std::shared_ptr<PermanentDiskCache> cache = nullptr;
@@ -419,7 +421,7 @@ void fast_check_if_warnings(void*) {
 /* Validations performed every 10 seconds to trigger visual warnings in the UI. */
 void normal_check_if_warnings(void*) {
     // Check if there is Internet connection
-    if (!verify_network_connection())
+    if (!verify_network_connection(network->get_connection()))
         mq->add_message("no_internet_available", _("Your device is offline."), _("Check your internet connection."));
     else
         mq->remove_message("no_internet_available");
@@ -434,7 +436,7 @@ void normal_check_if_warnings(void*) {
 void preview_video_cb(Fl_Button* widget, void* video_url){
     if (ytdlp_action_in_progress)
         return;
-    if (! verify_network_connection()) {
+    if (! verify_network_connection(network->get_connection())) {
         logger->warn(_("Your device is offline. Check your internet connection."));
         showMessageWindow( _("There seems that you don't have access to the Internet. "
         "Please, verify you network connection before proceed..."));
@@ -577,7 +579,7 @@ void update_video_info() {
             std::string thumbn_url = video_metadata[j]->thumbnail_url.substr(0, cut_pos)
                 + ((cut_pos != std::string::npos) ? "mqdefault.jpg" : "");
             std::string thumbn_name = "th_" + video_metadata[j]->id + ".jpg";
-            if (download_file(thumbn_url, FLTUBE_TEMPORAL_DIR, thumbn_name) != FLT_DOWNLOAD_FL_FAILED) {
+            if (download_file(thumbn_url, FLTUBE_TEMPORAL_DIR, thumbn_name, network->get_connection()) != FLT_DOWNLOAD_FL_FAILED) {
                 int targetWidth = video_info_arr[j]->thumbnail->w();
                 Fl_Image* resized_thumbnail = create_resized_image_from_jpg(FLTUBE_TEMPORAL_DIR + thumbn_name, targetWidth);
                 if (resized_thumbnail == nullptr) {
@@ -654,7 +656,7 @@ void getVideosAtList_cb(Fl_Choice* w, void* a){
     mainWin->previous_results_bttn->deactivate();
     mainWin->first_page_bttn->deactivate();
     // Check if there is Internet connectivity before do a search...
-    if (! verify_network_connection()) {
+    if (! verify_network_connection(network->get_connection())) {
         logger->warn(_("Your device is offline. Check your internet connection."));
         showMessageWindow( _("There seems that you don't have access to the Internet. "
         "Please, verify you network connection before proceed..."));
@@ -770,7 +772,7 @@ void check_fltube_update_cb (Fl_Widget* w, void* data) {
     change_cursor(FL_CURSOR_WAIT);
     std::string version_filename = "VERSION";
     if (!std::filesystem::exists(FLTUBE_TEMPORAL_DIR + version_filename)) {
-        int result = download_file(FLTUBE_UPSTREAM_VERSION_URL, FLTUBE_TEMPORAL_DIR, version_filename);
+        int result = download_file(FLTUBE_UPSTREAM_VERSION_URL, FLTUBE_TEMPORAL_DIR, version_filename, network->get_connection());
         if (result != 0) {
             logger->error(_("For some reason, FLTUBE VERSION file for update verification cannot be downloaded."));
             return;
@@ -942,7 +944,7 @@ void change_lang_cb(Fl_Widget* w, void* data) {
 
 void show_video_metadata_cb(Fl_Widget* w, void* data) {
     // Check if there is Internet connectivity before do a search...
-    if (! verify_network_connection()) {
+    if (! verify_network_connection(network->get_connection())) {
         logger->warn(_("Your device is offline. Check your internet connection."));
         showMessageWindow( _("There seems that you don't have access to the Internet. "
         "Please, verify you network connection before proceed..."));
@@ -1105,13 +1107,21 @@ void pre_init() {
         }
     }
 
+    initial_win->loading_about_data->label(_("Creating a reusable network connection by CURL..."));
+    try {
+        network = std::make_shared<NetworkConnection>();
+    } catch (const CurlInitException& e) {
+        logger->error(e.what());
+        return;
+    }
+
     initial_win->loading_about_data->label(_("Checking 'yt-dlp' installation..."));
     logger->info(_("Cheking if yt-dlp is at your system PATH..."));
     bool enable_alt_stream = config->getBoolProperty("ENABLE_ALTERNATIVE_STREAM_METHOD", true);
     int batch_size = config->getIntProperty("PREFETCH_BATCH_RESULTS_SIZE", YtDlp_Helper::DEFAULT_MIN_BATCH_SIZE);
     std::string ytdlp_path = config->getProperty("YTDLP_PATH", YtDlp_Helper::DEFAULT_YTDLP_PATH.c_str());
     try {
-        ytdlp = std::make_shared<YtDlp_Helper>(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, FLTUBE_TEMPORAL_DIR, batch_size, ytdlp_path);
+        ytdlp = std::make_shared<YtDlp_Helper>(STREAM_VIDEO_RESOLUTION, media_player, enable_alt_stream, logger, cache, network , FLTUBE_TEMPORAL_DIR, batch_size, ytdlp_path);
         logger->debug(_("yt-dlp version detected at your system: ") + ytdlp->installed_version);
     } catch (const YtDlpInitException& e) {
         logger->error(e.what());
@@ -1388,7 +1398,7 @@ void doSearch(const char* input_text) {
     ytdlp_action_in_progress = true;
     change_cursor(FL_CURSOR_WAIT);
     // Check if there is Internet connectivity before do a search...
-    if (! verify_network_connection()) {
+    if (! verify_network_connection(network->get_connection())) {
         //Restore cursor after search failed because no Internet is available...
         ytdlp_action_in_progress = false;
         change_cursor();
@@ -1671,6 +1681,11 @@ int main(int argc, char **argv) {
     }
     initial_win->hide();
     delete initial_win;
+
+    if (network == nullptr) {
+        showMessageWindow(_("Cannot create CURL connections for some reason. Please, check if libcurl package is installed at your system."));
+        exitApp(FLT_GENERAL_FAILED);
+    }
 
     if (ytdlp == nullptr) {
         showMessageWindow(_("yt-dlp is not installed on your system or its binary is not at $PATH system variable. See how to install it at https://github.com/yt-dlp/yt-dlp. Or run in a terminal the 'install_yt-dlp' script."));
