@@ -1373,7 +1373,7 @@ void post_init() {
             bool dummyFlag;
             bool continue_op = showChoiceWindow(_("Use this option if your Internet connection is slower than usual. Network request timeouts will be increased. Proceed?"), dummyFlag);
             if (!continue_op)  {
-                mainWin->slow_connect_bttn->value(0);
+                mainWin->slow_connect_bttn->clear();
                 return;
             }
         }
