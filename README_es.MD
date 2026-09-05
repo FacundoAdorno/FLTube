@@ -2,23 +2,25 @@
 
 Fltube es una aplicación para buscar y reproducir videos desde Youtube. Escrito para [FLTK](https://www.fltk.org/) y potenciado por [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
-Aunque inicialmente fue desarrollado para la distribución [Spirit-OS](https://spirit-os.sourceforge.io/), puede ser compilado en otras distribuciones modernas que tengan un compilador C++.
+Aunque está desarrollado principalmente para la distribución [Flinux](https://flinux-distro.sourceforge.io/), puede compilarse en otras distribuciones modernas con un compilador de C++, tanto para sistemas x86 como x86_64.
 
 ### Características
 - Aplicación ligera gracias a **C++** y la librería **FLTK** *(soporta FLTK 1.3.x o superior)*.
 - Potenciado por **yt-dlp**, una herramienta para descargar videos/audios por línea de comandos, muy rica en características, y desarrollada en Python.
 - Con capacidad de búsqueda de video en YouTube usando términos de búsqueda o una URL de YouTube específica.
+- Presenta optimizaciones para agilizar tiempos de carga de resultados de búsqueda, y la obtención de las URL de videos mediante el uso de cachés.
 - Capacidad para recordar los videos vistos y que gustaron, así como funciones para explorar esos videos a través de un "Historial de navegación" y una lista de videos "Me gusta".
 - Configuraciones disponibles para cambiar la resolución de transmisión de video: **240p**, **360p** (predeterminado), **480p**, **720p** y **1080p**.
-- Localizado al Inglés y Español, pero con potencial futuro a traducirse en otros idiomas. La localización se realiza mediante el uso de [GNU gettext](https://www.gnu.org/software/gettext/).
+- Localizado al Inglés, Español y Portugués, pero con potencial futuro a traducirse en otros idiomas. La localización se realiza mediante el uso de [GNU gettext](https://www.gnu.org/software/gettext/).
 - Diseñado para bajas resoluciones de pantalla en pantallas pequeñas.
-- Por ahora, la aplicación sólo fue probado en GNU/Linux.
+- Disponibilidad de diferentes temas de color (tema claro, tema oscuro, etc.).
+- Por ahora, la aplicación sólo fue desarrollado para sistemas GNU/Linux.
 
-![FLtube en Spirit OS!](https://i.postimg.cc/44QyBXH8/fltube-screenshot-5.png "Fltube en Spirit OS")
+![FLtube en Flinux - Temas Color!](https://fltube.sourceforge.io/img/screenshot_7.png "FLtube en Flinux - Temas Color")
 
-![FLtube en Debian 13 Trixie!](https://fltube.sourceforge.io/img/screenshot_2.png "Fltube en Debian 13 Trixie")
+![FLtube en Debian 13 Trixie!](https://fltube.sourceforge.io/img/screenshot_2.png?v=2 "Fltube en Debian 13 Trixie")
 
-![FLtube showing Navigation History list!](https://fltube.sourceforge.io/img/screenshot_6.png "FLtube showing 'Navigation History' list")
+![FLtube showing Navigation History list!](https://fltube.sourceforge.io/img/screenshot_6.png?v=2 "FLtube showing 'Navigation History' list")
 
 
 ------------
@@ -34,7 +36,7 @@ Se pueden descargar e instalar paquetes para 32 y 64 bits de .deb, así como un 
 Una vez descargado el código fuente (y siempre recomendable mantenerlo versionado con Git), puedes compilarlo utilizando [Make](https://www.gnu.org/software/make/).
 > NOTA: Por defecto, los directorios de instalación están bajo `/usr/local`, así que para encontrar los binarios del programa correctamente luego de la instalación, debes asegurarte que `/usr/local/bin` esté en la variable `$PATH` del sistema.
 
-### En FLinux, SpiritOS, o cualquier otra distribución basada en TinyCore
+### En FLinux ó cualquier otra distribución basada en TinyCore
 
 Instalar las dependencias y compilar usando *make*.
 ```bash
@@ -67,10 +69,6 @@ $ sudo make install
 
 $ fltube        ## Para ejecutar la aplicación.
 ```
-
-### Desinstalación
-
-Para desinstalar la aplicación, puedes ejecutar `make uninstall`.
 
 ## Modo Desarrollo
 

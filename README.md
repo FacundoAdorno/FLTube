@@ -2,23 +2,25 @@
 
 FLTube is an application for search & stream Youtube videos. Written for [FLTK](https://www.fltk.org/) and powered by [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
-Although initially developed for [Spirit-OS](https://spirit-os.sourceforge.io/) distribution, but can be compiled for other modern distributions with a C++ compiler.
+Although it is primarly developed for [Flinux](https://flinux-distro.sourceforge.io/) distribution, it can be compiled for other modern distributions with a C++ compiler, for both x86 and x86_64 systems.
 
 ### Features
 - A very lighweight app thanks to **C++** and **FLTK** toolkit *(support for FLTK 1.3.x or above)*.
 - Powered by **yt-dlp**, a feature-rich command-line audio/video downloader developed in Python.
 - With capabilities to search for videos on YouTube using search terms or a specific YouTube URL.
+- Includes optimizations to speed up search result loading and video URL retrieval through caching.
 - Ability to remember the watched and liked videos, as well as features to explore those videos through a "Navigation History" and a "Liked" video list.
 - Configurations available for change stream video resolution: 240p, 360p (default), 480p, 720p and 1080p.
-- Localized in English and Spanish, with the potential for future translation into other languages. Localization is done using [GNU gettext](https://www.gnu.org/software/gettext/).
+- Localized in English, Spanish and Portuguese, with the potential for future translation into other languages. Localization is done using [GNU gettext](https://www.gnu.org/software/gettext/).
 - Designed for low screen resolutions on small screens.
-- For now, the app only was tested on GNU/Linux.
+- Available differents color themes (Light Theme, Dark Theme, etc.).
+- For now, the app only was developed for GNU/Linux systems.
 
-![FLtube on Spirit OS!](https://i.postimg.cc/44QyBXH8/fltube-screenshot-5.png    "Fltube on Spirit OS")
+![FLtube en Flinux - Temas Color!](https://fltube.sourceforge.io/img/screenshot_7.png "FLtube en Flinux - Temas Color")
 
-![FLtube on Debian 13 Trixie!](https://fltube.sourceforge.io/img/screenshot_2.png "Fltube on Debian 13 Trixie")
+![FLtube on Debian 13 Trixie!](https://fltube.sourceforge.io/img/screenshot_2.png?v=2 "Fltube on Debian 13 Trixie")
 
-![FLtube showing Navigation History list!](https://fltube.sourceforge.io/img/screenshot_6.png "FLtube showing 'Navigation History' list")
+![FLtube showing Navigation History list!](https://fltube.sourceforge.io/img/screenshot_6.png?v=2 "FLtube showing 'Navigation History' list")
 
 ------------
 
@@ -35,7 +37,7 @@ Although initially developed for [Spirit-OS](https://spirit-os.sourceforge.io/) 
 Once downloaded the source code, you can compile it using [Make](https://www.gnu.org/software/make/). 
 > NOTE: By default, the installation directories are under `/usr/local`, so to find the binaries correctly after installation, you must ensure that `/usr/local/bin` is on your `$PATH` environment variable.
 
-### On FLinux, SpiritOS, or any TinyCore-based distro
+### On FLinux or any TinyCore-based distro
 
 Install app dependencies and compile using *make*.
 
@@ -69,10 +71,6 @@ $ sudo make install
 
 $ fltube        ## To execute app.
 ```
-
-### Uninstallation
-
-To uninstall the app from your system, you can run `make uninstall`.
 
 ## Development mode
 
