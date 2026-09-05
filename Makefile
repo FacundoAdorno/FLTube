@@ -56,16 +56,21 @@ build:
 install: all
 	mkdir -p $(PREFIX)$(LOCALE_INSTALL_DIR)/es/LC_MESSAGES
 	mkdir -p $(PREFIX)$(LOCALE_INSTALL_DIR)/en/LC_MESSAGES
+	mkdir -p $(PREFIX)$(LOCALE_INSTALL_DIR)/pt_BR/LC_MESSAGES
 
 	msgfmt -o locales/es/LC_MESSAGES/FLTube.mo  locales/es/LC_MESSAGES/FLTube.po
 	cp locales/es/LC_MESSAGES/FLTube.mo $(PREFIX)$(LOCALE_INSTALL_DIR)/es/LC_MESSAGES/
 	msgfmt -o locales/en/LC_MESSAGES/FLTube.mo  locales/en/LC_MESSAGES/FLTube.po
 	cp locales/en/LC_MESSAGES/FLTube.mo $(PREFIX)$(LOCALE_INSTALL_DIR)/en/LC_MESSAGES/
+	msgfmt -o locales/pt_BR/LC_MESSAGES/FLTube.mo  locales/pt_BR/LC_MESSAGES/FLTube.po
+	cp locales/pt_BR/LC_MESSAGES/FLTube.mo $(PREFIX)$(LOCALE_INSTALL_DIR)/pt_BR/LC_MESSAGES/
 
 	msgfmt -o locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).mo  locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po
 	cp locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).mo $(PREFIX)$(LOCALE_INSTALL_DIR)/es/LC_MESSAGES/
 	msgfmt -o locales/en/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).mo  locales/en/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po
 	cp locales/en/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).mo $(PREFIX)$(LOCALE_INSTALL_DIR)/en/LC_MESSAGES/
+	msgfmt -o locales/pt_BR/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).mo  locales/pt_BR/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po
+	cp locales/pt_BR/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).mo $(PREFIX)$(LOCALE_INSTALL_DIR)/pt_BR/LC_MESSAGES/
 
 	mkdir -p $(PREFIX)/usr/local/etc/fltube
 	cp fltube.conf $(PREFIX)/usr/local/etc/fltube/fltube.conf
@@ -88,9 +93,11 @@ po_update:
 	xgettext --keyword=_ --keyword=ng_ --language=C++ --from-code=utf-8 --output locales/FLTube.pot src/*.cxx include/*.h
 	msgmerge --update locales/es/LC_MESSAGES/FLTube.po  locales/FLTube.pot
 	msgmerge --update locales/en/LC_MESSAGES/FLTube.po  locales/FLTube.pot
+	msgmerge --update locales/pt_BR/LC_MESSAGES/FLTube.po  locales/FLTube.pot
 	xgettext --keyword=_ --keyword=ng_ --language=Shell --from-code=utf-8 --output locales/$(INSTALL_YTDLP_SCRIPTNAME).pot $(SCRIPTS_DIR)/$(INSTALL_YTDLP_SCRIPTNAME).sh
 	msgmerge --update locales/es/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po  locales/$(INSTALL_YTDLP_SCRIPTNAME).pot
 	msgmerge --update locales/en/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po  locales/$(INSTALL_YTDLP_SCRIPTNAME).pot
+	msgmerge --update locales/pt_BR/LC_MESSAGES/$(INSTALL_YTDLP_SCRIPTNAME).po  locales/$(INSTALL_YTDLP_SCRIPTNAME).pot
 
 
 DEB_BLD_DIR=/tmp/fltube_deb_build
