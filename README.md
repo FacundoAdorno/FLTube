@@ -16,11 +16,11 @@ Although it is primarly developed for [Flinux](https://flinux-distro.sourceforge
 - Available differents color themes (Light Theme, Dark Theme, etc.).
 - For now, the app only was developed for GNU/Linux systems.
 
-![FLtube en Flinux - Temas Color!](https://fltube.sourceforge.io/img/screenshot_7.png "FLtube en Flinux - Temas Color")
+![FLtube en Flinux - Temas Color!](.readme/screenshot_1.png "FLtube en Flinux - Temas Color")
 
-![FLtube on Debian 13 Trixie!](https://fltube.sourceforge.io/img/screenshot_2.png?v=2 "Fltube on Debian 13 Trixie")
+![FLtube on Debian 13 Trixie!](.readme/screenshot_4.png "Fltube on Debian 13 Trixie")
 
-![FLtube showing Navigation History list!](https://fltube.sourceforge.io/img/screenshot_6.png?v=2 "FLtube showing 'Navigation History' list")
+![FLtube showing Navigation History list!](.readme/screenshot_2.png "FLtube showing 'Navigation History' list")
 
 ------------
 
