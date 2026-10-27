@@ -66,12 +66,14 @@ Configuration::~Configuration(){
             } catch (const std::filesystem::filesystem_error& e) {
                 // Fallback for filesystems where std::filesystem::permissions()
                 // is not implemented.
+#ifndef _WIN32
                 if (::chmod(this->filepath.c_str(), 0444) != 0) {
                     char mssg[256];
                     snprintf(mssg, sizeof(mssg), _("chmod() failed [%s]: cannot set readonly for file %s."),
                              std::strerror(errno), this->filepath.c_str());
                     logger->error(mssg);
                 }
+#endif
             }
         }
 

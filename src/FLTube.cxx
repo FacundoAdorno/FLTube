@@ -58,21 +58,19 @@ const std::string FLTUBE_TEMPORAL_DIR(std::filesystem::temp_directory_path().gen
 //This FLAG changes over the application usage. If user wants to see all videos of a channel, is set to true (0). Defaults to false.
 bool SEARCH_BY_CHANNEL_F = false;
 
+#ifdef _WIN32
+std::string USER_CONFIGFILE_PATH = std::string(getHomePathOr("")) + "/AppData/Roaming/fltube/fltube.conf";
+std::string USERDATA_FILE_PATH = std::string(getHomePathOr("")) + "/AppData/Local/fltube/userdata.txt";
+std::string SYSTEM_CONFIGFILE_PATH = "fltube.conf";
+std::string CONFIG_APP_PATH = std::string(getHomePathOr("")) + "/AppData/Roaming/fltube/app.conf";
+std::string RESOURCES_PATH = "resources";
+#else
 std::string USER_CONFIGFILE_PATH = std::string(getHomePathOr("")) + "/.config/fltube/fltube.conf";
-
 std::string USERDATA_FILE_PATH = std::string(getHomePathOr("")) + "/.local/share/fltube/userdata.txt";
-
 std::string SYSTEM_CONFIGFILE_PATH = "/usr/local/etc/fltube/fltube.conf";
-
 std::string CONFIG_APP_PATH = std::string(getHomePathOr("")) + "/.config/fltube/app.conf";
-
-// Keep the current selected color theme
-ColorTheme CURRENT_COLOR_THEME = ColorTheme::DEFAULT;
-
-std::string CONFIG_FILE_PATH = "";
-
-// Path to fltube resources, like images, sounds, etc. Can be modified at fltube.conf file.
 std::string RESOURCES_PATH = "/usr/local/share/fltube/resources";
+#endif
 
 // Current displayed language for UI.
 std::string current_language;

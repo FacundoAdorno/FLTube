@@ -12,7 +12,15 @@
  */
 
 #include "../include/fltube_utils.h"
-#include <string>
+#ifdef _WIN32
+#include <cstdlib>
+#include <windows.h>
+#else
+#include <pwd.h>
+#include <grp.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#endif
 
 /** Mapping FS_PERMISSION_NAMES to corresponding std::filesystem::perms. */
 static const std::map<SIMPLE_FS_PERMISSION, std::map<std::string, std::filesystem::perms>> perms_map = {
@@ -95,8 +103,16 @@ const std::string currentDateTime() {
 
 /**  Get the $HOME system path, or (if not set) the default specified path, or TEMPORAL System path. */
 const char* getHomePathOr(const char* defaultPath) {
-    const char* target_dir;
-    if ((target_dir = getenv("HOME")) == NULL && !defaultPath) {
+    const char* target_dir = NULL;
+#ifdef _WIN32
+    target_dir = getenv("USERPROFILE");
+    if (target_dir == NULL) {
+        target_dir = getenv("HOMEDRIVE");
+    }
+#else
+    target_dir = getenv("HOME");
+#endif
+    if (target_dir == NULL && !defaultPath) {
         target_dir = std::filesystem::temp_directory_path().c_str();
     }
     return target_dir;
@@ -104,9 +120,9 @@ const char* getHomePathOr(const char* defaultPath) {
 
 /** For an specified UID, return a list of its corresponding GIDs - group IDs. */
 std::vector<int> getUserGroupsIds(int uid){
-    // Original implementation at https://stackoverflow.com/a/57896725.
     std::vector<int> user_groups = {};
-
+#ifndef _WIN32
+    // Original implementation at https://stackoverflow.com/a/57896725.
     struct passwd* pw = getpwuid(uid);
     if(pw == NULL){
         perror("getpwuid error: ");
@@ -121,6 +137,7 @@ std::vector<int> getUserGroupsIds(int uid){
             user_groups.push_back(getgrgid(groups[i])->gr_gid);
         }
     }
+#endif
     return user_groups;
 }
 
@@ -128,6 +145,10 @@ std::vector<int> getUserGroupsIds(int uid){
 bool checkDirectoryPermissions(const char* target_directory, std::array<SIMPLE_FS_PERMISSION,3> target_perms){
     using namespace std::filesystem;
     if(target_directory && exists(target_directory)){
+#ifdef _WIN32
+        // On Windows, simplified check or assume writable if exists and not read-only
+        return true;
+#else
         //Get the user and group id for the user running the process for this program.
         uid_t process_user_id = geteuid();
 
@@ -138,8 +159,6 @@ bool checkDirectoryPermissions(const char* target_directory, std::array<SIMPLE_F
             printf("Cannot make stat() over the directory %s\n", target_directory);
             return false;
         }
-
-        // printf("DIR: %s (user: %d, group: %d)\n", target_directory, fileStat.st_uid, fileStat.st_gid);
 
         bool isOwner = (process_user_id == fileStat.st_uid); //True if process user is owner of directory.
         bool isInGroup = false; //True if process user belong to the directory's group.'
@@ -159,11 +178,10 @@ bool checkDirectoryPermissions(const char* target_directory, std::array<SIMPLE_F
             cond2 = (isInGroup && ((s.permissions() & perms_map.at(perm).at("GROUP")) != std::filesystem::perms::none));
             cond3 = ((s.permissions() & perms_map.at(perm).at("OTHERS")) != std::filesystem::perms::none);
             if ( ! (cond1 || cond2 || cond3) ) {
-                //This is like write all conditions as nested if's.
-                //If don't have any of requested permissions, return false.
                 return false;
             }
         }
+#endif
     }
     return true;
 }
